@@ -11,6 +11,8 @@ Data as of **2026-11-17**. Prices are German retail, brutto incl. 19 % VAT (net 
 | [research/gpu-master-table.md](research/gpu-master-table.md) / [.csv](research/gpu-master-table.csv) | One row per GPU: prices, shader/CUDA cores, tensor/RT cores, VRAM, bandwidth, TFLOPS, power, slots, cooling, ECC, NVLink, vGPU/MIG |
 | [research/benchmarks.md](research/benchmarks.md) | Measured benchmarks: rendering, AI training, LLM inference, VRAM needs |
 | [research/rankings.md](research/rankings.md) | The table sorted by benchmark and by price/performance |
+| [research/training-bench.md](research/training-bench.md) / [.csv](research/training-bench.csv) | Measured deep-learning training numbers per source (Exxact, Lambda, Bizon, community) |
+| [research/intel-extra.md](research/intel-extra.md) | Notes on the added Intel cards |
 | [research/prices-b2b.md](research/prices-b2b.md) / [.csv](research/prices-b2b.csv) | Business-reseller prices (Bechtle, Senetic, Jacob, Mercateo, Alternate), net and brutto |
 | [research/imagine-case-10k.md](research/imagine-case-10k.md) | "Imagine 10,000 EUR": four example packages and trade-offs |
 | [research/amd-vs-nvidia.md](research/amd-vs-nvidia.md) | AMD vs NVIDIA (and Intel): software maturity, speed, price |

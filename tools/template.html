@@ -78,7 +78,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
 <p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
-  <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#tabelle">Alle Karten</a>
+  <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#tabelle">Alle Karten</a>
   <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="#details">Details</a>
 </nav>
 
@@ -126,6 +126,11 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
   </div>
   <div class="bars" id="bars"></div>
 </div>
+
+<h2 id="training">Training: gemessene Werte</h2>
+<p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Deshalb steht hier jede Quelle für sich. Vergleiche nur Karten innerhalb eines Kastens, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser.</p>
+<div class="pk" id="train"></div>
+<p class="small">Ohne jeden gemessenen Trainingswert: RTX PRO 5000 72 GB, RTX PRO 4000, RTX 5080, RTX 5060 Ti, RTX 5000 Ada, RTX 4500 Ada, RTX 4000 Ada, alle AMD-Profikarten und alle Intel-Karten. Alle 93 Messwerte mit Quellen: <a href="research/training-bench.md">training-bench.md</a> (<a href="research/training-bench.csv">CSV</a>)</p>
 
 <h2 id="tabelle">Alle Karten</h2>
 <p class="sub">Spaltenkopf anklicken zum Sortieren. Blender: Open Data 4.5.0, Median (n = Anzahl Messungen). LLM: llama.cpp, 7B-Modell mit 4 Bit, Token pro Sekunde.</p>
@@ -293,13 +298,37 @@ function drawB2B(){
     rows.map(r => `<tr><td>${esc(r.card)}</td><td>${esc(r.sku)}</td><td>${/^https?:/.test(r.url) ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.reseller)}</a>` : esc(r.reseller)}</td><td class="num">${fmt(net(r))}</td><td class="num">${fmt(parseFloat(r.price_brutto_eur))}</td><td class="wrap">${esc(r.availability || "–")}</td><td>${r.evidence == "V" ? "auf der Seite gesehen" : "nur Suchtreffer"}</td></tr>`).join("") + "</tbody></table></div></details>";
   $("#b2bwrap").innerHTML = h;
 }
+const TRAIN = [
+ {t:"LLM-Fine-Tuning (LoRA, Llama 3.1 8B)", u:"Token/s", s:"Exxact, Juni 2026 · an der Quelle geprüft", n:"4× RTX PRO 4500 zusammen: 10.717 Token/s (3,86-fach).",
+  d:[["RTX PRO 6000 Server 96GB",4962,"nvpro"],["RTX PRO 5000 48GB",3721,"nvpro"],["RTX PRO 4500 32GB",2777,"nvpro"]]},
+ {t:"ResNet50 (Bildmodell), FP32", u:"Bilder/s", s:"Exxact, April 2026 · an der Quelle geprüft",
+  d:[["RTX PRO 6000 Server 96GB",1918,"nvpro"],["RTX PRO 6000 Max-Q 96GB",1741,"nvpro"],["RTX 6000 Ada 48GB",1185,"nvpro"],["L40S 48GB",1028,"nvpro"]]},
+ {t:"BERT Large (Transformer), FP32", u:"Sequenzen/s", s:"Exxact, April 2026",
+  d:[["RTX PRO 6000 Server 96GB",174,"nvpro"],["RTX PRO 6000 Max-Q 96GB",133,"nvpro"],["L40S 48GB",90,"nvpro"],["RTX 6000 Ada 48GB",89,"nvpro"]]},
+ {t:"ResNet50, FP16", u:"Bilder/s", s:"Lambda, 2023 · an der Quelle geprüft",
+  d:[["A100 80GB",1527,"nvpro"],["RTX 4090 24GB",1301,"geforce"],["RTX 6000 Ada 48GB",1146,"nvpro"],["RTX A6000 48GB",916,"nvpro"],["RTX 3090 24GB",905,"geforce"]]},
+ {t:"BERT Large (Transformer), FP16", u:"Sequenzen/s", s:"Lambda, 2023 · an der Quelle geprüft",
+  d:[["A100 80GB",140,"nvpro"],["RTX 4090 24GB",93,"geforce"],["RTX 6000 Ada 48GB",79,"nvpro"],["RTX A6000 48GB",68,"nvpro"],["RTX 3090 24GB",52,"geforce"]]},
+ {t:"ResNet50, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · nicht gegengeprüft",
+  d:[["RTX 5090 32GB",1624,"geforce"],["RTX 4090 24GB",1361,"geforce"],["RTX 3090 24GB",889,"geforce"]]},
+ {t:"Swin Transformer, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · nicht gegengeprüft",
+  d:[["RTX 5090 32GB",822,"geforce"],["RTX 4090 24GB",597,"geforce"],["RTX 3090 24GB",337,"geforce"]]},
+ {t:"ResNet50, FP16", u:"Einheit an der Quelle nicht genannt", s:"Bizon, 2026 · nicht gegengeprüft",
+  d:[["A100 80GB",2535,"nvpro"],["RTX 6000 Ada 48GB",1800,"nvpro"],["RTX 4090 24GB",1720,"geforce"],["RTX A6000 48GB",1424,"nvpro"],["RTX 3090 24GB",1071,"geforce"],["RTX A5000 24GB",1061,"nvpro"],["RTX A4000 16GB",604,"nvpro"]]}
+];
+function drawTrain(){
+  $("#train").innerHTML = TRAIN.map(g => { const max = Math.max(...g.d.map(x => x[1]));
+    return `<div class="card"><h3>${g.t}</h3><div class="small" style="margin-bottom:8px">${g.u} · ${g.s}</div>` +
+      g.d.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>${x[0]}</span><span style="font-variant-numeric:tabular-nums">${fmt(x[1])}</span></div><div style="height:10px;border-radius:0 4px 4px 0;width:${x[1] / max * 100}%;background:var(--${x[2]})"></div>`).join("") +
+      `${g.n ? `<p class="small" style="margin-top:10px">${g.n}</p>` : ""}</div>`; }).join("");
+}
 function seg(id, key, fn){ document.querySelectorAll(id + " button").forEach(b => b.onclick = () => {
   document.querySelectorAll(id + " button").forEach(x => x.setAttribute("aria-pressed", x == b)); state[key] = b.dataset.m; fn(); }); }
 function all(){ drawScatter(); drawBars(); drawTable(); }
 seg("#ysel", "y", drawScatter); seg("#bsel", "bar", drawBars);
 document.querySelectorAll("#filters input, #filters select").forEach(el => el.addEventListener("input", all));
 $("#q").addEventListener("input", drawTable);
-all(); drawB2B();
+all(); drawB2B(); drawTrain();
 </script>
 </body>
 </html>
