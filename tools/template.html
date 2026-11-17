@@ -79,7 +79,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
   <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#tabelle">Alle Karten</a>
-  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="#details">Details</a>
+  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
 </nav>
 
 <div class="cards">
@@ -176,6 +176,30 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex; Arc Pro B60/B70 (Reife unklar)</td></tr>
 </tbody></table></div>
 <p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
+
+<h2 id="lb">Dynamisches Load Balancing: Jobs automatisch verteilen</h2>
+<p class="sub">Heute sucht sich jeder per Remote-Desktop selbst eine freie Karte. Load Balancing heißt: Ein System legt Jobs und Anfragen automatisch auf passende, freie Karten. Das passiert auf mehreren Ebenen, und für jede gibt es kostenlose Werkzeuge.</p>
+<div class="tw"><table>
+<thead><tr><th>Ebene</th><th>Was sie tut</th><th>Werkzeuge (kostenlos)</th></tr></thead>
+<tbody>
+<tr><td>Warteschlange</td><td class="wrap">Render- und Trainingsjobs warten in einer Schlange und starten, sobald eine passende Karte frei ist</td><td class="wrap">Kueue (Kubernetes), Slurm, Volcano</td></tr>
+<tr><td>Passende Karte wählen</td><td class="wrap">Der Job nennt seinen Bedarf (z. B. 32 GB VRAM) und landet auf dem richtigen Kartenmodell</td><td class="wrap">NVIDIA GPU Operator mit Labels je Modell, Kueue ResourceFlavor</td></tr>
+<tr><td>Prioritäten und Unterbrechung</td><td class="wrap">Interaktive Arbeit verdrängt Batch-Jobs; unterbrochene Trainings setzen am letzten Checkpoint fort</td><td class="wrap">Kueue-Prioritätsklassen, KAI Scheduler (Run:ai-Scheduler, Open Source)</td></tr>
+<tr><td>Karten teilen</td><td class="wrap">Mehrere kleine Jobs auf einer Karte</td><td class="wrap">Time-Slicing (ohne Speichertrennung), MIG, HAMi, KAI</td></tr>
+<tr><td>Anfragen verteilen</td><td class="wrap">LLM-Anfragen gehen an eine Adresse und werden auf laufende Modell-Instanzen verteilt</td><td class="wrap">vLLM hinter LiteLLM; bei mehreren Servern llm-d</td></tr>
+<tr><td>Autoscaling</td><td class="wrap">Wenig genutzte Dienste fahren herunter und geben ihre Karte für Render- oder Trainingsjobs frei</td><td class="wrap">KEDA</td></tr>
+<tr><td>Renderfarm</td><td class="wrap">Renderjobs füllen als niedrigste Priorität die ungenutzten Karten</td><td class="wrap">Flamenco (Blender), Kubernetes-Jobs je Frame-Bereich</td></tr>
+</tbody></table></div>
+<h3 style="margin-top:20px">Einführung in Stufen</h3>
+<div class="pk">
+  <div class="card"><span class="tag">Stufe 0 · 1–2 Tage</span><h3>Messen</h3><p class="small">Auslastung und VRAM je Karte und Nutzer mitschreiben (DCGM-Exporter, Prometheus, Grafana). Die Nutzer merken nichts. Das Ergebnis zeigt, wie viele Karten für Desktops reserviert bleiben müssen.</p></div>
+  <div class="card"><span class="tag">Stufe 1 · 2–5 Tage</span><h3>Warteschlange für ganze Karten</h3><p class="small">k3s mit GPU Operator und Kueue, oder Slurm. Zwei bis vier Karten bleiben für Remote-Desktop reserviert, der Rest läuft über die Schlange. Nutzer schicken Jobs ab, statt sich eine Karte zu nehmen.</p></div>
+  <div class="card"><span class="tag">Stufe 2 · 3–7 Tage</span><h3>Prioritäten, Kontingente, Teilen</h3><p class="small">Dringende Jobs starten sofort, Batch-Jobs werden pausiert. Voraussetzung: Trainings speichern regelmäßig Checkpoints. Kartenteilung zuerst nur für Notebooks und Entwicklung.</p></div>
+  <div class="card"><span class="tag">Stufe 3 · 3–7 Tage</span><h3>LLM-Dienst mit Autoscaling</h3><p class="small">vLLM je Modell, LiteLLM als eine gemeinsame Adresse, KEDA skaliert nach Wartezeit. Selten genutzte Modelle fahren auf null; die erste Anfrage danach ist langsam.</p></div>
+  <div class="card"><span class="tag">Stufe 4 · 2–4 Tage</span><h3>Renderfarm im selben Pool</h3><p class="small">Flamenco-Worker fordern je eine Karte an und laufen mit niedrigster Priorität. In Blender heißt es dann „An die Farm senden“. Lizenzserver für V-Ray oder Octane müssen aus dem Cluster erreichbar sein.</p></div>
+</div>
+<div class="note">Stolpersteine: Time-Slicing trennt den Speicher nicht, ein Job kann den anderen zum Absturz bringen. Bei gemischten Karten zersplittert der VRAM, deshalb je Kartenmodell eine eigene Klasse anlegen. Mit nur einem Server fällt bei einem Defekt alles aus. Der Aufwand je Stufe ist eine Schätzung.</div>
+<p class="small">Beispielarchitekturen (minimal, empfohlen, erweitert), Konfigurationsbeispiele und der Werkzeugvergleich: <a href="research/load-balancing.md">load-balancing.md</a></p>
 
 <h2 id="details">Details und Grenzen der Daten</h2>
 <div class="note">Für die neuesten Karten (Blackwell) gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Gebrauchtpreise sind Angebotspreise.</div>
