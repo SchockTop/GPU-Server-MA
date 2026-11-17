@@ -75,7 +75,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <body>
 <main>
 <h1>GPU-Vergleich für Rendering und KI</h1>
-<p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von 31 Karten zusammen.</p>
+<p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
 <p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
   <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#tabelle">Alle Karten</a>
@@ -211,14 +211,14 @@ function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const f 
 function drawScatter(){
   const m = state.y, all = visible(), pts = all.filter(c => price(c) != null && c[m] != null);
   const W = 1000, H = 500, L = 62, Rm = 24, T = 36, B = 46;
-  const x0 = Math.log10(700), x1 = Math.log10(24000);
+  const x0 = Math.log10(250), x1 = Math.log10(24000);
   const ymax = niceMax(Math.max(1, ...pts.map(c => c[m])));
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - Rm);
   const Y = v => H - B - v / ymax * (H - T - B);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Streudiagramm Preis gegen ${YL[m]}">`;
   for (let i = 0; i <= 5; i++){ const v = ymax * i / 5, y = Y(v);
     s += `<line x1="${L}" x2="${W - Rm}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${L - 8}" y="${y + 4}" text-anchor="end">${fmt(v)}</text>`; }
-  for (const v of [1000, 2000, 3000, 5000, 10000, 20000]){ const x = X(v);
+  for (const v of [300, 500, 1000, 2000, 5000, 10000, 20000]){ const x = X(v);
     s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" stroke="var(--grid)"/><text x="${x}" y="${H - B + 18}" text-anchor="middle">${fmt(v)} €</text>`; }
   s += `<line x1="${L}" x2="${W - Rm}" y1="${H - B}" y2="${H - B}" stroke="var(--axis)"/>`;
   s += `<text x="${(L + W - Rm) / 2}" y="${H - 6}" text-anchor="middle">Preis (${basis() == 1 ? "brutto" : "netto"})</text>`;

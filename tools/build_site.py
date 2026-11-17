@@ -3,17 +3,15 @@
 Usage: python tools/build_site.py
 Reads  research/gpu-master-table.csv and, if present, research/prices-b2b.csv.
 """
-import csv, json, pathlib
+import csv, json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 R = ROOT / "research"
 
 
 def num(s):
-    try:
-        return float(str(s).replace(",", ""))
-    except ValueError:
-        return None
+    m = re.match(r"\s*(\d+(?:\.\d+)?)(?![\d.]*\s*x)", str(s).replace(",", ""))
+    return float(m.group(1)) if m else None
 
 
 def vendor(group):
@@ -53,6 +51,7 @@ if p.exists():
 
 html = (ROOT / "tools" / "template.html").read_text(encoding="utf-8")
 html = html.replace("/*CARDS*/[]", json.dumps(cards, ensure_ascii=False))
+html = html.replace("{{N}}", str(len(cards)))
 html = html.replace("/*B2B*/[]", json.dumps(b2b, ensure_ascii=False))
 (ROOT / "index.html").write_text(html, encoding="utf-8")
 print("index.html written:", len(cards), "cards,", len(b2b), "b2b prices")

@@ -1,5 +1,7 @@
 # GPU master table
 
+> Update 2026-11-17: more Intel cards (Arc Pro B65, B50, Dual B60, Arc B580, B570, A770) and a price for the Arc Pro B70 were added to [gpu-master-table.csv](gpu-master-table.csv) and the overview page only; notes in [intel-extra.md](intel-extra.md). The tables below still show the first 31 cards.
+
 
 Legend: **D** = derived by us (e.g. dense = sparse / 2, or FP16 = FP4-sparse / 8), **U** = unverified (third-party or memory), everything else was seen on a manufacturer page/datasheet (or Wikipedia for GeForce bandwidth/FP32). Tensor figures are **dense**. GeForce FP16 figures are with FP16 accumulate; with FP32 accumulate (typical for training) GeForce runs at half that rate, pro cards do not.
 
