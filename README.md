@@ -2,6 +2,8 @@
 
 Research notes for choosing GPUs for a shared compute setup: rendering as a service (on-demand and batch), neural-network training (UNet, Transformers), LLM training and LLM inference.
 
+**Overview page (charts, sortable table, German): https://schocktop.github.io/GPU-Server-MA/** (source: `index.html`, rebuilt with `python tools/build_site.py`).
+
 Data as of **2026-11-17**. Prices are German retail, brutto incl. 19 % VAT (net = brutto / 1.19). GPU prices move fast, so re-check before buying. Values are marked verified (seen on a cited page), derived or unverified; sources are listed in the files.
 
 | File | Content |

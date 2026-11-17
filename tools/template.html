@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPU-Vergleich</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:#e1e0d9;
+  --nvpro:#2a78d6; --geforce:#eb6834; --amd:#1baf7a; --intel:#eda100;
+  --good:#006300; --warn-bg:#fff4d6; --warn-ink:#6b4a00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:#2c2c2a;
+    --nvpro:#3987e5; --geforce:#d95926; --amd:#199e70; --intel:#c98500;
+    --good:#0ca30c; --warn-bg:#3a2d08; --warn-ink:#f3d58a;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px}
+h2{font-size:20px;margin:40px 0 4px}
+h3{font-size:16px;margin:0 0 6px}
+p{margin:6px 0}
+.sub{color:var(--ink2);max-width:75ch}
+.small{font-size:13px;color:var(--ink2)}
+a{color:var(--nvpro)}
+nav{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0 0;font-size:14px}
+.note{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;margin:16px 0;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.card .big{font-size:22px;font-weight:650;line-height:1.2;margin:2px 0 6px}
+.card ul{margin:6px 0 0;padding-left:18px}
+.card li{margin:2px 0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+.filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;position:sticky;top:0;z-index:5;background:var(--page);padding:10px 0;border-bottom:1px solid var(--border);margin-top:28px}
+.filters label{font-size:14px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.sw{width:10px;height:10px;border-radius:50%;display:inline-block}
+select,input[type=search],input[type=number]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:6px;padding:4px 8px}
+.seg{display:inline-flex;border:1px solid var(--axis);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:inherit;font-size:14px;border:0;background:transparent;color:var(--ink2);padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2);margin:8px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--ink2);font-size:12px}
+svg .lab{fill:var(--ink);font-size:11px}
+.bars{display:grid;grid-template-columns:minmax(120px,230px) 1fr 84px;gap:4px 10px;align-items:center;font-size:13px;margin-top:10px}
+.bars .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars .t{height:14px}
+.bars .b{height:14px;border-radius:0 4px 4px 0;min-width:2px}
+.bars .v{text-align:right;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--grid);white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+th{position:sticky;top:0;background:var(--surface);color:var(--ink2);font-weight:600;cursor:pointer;user-select:none}
+th[aria-sort]::after{content:" ▲";font-size:10px}
+th[aria-sort=descending]::after{content:" ▼"}
+td.wrap{white-space:normal;min-width:220px}
+tr:last-child td{border-bottom:0}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.4;max-width:280px;display:none;z-index:20}
+#tip b{display:block}
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.pk dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0;font-size:14px}
+.pk dt{color:var(--ink2)} .pk dd{margin:0;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--axis);border-radius:20px;padding:0 8px;color:var(--ink2)}
+</style>
+</head>
+<body>
+<main>
+<h1>GPU-Vergleich für Rendering und KI</h1>
+<p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von 31 Karten zusammen.</p>
+<p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
+<nav>
+  <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#tabelle">Alle Karten</a>
+  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="#details">Details</a>
+</nav>
+
+<div class="cards">
+  <div class="card"><div class="small">Rendering</div><div class="big">GeForce kostet halb so viel pro Renderleistung</div>
+    <p class="small">Eine RTX 5080 oder 5070 Ti kostet etwa 230 bis 240 € je 1.000 Blender-Punkte, eine RTX PRO 4000 oder 4500 etwa 440 bis 540 €.</p></div>
+  <div class="card"><div class="small">LLMs</div><div class="big">Der Speicher entscheidet, nicht die Rechenleistung</div>
+    <p class="small">Ein 32B-Modell (4 Bit) läuft auf 24 GB mit 5 Token/s, auf 48 GB mit 28 Token/s. Passt ein Modell nicht in den VRAM, wird es etwa zehnmal langsamer.</p></div>
+  <div class="card"><div class="small">Teilen</div><div class="big">Keine neue Karte unter 10.000 € kann NVIDIA vGPU</div>
+    <p class="small">Die kostenlosen Wege (ganze Karten zuteilen, MIG, Time-Slicing, Run:ai Open Source) passen ohnehin besser zu Kubernetes.</p></div>
+</div>
+
+<div class="filters" id="filters">
+  <span class="small">Anzeigen:</span>
+  <label><input type="checkbox" data-v="nvpro" checked><span class="sw" style="background:var(--nvpro)"></span>NVIDIA Pro</label>
+  <label><input type="checkbox" data-v="geforce" checked><span class="sw" style="background:var(--geforce)"></span>NVIDIA GeForce</label>
+  <label><input type="checkbox" data-v="amd" checked><span class="sw" style="background:var(--amd)"></span>AMD</label>
+  <label><input type="checkbox" data-v="intel" checked><span class="sw" style="background:var(--intel)"></span>Intel</label>
+  <label><input type="checkbox" id="used" checked>Gebrauchte</label>
+  <label>Preise <select id="basis"><option value="1">brutto (inkl. 19 % MwSt.)</option><option value="1.19">netto</option></select></label>
+  <label>bis <input type="number" id="maxp" min="0" step="500" placeholder="kein Limit" style="width:110px"> €</label>
+</div>
+
+<h2 id="chart">Preis und Leistung</h2>
+<p class="sub">Jeder Punkt ist eine Karte. Weiter oben ist besser, weiter links ist billiger. Die Preisachse ist logarithmisch.</p>
+<div class="panel">
+  <div class="seg" id="ysel">
+    <button data-m="blender" aria-pressed="true">Rendering (Blender-Punkte)</button>
+    <button data-m="llm" aria-pressed="false">LLM-Tempo (Token/s, 7B-Modell)</button>
+    <button data-m="vram" aria-pressed="false">Speicher (GB VRAM)</button>
+    <button data-m="fp32" aria-pressed="false">Rechenleistung (TFLOPS FP32)</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div id="scatter"></div>
+  <p class="small" id="scnote"></p>
+</div>
+
+<h2 id="pl">Preis-Leistung</h2>
+<p class="sub">Wie viel Euro kostet eine Einheit Leistung? Kürzere Balken sind besser. Sortiert vom günstigsten zum teuersten.</p>
+<div class="panel">
+  <div class="seg" id="bsel">
+    <button data-m="blender" aria-pressed="true">€ je 1.000 Blender-Punkte</button>
+    <button data-m="vram" aria-pressed="false">€ je GB VRAM</button>
+    <button data-m="llm" aria-pressed="false">€ je Token/s</button>
+  </div>
+  <div class="bars" id="bars"></div>
+</div>
+
+<h2 id="tabelle">Alle Karten</h2>
+<p class="sub">Spaltenkopf anklicken zum Sortieren. Blender: Open Data 4.5.0, Median (n = Anzahl Messungen). LLM: llama.cpp, 7B-Modell mit 4 Bit, Token pro Sekunde.</p>
+<p><input type="search" id="q" placeholder="Karte suchen …" style="width:min(320px,100%)"></p>
+<div class="tw"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+
+<h2 id="b2b">Firmenpreise (B2B)</h2>
+<p class="sub">Preise von Händlern und Systemhäusern, die an Unternehmen verkaufen. Netto ist der Preis ohne Mehrwertsteuer. Viele Systemhäuser zeigen Preise nur nach Anmeldung oder auf Anfrage; Projektpreise liegen oft unter den Listenpreisen.</p>
+<div id="b2bwrap"></div>
+
+<h2 id="pakete">Beispiel: Was bekommt man für 10.000 €?</h2>
+<p class="sub">Vier Beispielpakete, keine Empfehlung. Preise brutto, niedrigstes Angebot. 10.000 € brutto sind 8.403 € netto; 10.000 € netto sind 11.900 € brutto.</p>
+<div class="pk">
+  <div class="card"><span class="tag">A · ausgewogen</span><h3>2× RTX PRO 4500 (32 GB)</h3>
+    <dl><dt>Preis</dt><dd>9.118 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
+    <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Blower, dicht stapelbar, ECC</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
+  <div class="card"><span class="tag">B · größtes Modell</span><h3>1× RTX PRO 5000 (48 GB)</h3>
+    <dl><dt>Preis</dt><dd>8.119 €</dd><dt>VRAM</dt><dd>48 GB auf einer Karte</dd><dt>Blender</dt><dd>ca. 10.900</dd><dt>Strom</dt><dd>300 W</dd></dl>
+    <ul><li>70B-LLMs mit 4 Bit laufen</li><li>Teilbar in 2× 24 GB (MIG)</li><li>Nur ein großer Job gleichzeitig</li><li>Rund 1.900 € bleiben übrig</li></ul></div>
+  <div class="card"><span class="tag">C · viele Nutzer</span><h3>3× RTX PRO 4000 (24 GB)</h3>
+    <dl><dt>Preis</dt><dd>8.325 €</dd><dt>VRAM</dt><dd>72 GB, größter Job 24 GB</dd><dt>Blender</dt><dd>ca. 18.800</dd><dt>Strom</dt><dd>3× 145 W</dd></dl>
+    <ul><li>Drei parallele Jobs</li><li>Nur ein Slot pro Karte, ECC</li><li>24 GB sind für LLMs knapp</li></ul></div>
+  <div class="card"><span class="tag">D · Render-Durchsatz</span><h3>4× GeForce RTX 5080 (16 GB)</h3>
+    <dl><dt>Preis</dt><dd>8.780 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 16 GB</dd><dt>Blender</dt><dd>ca. 36.600</dd><dt>Strom</dt><dd>4× 360 W</dd></dl>
+    <ul><li>Etwa doppelte Renderleistung</li><li>16 GB begrenzen LLMs auf ca. 14B</li><li>Große Karten, brauchen Platz und Luft</li><li>GeForce-Treiberlizenz schließt Rechenzentren aus (rechtlich prüfen)</li></ul></div>
+</div>
+<p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a></p>
+
+<h2 id="lizenz">Karten teilen: Kosten und Lizenzen</h2>
+<p class="sub">Mehrere Nutzer auf denselben Karten: Was kostet es, und wie gut sind die Nutzer voneinander getrennt?</p>
+<div class="tw"><table>
+<thead><tr><th>Weg</th><th>Kosten</th><th>Trennung</th><th>Passt zu Kubernetes</th><th>Karten</th></tr></thead>
+<tbody>
+<tr><td>Ganze Karten zuteilen (Device Plugin, Slurm)</td><td>kostenlos</td><td>voll, pro Karte</td><td>ja</td><td>alle</td></tr>
+<tr><td>Passthrough an VMs</td><td>kostenlos</td><td>voll, pro Karte</td><td>teilweise</td><td>alle Pro-Karten; GeForce mit Lizenzvorbehalt</td></tr>
+<tr><td>Time-Slicing</td><td>kostenlos</td><td>keine</td><td>ja</td><td>alle NVIDIA</td></tr>
+<tr><td>MPS</td><td>kostenlos</td><td>schwach</td><td>ja</td><td>alle NVIDIA</td></tr>
+<tr><td>MIG (Karte in feste Teile schneiden)</td><td>kostenlos</td><td>in Hardware</td><td>ja</td><td>RTX PRO 6000 (4 Teile), PRO 5000 (2), PRO 4500 Server (2)</td></tr>
+<tr><td>KAI / Run:ai Open Source / HAMi</td><td>kostenlos, ohne Herstellersupport</td><td>per Software</td><td>ja</td><td>NVIDIA</td></tr>
+<tr><td>NVIDIA vGPU (RTX vWS)</td><td>250 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>keine neue Karte unter 10.000 €</td></tr>
+<tr><td>NVIDIA AI Enterprise</td><td>4.500 $ pro GPU und Jahr</td><td>stark (VM)</td><td>ja</td><td>Datacenter-Karten</td></tr>
+<tr><td>AMD MxGPU (SR-IOV)</td><td>keine Gebühr gefunden</td><td>stark</td><td>teilweise</td><td>nur Instinct und Radeon PRO V710, keine Workstation-Radeon</td></tr>
+<tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex; Arc Pro B60/B70 (Reife unklar)</td></tr>
+</tbody></table></div>
+<p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
+
+<h2 id="details">Details und Grenzen der Daten</h2>
+<div class="note">Für die neuesten Karten (Blackwell) gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Gebrauchtpreise sind Angebotspreise.</div>
+<ul>
+  <li><a href="research/gpu-master-table.md">Vollständige Tabelle mit Quellen</a> (<a href="research/gpu-master-table.csv">CSV</a>)</li>
+  <li><a href="research/benchmarks.md">Benchmarks</a>: Rendering, Training, LLM-Inferenz, Speicherbedarf</li>
+  <li><a href="research/rankings.md">Rankings</a> nach Leistung und Preis-Leistung</li>
+  <li><a href="research/amd-vs-nvidia.md">AMD gegen NVIDIA</a> (und Intel)</li>
+</ul>
+</main>
+<div id="tip"></div>
+<script>
+const CARDS = /*CARDS*/[];
+const B2B = /*B2B*/[];
+const VN = {nvpro:"NVIDIA Pro", geforce:"NVIDIA GeForce", amd:"AMD", intel:"Intel"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (v, d = 0) => v == null || isNaN(v) ? "–" : v.toLocaleString("de-DE", {maximumFractionDigits: d, minimumFractionDigits: d});
+const state = {y: "blender", bar: "blender", sort: "price", dir: 1};
+const tip = $("#tip");
+function showTip(e, html){ tip.innerHTML = html; tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - w - 8) + "px";
+  tip.style.top = Math.max(8, e.clientY - h - 12) + "px"; }
+function hideTip(){ tip.style.display = "none"; }
+function basis(){ return parseFloat($("#basis").value); }
+function price(c){ return c.price == null ? null : c.price / basis(); }
+function visible(){
+  const on = new Set([...document.querySelectorAll("#filters [data-v]")].filter(x => x.checked).map(x => x.dataset.v));
+  const used = $("#used").checked, max = parseFloat($("#maxp").value);
+  return CARDS.filter(c => on.has(c.vendor) && (used || !c.used) && (isNaN(max) || (price(c) != null && price(c) <= max)));
+}
+function tipHtml(c){
+  return `<b>${esc(c.name)}</b>${c.used ? "gebraucht · " : ""}${VN[c.vendor]}<br>Preis: ${fmt(price(c))} €<br>VRAM: ${fmt(c.vram)} GB<br>Blender: ${fmt(c.blender)}${c.bn ? " (n=" + fmt(c.bn) + ")" : ""}<br>LLM: ${c.llm ? fmt(c.llm, 0) + " Token/s" : "keine Messung"}`;
+}
+const YL = {blender:"Blender-Punkte", llm:"Token/s", vram:"GB VRAM", fp32:"TFLOPS (FP32)"};
+function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
+function drawScatter(){
+  const m = state.y, all = visible(), pts = all.filter(c => price(c) != null && c[m] != null);
+  const W = 1000, H = 500, L = 62, Rm = 24, T = 36, B = 46;
+  const x0 = Math.log10(700), x1 = Math.log10(24000);
+  const ymax = niceMax(Math.max(1, ...pts.map(c => c[m])));
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - Rm);
+  const Y = v => H - B - v / ymax * (H - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Streudiagramm Preis gegen ${YL[m]}">`;
+  for (let i = 0; i <= 5; i++){ const v = ymax * i / 5, y = Y(v);
+    s += `<line x1="${L}" x2="${W - Rm}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${L - 8}" y="${y + 4}" text-anchor="end">${fmt(v)}</text>`; }
+  for (const v of [1000, 2000, 3000, 5000, 10000, 20000]){ const x = X(v);
+    s += `<line x1="${x}" x2="${x}" y1="${T}" y2="${H - B}" stroke="var(--grid)"/><text x="${x}" y="${H - B + 18}" text-anchor="middle">${fmt(v)} €</text>`; }
+  s += `<line x1="${L}" x2="${W - Rm}" y1="${H - B}" y2="${H - B}" stroke="var(--axis)"/>`;
+  s += `<text x="${(L + W - Rm) / 2}" y="${H - 6}" text-anchor="middle">Preis (${basis() == 1 ? "brutto" : "netto"})</text>`;
+  s += `<text x="14" y="14">${YL[m]}</text>`;
+  const placed = pts.map(c => ({x1: X(price(c)) - 8, y1: Y(c[m]) - 8, x2: X(price(c)) + 8, y2: Y(c[m]) + 8}));
+  const sorted = [...pts].sort((a, b) => b[m] - a[m]);
+  let labels = "";
+  for (const c of sorted){
+    const x = X(price(c)), y = Y(c[m]), short = c.name.replace("GeForce ", "").replace("AMD Radeon ", "").replace("Intel ", "").replace(" Blackwell", "").replace(" Workstation", " WS");
+    const w = short.length * 6.2, box = {x1: x + 9, y1: y - 8, x2: x + 9 + w, y2: y + 6};
+    if (box.x2 > W - 4){ box.x1 = x - 9 - w; box.x2 = x - 9; }
+    if (!placed.some(p => !(box.x2 < p.x1 || box.x1 > p.x2 || box.y2 < p.y1 || box.y1 > p.y2))){
+      placed.push(box); labels += `<text class="lab" x="${box.x1}" y="${y + 4}">${esc(short)}</text>`; }
+  }
+  s += labels;
+  pts.forEach((c, i) => { const x = X(price(c)), y = Y(c[m]);
+    s += `<circle cx="${x}" cy="${y}" r="6" fill="var(--${c.vendor})" stroke="var(--surface)" stroke-width="2" ${c.used ? 'fill-opacity=".45"' : ""}/><circle class="hit" data-i="${CARDS.indexOf(c)}" cx="${x}" cy="${y}" r="13" fill="transparent"/>`; });
+  s += "</svg>";
+  $("#scatter").innerHTML = s;
+  document.querySelectorAll("#scatter .hit").forEach(h => { const c = CARDS[h.dataset.i];
+    h.addEventListener("mousemove", e => showTip(e, tipHtml(c))); h.addEventListener("mouseleave", hideTip); });
+  const miss = all.length - pts.length;
+  $("#scnote").textContent = (miss ? miss + " Karten fehlen im Diagramm, weil Preis oder Messwert nicht vorliegt. " : "") + "Blasse Punkte sind Gebrauchtkarten. Nicht jeder Punkt ist beschriftet; der Name erscheint beim Überfahren und in der Tabelle.";
+  $("#legend").innerHTML = Object.keys(VN).map(v => `<span><i class="sw" style="background:var(--${v})"></i>${VN[v]}</span>`).join("");
+}
+const BM = {blender: c => c.blender ? price(c) / c.blender * 1000 : null, vram: c => c.vram ? price(c) / c.vram : null, llm: c => c.llm ? price(c) / c.llm : null};
+function drawBars(){
+  const f = BM[state.bar];
+  const rows = visible().filter(c => price(c) != null).map(c => ({c, v: f(c)})).filter(r => r.v != null).sort((a, b) => a.v - b.v);
+  const max = Math.max(1, ...rows.map(r => r.v));
+  $("#bars").innerHTML = rows.map(r => `<div class="n" title="${esc(r.c.name)}">${esc(r.c.name)}</div><div class="t" data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.v / max * 100}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.v)} €</div>`).join("") || '<div class="small">Keine Karten für diese Auswahl.</div>';
+  document.querySelectorAll("#bars .t").forEach(h => { const c = CARDS[h.dataset.i];
+    h.addEventListener("mousemove", e => showTip(e, tipHtml(c))); h.addEventListener("mouseleave", hideTip); });
+}
+const COLS = [
+  ["name", "Karte", c => c.name, 0], ["vendor", "Gruppe", c => VN[c.vendor], 0], ["cond", "Zustand", c => c.used ? "gebraucht" : (c.price == null ? "kein Angebot" : "neu"), 0],
+  ["price", "Preis €", c => price(c), 1], ["vram", "VRAM GB", c => c.vram, 1], ["blender", "Blender", c => c.blender, 1], ["bn", "n", c => c.bn, 1],
+  ["llm", "LLM Token/s", c => c.llm, 1], ["pb", "€ / 1.000 Bl.", c => price(c) != null ? BM.blender(c) : null, 1], ["pv", "€ / GB", c => price(c) != null ? BM.vram(c) : null, 1],
+  ["cores", "CUDA-Kerne / Shader", c => c.cores, 1], ["fp32", "TFLOPS FP32", c => c.fp32, 1], ["bw", "Bandbreite GB/s", c => c.bw, 1], ["mem", "Speichertyp", c => c.mem, 0],
+  ["tdp", "Watt", c => c.tdp, 1], ["slots", "Slots", c => c.slots, 0], ["cooling", "Kühlung", c => c.cooling, 0], ["ecc", "ECC", c => c.ecc, 0], ["vgpu", "vGPU", c => c.vgpu, 0], ["mig", "MIG", c => c.mig, 0]
+];
+function drawTable(){
+  const q = $("#q").value.toLowerCase(), col = COLS.find(c => c[0] == state.sort);
+  const rows = visible().filter(c => c.name.toLowerCase().includes(q)).sort((a, b) => {
+    const x = col[2](a), y = col[2](b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (typeof x == "number" ? x - y : String(x).localeCompare(String(y), "de")) * state.dir; });
+  $("#tbl thead").innerHTML = "<tr>" + COLS.map(c => `<th data-k="${c[0]}" class="${c[3] ? "num" : ""}" ${c[0] == state.sort ? `aria-sort="${state.dir > 0 ? "ascending" : "descending"}"` : ""}>${c[1]}</th>`).join("") + "</tr>";
+  $("#tbl tbody").innerHTML = rows.map(c => "<tr>" + COLS.map(k => { const v = k[2](c);
+    return `<td class="${k[3] ? "num" : ""}">${k[0] == "name" ? `<i class="sw" style="background:var(--${c.vendor});margin-right:6px"></i>` : ""}${k[3] ? fmt(v, k[0] == "fp32" ? 1 : 0) : esc(v || "–")}</td>`; }).join("") + "</tr>").join("");
+  document.querySelectorAll("#tbl th").forEach(th => th.onclick = () => { const k = th.dataset.k;
+    if (state.sort == k) state.dir *= -1; else { state.sort = k; state.dir = COLS.find(c => c[0] == k)[3] && !["price", "pb", "pv"].includes(k) ? -1 : 1; } drawTable(); });
+}
+function drawB2B(){
+  if (!B2B.length){ $("#b2bwrap").innerHTML = '<div class="note">Firmenpreise werden gerade recherchiert und hier ergänzt.</div>'; return; }
+  const rows = [...B2B].sort((a, b) => a.card.localeCompare(b.card) || (parseFloat(a.price_net_eur) || 1e9) - (parseFloat(b.price_net_eur) || 1e9));
+  $("#b2bwrap").innerHTML = '<div class="tw"><table><thead><tr><th>Karte</th><th>Modell</th><th>Händler</th><th class="num">Netto €</th><th class="num">Brutto €</th><th>Lieferbar</th><th>Beleg</th></tr></thead><tbody>' +
+    rows.map(r => `<tr><td>${esc(r.card)}</td><td>${esc(r.sku)}</td><td>${/^https?:/.test(r.url) ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.reseller)}</a>` : esc(r.reseller)}</td><td class="num">${fmt(parseFloat(r.price_net_eur))}</td><td class="num">${fmt(parseFloat(r.price_brutto_eur))}</td><td>${esc(r.availability || "–")}</td><td>${r.evidence == "V" ? "auf der Seite gesehen" : "nur Suchtreffer"}</td></tr>`).join("") + "</tbody></table></div>";
+}
+function seg(id, key, fn){ document.querySelectorAll(id + " button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(id + " button").forEach(x => x.setAttribute("aria-pressed", x == b)); state[key] = b.dataset.m; fn(); }); }
+function all(){ drawScatter(); drawBars(); drawTable(); }
+seg("#ysel", "y", drawScatter); seg("#bsel", "bar", drawBars);
+document.querySelectorAll("#filters input, #filters select").forEach(el => el.addEventListener("input", all));
+$("#q").addEventListener("input", drawTable);
+all(); drawB2B();
+</script>
+</body>
+</html>
