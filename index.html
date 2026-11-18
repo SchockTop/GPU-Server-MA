@@ -76,7 +76,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 .opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:14px;margin:10px 0}
 .opts label{display:inline-flex;align-items:center;gap:6px}
 .sc .cv{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
-.sc{display:grid;grid-template-columns:48px 26px minmax(150px,240px) minmax(140px,1.5fr) 40px 58px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:1010px}
+.sc{display:grid;grid-template-columns:48px 26px minmax(150px,240px) minmax(140px,1.5fr) 40px 58px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:900px}
 .sc .h{overflow-wrap:anywhere;color:var(--ink2);font-weight:600;font-size:12px;line-height:1.25;align-self:end;padding-bottom:4px;border-bottom:1px solid var(--grid)}
 .sc .rk{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .sc .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -168,7 +168,8 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
   <p class="small">Die Wertung kennt nur Preis und Messwerte. Sie berücksichtigt nicht, dass die GeForce-Lizenz den Einsatz „im Rechenzentrum“ ausschließt (ob ein Firmenserver darunter fällt, ist rechtlich zu prüfen), dass Intel- und AMD-Karten kein CUDA haben und dass sich nur wenige Karten auf mehrere VMs aufteilen lassen (siehe <a href="#lizenz">Teilen und Lizenzen</a>). Mit den Häkchen oben lassen sich ganze Gruppen ausblenden.</p>
   <details><summary>So wird gerechnet</summary>
   <p class="small">Ein Klick auf einen Spaltenkopf sortiert nach diesem Wert; die Nummer links bleibt der Rang in der Gesamtwertung. Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte. Das kann Karten mit wenigen Messungen zu gut aussehen lassen. Deshalb zeigt die Spalte „Abdeckung“, für welchen Anteil der Gewichte ein Messwert vorliegt; Karten unter 70 % bekommen keinen Rang und stehen am Ende.</p>
-  <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte braucht Platz, Strom, Kühlung und einen Teil des Servers, und Steckplätze sind begrenzt. Der Betrag gilt in derselben Basis wie die Preise (brutto oder netto). Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. „LLM-Tempo, großes Modell“ ist Qwen3 32B mit 4 Bit (Hardware Corner, März 2026, 4k Kontext). Gemessen sind nur 4 der aufgeführten Karten; Karten mit weniger als 24 GB bekommen 0, weil das Modell nicht in den Speicher passt, Karten ab 24 GB ohne Messung zählen als fehlend. Die Standardgewichte (Vorgabe „Ausgewogen“) zählen Rendering mit gut einem Drittel, Speicher und LLM-Tempo zusammen mit knapp der Hälfte und Training mit einem Fünftel. „Training, gemessen“ ist das Training des Netzes BERT Large mit halber Genauigkeit (FP16) im Labor des Systemhauses AIME, die breiteste einheitliche Messreihe, die wir gefunden haben; sie deckt aber nur 11 Karten ab. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo. Sie bleibt als zweiter Wert, weil kein Trainings-Benchmark alle Karten abdeckt.</p></details>
+  <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte braucht Platz, Strom, Kühlung und einen Teil des Servers, und Steckplätze sind begrenzt. Der Betrag gilt in derselben Basis wie die Preise (brutto oder netto). Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. Die Standardgewichte (Vorgabe „Ausgewogen“) zählen Rendering mit gut einem Drittel, VRAM mit einem Viertel, LLM-Tempo und Rechenleistung mit je einem Fünftel.</p>
+  <p class="small">In die Wertung gehen nur Werte ein, die es für alle oder die meisten Karten gibt, damit der Vergleich fair bleibt: Blender-Punkte, VRAM und Rechenleistung liegen für praktisch alle Karten vor, das LLM-Tempo mit dem 7B-Modell für knapp zwei Drittel. Das LLM-Tempo mit einem großen 32B-Modell (nur 4 Karten gemessen) und das gemessene Trainingstempo (AIME, 11 Karten) sind bewusst nicht Teil der Wertung. Beide stehen als Spalten in der Tabelle „Alle Karten“ und in den Kästen unter „Training“. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo; sie ist der einzige Trainingswert, den es für alle Karten gibt.</p></details>
 </div>
 
 <h2 id="chart">Preis und Leistung</h2>
@@ -225,7 +226,7 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <p class="small">Diese Werte stammen aus der Recherche vom 17.11.2026 und sind nicht einzeln an der Quelle nachgeprüft. Jede Zeile ist ein eigener Test; Zeilen untereinander sind nicht vergleichbar. Quellen (englisch): <a href="research/benchmarks.md">benchmarks.md</a>, Abschnitt 3.2.</p>
 
 <h2 id="training">Training: gemessene Werte</h2>
-<p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Die breiteste Messreihe (AIME, erster Kasten) deckt 11 Karten ab; Die großen Benchmark-Reihen helfen nicht: MLPerf Training misst nur ganze Rechenzentrums-Systeme, andere bekannte KI-Benchmarks messen nur Inferenz. Es bleiben einzelne Messreihen von Systemhäusern und Blogs. Deshalb steht hier jede Quelle für sich. Bitte nur Karten innerhalb eines Kastens vergleichen, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser, außer wo „kürzer ist besser“ dabeisteht.</p>
+<p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Die breiteste Messreihe (AIME, dritter Kasten) deckt 11 Karten ab; Die großen Benchmark-Reihen helfen nicht: MLPerf Training misst nur ganze Rechenzentrums-Systeme, andere bekannte KI-Benchmarks messen nur Inferenz. Es bleiben einzelne Messreihen von Systemhäusern und Blogs. Deshalb steht hier jede Quelle für sich. Bitte nur Karten innerhalb eines Kastens vergleichen, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser, außer wo „kürzer ist besser“ dabeisteht.</p>
 <div class="pk" id="train"></div>
 <p class="small">RTX 3090, RTX 4090 und RTX A6000 gibt es praktisch nur noch gebraucht. Sie stehen in den Kästen nur als Vergleichswerte, weil viele Messreihen sie enthalten.</p>
 <p class="small">Die Kästen folgen nicht den Filtern, dem Anpinnen oder dem Ausblenden. Ohne jeden gemessenen Trainingswert: RTX PRO 5000 72 GB, RTX PRO 4000, RTX 4000 Ada, RTX 5080, RTX 5060 Ti, RTX 4080 Super, Radeon AI PRO R9700 und alle Intel-Karten. Alle Messwerte mit Quellen: <a href="research/training-bench.md">training-bench.md</a> (<a href="research/training-bench.csv">CSV</a>); weitere Quellen und was sie abdecken: <a href="research/training-sources.md">training-sources.md</a> (<a href="research/training-extra.csv">CSV</a>)</p>
@@ -497,15 +498,13 @@ function drawTrain(){
 }
 const SM = /*SM*/[
   {k:"blender", n:"Rendering", u:"Blender-Punkte je €", w:35},
-  {k:"vram", n:"Grafikspeicher (VRAM)", u:"GB je €", w:20},
-  {k:"llm", n:"LLM-Tempo, kleines Modell", u:"Token/s je €, 7B-Modell", w:10},
-  {k:"llm32", n:"LLM-Tempo, großes Modell", u:"Token/s je €, 32B-Modell; 0 unter 24 GB", w:15},
-  {k:"train", n:"Training, gemessen", u:"Sequenzen/s je €, BERT Large (AIME); nur 11 Karten", w:10},
-  {k:"fp32", n:"Rechenleistung", u:"TFLOPS je €, Näherung für Training", w:10}
+  {k:"vram", n:"Grafikspeicher (VRAM)", u:"GB je €", w:25},
+  {k:"llm", n:"LLM-Tempo", u:"Token/s je €, 7B-Modell", w:20},
+  {k:"fp32", n:"Rechenleistung", u:"TFLOPS je €, Näherung für Training", w:20}
 ];
-const PRESETS = /*PRESETS*/[["Ausgewogen", {blender:35, vram:20, llm:10, llm32:15, train:10, fp32:10}], ["Rendering", {blender:70, vram:10, llm:5, llm32:5, train:5, fp32:5}], ["LLM", {blender:5, vram:30, llm:15, llm32:40, train:5, fp32:5}], ["Training", {blender:10, vram:20, llm:5, llm32:5, train:35, fp32:25}]];
+const PRESETS = /*PRESETS*/[["Ausgewogen", {blender:35, vram:25, llm:20, fp32:20}], ["Rendering", {blender:70, vram:10, llm:10, fp32:10}], ["LLM", {blender:10, vram:40, llm:40, fp32:10}], ["Training", {blender:10, vram:30, llm:10, fp32:50}]];
 function initScore(){
-  $("#sliders").innerHTML = SM.map(m => `<div class="ln">${m.n}<small>${m.u}</small></div><input type="range" min="0" max="100" step="5" value="${m.w}" data-k="${m.k}" aria-label="Gewicht ${m.n}"><output id="o_${m.k}"></output>`).join("");
+  $("#sliders").innerHTML = SM.map(m => `<div class="ln">${m.n}<small>${m.u} · Wert für ${CARDS.filter(c => c.price != null && c[m.k] != null).length} von ${CARDS.filter(c => c.price != null).length} Karten</small></div><input type="range" min="0" max="100" step="5" value="${m.w}" data-k="${m.k}" aria-label="Gewicht ${m.n}"><output id="o_${m.k}"></output>`).join("");
   document.querySelectorAll("#sliders input").forEach(el => el.addEventListener("input", () => { SM.find(m => m.k == el.dataset.k).w = +el.value; markPreset(); drawScore(); }));
   $("#presets").innerHTML = PRESETS.map((p, i) => `<button data-i="${i}" aria-pressed="${i == 0}">${p[0]}</button>`).join("");
   document.querySelectorAll("#presets button").forEach(b => b.onclick = () => { const p = PRESETS[b.dataset.i][1];

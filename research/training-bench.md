@@ -44,7 +44,7 @@ RTX PRO 5000 Blackwell 72GB, RTX PRO 4000 Blackwell 24GB, RTX PRO 4000 Blackwell
 ## Wider sources found later: `training-extra.csv`
 
 `training-sources.md` lists the further training sources checked on 2026-11-18, and `training-extra.csv` (96 rows) holds their values.
-- The **AIME series** (BERT Large and ResNet-50, fp32 and fp16 AMP, eager and torch.compile; 11 cards; November 2025) is the widest single-method training source found. The overview page's score uses it as the measured training value.
+- The **AIME series** (BERT Large and ResNet-50, fp32 and fp16 AMP, eager and torch.compile; 11 cards; November 2025) is the widest single-method training source found. The overview page shows it as a table column and a chart box. It is not part of the weighted score, because it covers only 11 of 34 cards.
 - A second source, Puget Systems SDXL LoRA training, adds 4 cards (RTX A5000, RTX 5000 Ada, RTX 6000 Ada, AMD Radeon PRO W7900 48GB).
 - Together with `training-bench.csv`, 17 of the 34 cards have at least one measured training value. The other 17 have none: GeForce RTX 5060 Ti 16GB and 8GB, RTX PRO 5000 Blackwell 72GB, RTX PRO 4000 Blackwell 24GB and SFF, RTX 4000 Ada, GeForce RTX 5080, GeForce RTX 4080 Super, Radeon AI PRO R9700, and all Intel cards.
 - The values of the two files come from different methods. Compare only within one benchmark.
