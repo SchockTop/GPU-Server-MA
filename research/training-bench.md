@@ -9,7 +9,7 @@ Data: `training-bench.csv` (93 rows). Only values read on the source page. Nothi
 
 ## Which benchmark as "the training score"?
 
-No single benchmark covers the 31 cards. No MLPerf Training, Geekbench AI, UL Procyon or MLPerf Client result is usable (data-center only, or inference only).
+No single benchmark in this file covers the 34 cards. No MLPerf Training, Geekbench AI, UL Procyon or MLPerf Client result is usable (data-center only, or inference only).
 
 Coverage by benchmark:
 - **Bizon ResNet50 FP16/FP32** covers the most cards (7: A4000, A5000, A6000, A100 80GB, 3090, 4090, 6000 Ada). Weaknesses: no units, no batch size, no date ("2026 [Updated]"). Its Blackwell, 5000 Ada, 4500 Ada and 50-series cells are "n/a".
@@ -39,11 +39,19 @@ Measured number exists:
 - RTX A5000 24GB, RTX A4000 16GB: Bizon only
 - AMD Radeon RX 9070 XT 16GB: GitHub issue (community, ROCm Windows, several runs)
 
-No measured training number found (14 cards):
-RTX PRO 5000 Blackwell 72GB, RTX PRO 4000 Blackwell 24GB, RTX PRO 4000 Blackwell SFF 24GB, GeForce RTX 5080 16GB, GeForce RTX 5060 Ti 16GB, GeForce RTX 5060 Ti 8GB, GeForce RTX 4080 Super 16GB, RTX 5000 Ada 32GB, RTX 4500 Ada 24GB, RTX 4000 Ada 20GB, AMD Radeon AI PRO R9700 32GB, AMD Radeon PRO W7900 48GB, Intel Arc Pro B60 24GB, Intel Arc Pro B70 32GB.
+No measured training number found in this file (20 cards; three of them, RTX 5000 Ada, RTX 4500 Ada and Radeon PRO W7900, have values in `training-extra.csv`, see the next section):
+RTX PRO 5000 Blackwell 72GB, RTX PRO 4000 Blackwell 24GB, RTX PRO 4000 Blackwell SFF 24GB, GeForce RTX 5080 16GB, GeForce RTX 5060 Ti 16GB, GeForce RTX 5060 Ti 8GB, GeForce RTX 4080 Super 16GB, RTX 5000 Ada 32GB, RTX 4500 Ada 24GB, RTX 4000 Ada 20GB, AMD Radeon AI PRO R9700 32GB, AMD Radeon PRO W7900 48GB, Intel Arc Pro B60 24GB, Intel Arc Pro B65 32GB, Intel Arc Pro B60 Dual 48GB (Maxsun), Intel Arc Pro B70 32GB, Intel Arc Pro B50 16GB, Intel Arc B580 12GB, Intel Arc B570 10GB, Intel Arc A770 16GB.
+## Wider sources found later: `training-extra.csv`
+
+`training-sources.md` lists the further training sources checked on 2026-11-18, and `training-extra.csv` (96 rows) holds their values.
+- The **AIME series** (BERT Large and ResNet-50, fp32 and fp16 AMP, eager and torch.compile; 11 cards; November 2025) is the widest single-method training source found. The overview page's score uses it as the measured training value.
+- A second source, Puget Systems SDXL LoRA training, adds 4 cards (RTX A5000, RTX 5000 Ada, RTX 6000 Ada, AMD Radeon PRO W7900 48GB).
+- Together with `training-bench.csv`, 17 of the 34 cards have at least one measured training value. The other 17 have none: GeForce RTX 5060 Ti 16GB and 8GB, RTX PRO 5000 Blackwell 72GB, RTX PRO 4000 Blackwell 24GB and SFF, RTX 4000 Ada, GeForce RTX 5080, GeForce RTX 4080 Super, Radeon AI PRO R9700, and all Intel cards.
+- The values of the two files come from different methods. Compare only within one benchmark.
+
 ## Checked, nothing usable
 - AI-Benchmark ranking: stale. The only matching rows are Radeon VII/RX 480/470; the page has no modern NVIDIA, AMD or Intel entries.
-- AIME blog: results only in chart images (no text values). Lambda web page: JavaScript table, not readable, so the GitHub CSV was used.
+- AIME blog: the chart values are loaded from JSON files; they were read later and are in `training-extra.csv` (see the next section). Lambda web page: JavaScript table, not readable, so the GitHub CSV was used.
 - Puget 2025-26: RTX 5090/5080 AI review is inference only. No Blackwell training article found.
 - Phoronix: R9700 reviews are vLLM/OpenCL. The Phoronix PRO Blackwell review returned 403. A news.lavx.hu mirror lists non-existent GPUs ("Radeon AI PRO X3", "Arc Pro B-Series 800"), so it was ignored.
 - MLPerf Training v5.1: data-center systems only. Intel B60 MLPerf: inference only. Geekbench AI, UL Procyon, MLPerf Client: inference only.

@@ -6,7 +6,7 @@ Prices and facts re-checked at the sources on 18 Nov 2026.
 
 As of 2026-11-17. [V] = checked on the cited page (some pages were read through a summarising fetch tool, so re-check key figures against the page before relying on them). [U] = secondary, community or unverified. Prices are NVIDIA list prices in USD; partner quotes differ.
 
-Context: a small team moving from remote desktops to Kubernetes-style shared compute for rendering, training and LLM inference.
+Context: an organisation that moves from remote desktops to Kubernetes-style shared compute for rendering, training and LLM inference.
 
 ## 1. NVIDIA vGPU (paid)
 
@@ -103,7 +103,7 @@ Notes:
 | MIG | free | **hardware** | **yes** (GPU Operator, DRA) | RTX PRO 6000 (4), PRO 5000 48/72 (2), PRO 4500 Server (2), A100/H100 | Best free isolation; compute only |
 | KAI / Run:ai OSS / HAMi | free (no vendor support) | scheduler / software | **yes** | NVIDIA (HAMi broader) | Quotas, queues, fair share, fractions |
 | NVIDIA vGPU RTX vWS | 250 USD/CCU/yr, or 450 + 100/yr perpetual | strong (VM, fixed slices) | partly (VDI, or Kubernetes inside VMs) | see 1.4 (none of the new Blackwell cards under 10k EUR; RTX 5000 Ada ~4,700 EUR and RTX 6000 Ada ~9,600 EUR are vGPU-capable) | Only option for shared graphics desktops on one GPU |
-| NVIDIA AI Enterprise (vGPU for Compute) | 4,500 USD/GPU/yr (EDU/Inception 1,125) | strong (VM) | yes | datacenter / qualified cards | Expensive for a small team |
+| NVIDIA AI Enterprise (vGPU for Compute) | 4,500 USD/GPU/yr (EDU/Inception 1,125) | strong (VM) | yes | datacenter / qualified cards | Expensive for a small setup |
 | AMD MxGPU SR-IOV | no fee found | strong (VF) | partly | Instinct MI2xx/MI3xx, Radeon PRO V710 | Not available on workstation Radeon |
 | AMD CPX/NPS partitioning | free | hardware-like | yes (AMD GPU Operator) | Instinct MI300 series | Datacenter only |
 | Intel SR-IOV | free | VF | partly | Flex; Arc Pro B50 (2 VFs) and B70 (4 VFs) officially per Intel; B60 (community) | Maturity uncertain |

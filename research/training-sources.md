@@ -1,14 +1,14 @@
 # Training-speed benchmarks beyond the five we already had (research date 2026-11-18)
 
-Question: which public benchmarks measure deep-learning TRAINING (not inference) on single GPUs, and which cover many of our 30 cards with one consistent method?
+Question: which public benchmarks measure deep-learning TRAINING (not inference) on single GPUs, and which cover many of the 34 cards on the list with one consistent method?
 
 Evidence labels: RAW = seen in the raw page or raw JSON fetched with curl. IMG = number printed on a chart image that I opened and read (not text). SUM = summary tool. U = search snippet or secondary text only, not verified. Every measured value is in `training-extra.csv` (96 rows). Already-known sources (Exxact, Lambda, Bizon, nikolasent, ROCm/TheRock issue) are not repeated.
 
-Our 30 cards, counting each variant separately: A5000, 5000 Ada, A4000, 5060 Ti, PRO 6000 (Workstation, Max-Q, Server = 3), PRO 5000 (48GB, 72GB = 2), PRO 4500, PRO 4000, 6000 Ada, 4500 Ada, 4000 Ada, L40S, 5090, 5080, 5070 Ti, 5070, 4080 Super, R9700, W7900, RX 9070 XT, Arc Pro B50/B60/B65/B70 (4), B580, B570, A770.
+The 34 cards of the list, counting each variant separately: A5000, 5000 Ada, A4000, 5060 Ti (16GB, 8GB = 2), PRO 6000 (Workstation, Max-Q, Server = 3), PRO 5000 (48GB, 72GB = 2), PRO 4500, PRO 4000 (24GB, SFF = 2), 6000 Ada, 4500 Ada, 4000 Ada, L40S, A100 80GB PCIe, 5090, 5080, 5070 Ti, 5070, 4080 Super, R9700, AMD Radeon PRO W7900 48GB, RX 9070 XT, Arc Pro B50/B60/B65/B70 (4), Arc Pro B60 Dual 48GB (Maxsun), B580, B570, A770.
 
 ## Short answer
 
-Is there one training benchmark that covers most of our cards with one method? No. The best is the AIME "Deep Learning GPU Benchmarks" page (aime.info): one method (PyTorch, BERT Large and ResNet-50, fp32 and fp16 AMP, eager and torch.compile), by one lab, updated November 2025. It has values for 11 of our 30 cards (A5000, 5000 Ada, 6000 Ada, 4500 Ada, L40S, 5090, PRO 6000 x3, PRO 5000 48GB, PRO 4500). It has nothing for all AMD and Intel cards, nothing for the RTX 50-series below the 5090, nothing for 4000/4080 Super/A4000/PRO 4000/PRO 5000 72GB. No other source I found is wider. Everything else is either inference-only, covers 1 to 4 of our cards, or is blocked to automated access.
+Is there one training benchmark that covers most of our cards with one method? No. The best is the AIME "Deep Learning GPU Benchmarks" page (aime.info): one method (PyTorch, BERT Large and ResNet-50, fp32 and fp16 AMP, eager and torch.compile), by one lab, updated November 2025. It has values for 11 of the 34 cards (A5000, 5000 Ada, 6000 Ada, 4500 Ada, L40S, 5090, PRO 6000 x3, PRO 5000 48GB, PRO 4500). It has nothing for all AMD and Intel cards, nothing for the RTX 50-series below the 5090, nothing for 4000/4080 Super/A4000/PRO 4000/PRO 5000 72GB. No other source I found is wider. Everything else is either inference-only, covers 1 to 4 of our cards, or is blocked to automated access.
 
 ## 1. AIME Deep Learning GPU Benchmarks (best coverage)
 
@@ -21,8 +21,8 @@ Is there one training benchmark that covers most of our cards with one method? N
 - Unit: BERT Large "processed sequences per second" (sequence length not stated in the text I read); ResNet-50 "processed images per second".
 - Platform: EPYC 9354 server (server cards) or Threadripper PRO 7975WX workstation (workstation-only cards), 256 GB DDR5.
 - Recency: Nov 2025; includes cards up to PRO 5000 Blackwell and PRO 6000 Blackwell, H200.
-- Our cards with values (RAW): RTX A5000 24GB, RTX 5000 Ada 32GB, RTX 6000 Ada 48GB, RTX 4500 Ada 24GB, L40S 48GB, GeForce RTX 5090 32GB, RTX PRO 6000 Blackwell Workstation / Server / Max-Q 96GB, RTX PRO 5000 Blackwell 48GB, RTX PRO 4500 Blackwell 32GB. Total 11 of 30.
-- Not covered: A4000, 4000 Ada, PRO 4000, PRO 5000 72GB, 5060 Ti, 5070, 5070 Ti, 5080, 4080 Super, all AMD (page has only MI100), all Intel. It also lists RTX 4060 Ti 16GB, 4090, 3090, A6000, A100, H100, H200 which are not in our list but useful as bridges.
+- Our cards with values (RAW): RTX A5000 24GB, RTX 5000 Ada 32GB, RTX 6000 Ada 48GB, RTX 4500 Ada 24GB, L40S 48GB, GeForce RTX 5090 32GB, RTX PRO 6000 Blackwell Workstation / Server / Max-Q 96GB, RTX PRO 5000 Blackwell 48GB, RTX PRO 4500 Blackwell 32GB. Total 11 of 34.
+- Not covered: A4000, 4000 Ada, PRO 4000 (24GB and SFF), PRO 5000 72GB, 5060 Ti (16GB and 8GB), 5070, 5070 Ti, 5080, 4080 Super, all AMD (page has only MI100), all Intel. The page also lists RTX 4060 Ti 16GB, 4090, 3090, A6000, H100, H200, which are not on our list but useful as bridges, and an A100 whose variant is not in `training-extra.csv`, so the A100 80GB PCIe is not counted.
 - Example values (ResNet-50 fp32 compile, images/s): PRO 6000 Server 1494, 5090 1361, PRO 6000 Max-Q 1260, PRO 5000 48GB 1079, 6000 Ada 951, L40S 947, PRO 4500 678, 5000 Ada 612, A5000 604, 4500 Ada 380. BERT Large fp16 compile (sequences/s): PRO 6000 220, 5090 134, PRO 5000 133, 6000 Ada 115, L40S 107, PRO 4500 92, 5000 Ada 79, A5000 50, 4500 Ada 48.
 - Strengths: one method for 11 cards, current generations, both precisions, public scripts, raw data in a machine-readable file.
 - Weaknesses and warnings: vendor measurement; two models only; batch sizes and PyTorch versions differ by card; PRO 6000 Workstation and Server have identical numbers in every chart (probably one measurement reused, treat as one value); RTX 4500 Ada looks low relative to the 5000 Ada in ResNet fp32 (279 vs 464), which I cannot explain; the RTX 5090 BERT fp32 eager (39) is higher than PRO 4500 and close to PRO 5000, so the BERT fp32 eager column is odd for some cards (cause unknown); no power limit noted. No AMD/Intel coverage. Compare within a column only.
@@ -53,7 +53,7 @@ Is there one training benchmark that covers most of our cards with one method? N
 - URLs (RAW): https://ai-benchmark.com/ranking_deeplearning.html and .../ranking_deeplearning_detailed.html
 - Who: A. Ignatov, crowd-submitted results of the AI Benchmark pip package (TensorFlow). Separate "Inference score", "Training score", and combined AI-Score. Detailed page lists per-network train ms (MobileNet-V2, Inception, ResNet, VGG, U-Net, LSTM, GNMT etc.).
 - Recency: table is frozen at the TensorFlow 2.1/CUDA 10.1 era. Newest GPUs are Turing (RTX 2080 Ti, Titan RTX, Quadro RTX 8000) and Radeon VII, Tesla V100. Page footer says copyright 2018-2026 but there are no Ampere, Ada or Blackwell entries.
-- Our cards: 0 of 30.
+- Our cards: 0 of 34.
 - Verdict: dead for our purpose; only valid as historical context.
 
 ## 5. Phoronix Test Suite / OpenBenchmarking.org (PyTorch, TensorFlow profiles)
@@ -90,28 +90,29 @@ Is there one training benchmark that covers most of our cards with one method? N
 | RTX A5000 24GB | yes | yes | - |
 | RTX 5000 Ada 32GB | yes | yes | - |
 | RTX A4000 16GB | no | no | - |
-| RTX 5060 Ti 16GB | no | no | - |
+| RTX 5060 Ti 16GB and 8GB | no | no | - |
 | RTX PRO 6000 Blackwell Workstation | yes | no | Kaitchup relative only (edition unclear) |
 | RTX PRO 6000 Blackwell Max-Q | yes | no | - |
 | RTX PRO 6000 Blackwell Server | yes (identical to WS) | no | - |
 | RTX PRO 5000 Blackwell 48GB | yes | no | - |
 | RTX PRO 5000 Blackwell 72GB | no | no | - |
 | RTX PRO 4500 Blackwell 32GB | yes | no | - |
-| RTX PRO 4000 Blackwell 24GB | no | no | - |
+| RTX PRO 4000 Blackwell 24GB and SFF | no | no | - |
 | RTX 6000 Ada 48GB | yes | yes | - |
 | RTX 4500 Ada 24GB | yes | no | - |
 | RTX 4000 Ada 20GB | no | no | - |
+| A100 80GB PCIe | no | no | - |
 | L40S 48GB | yes | no | - |
 | GeForce RTX 5090 32GB | yes | no | - |
 | RTX 5080, 5070 Ti, 5070, 4080 Super | no | no | - |
-| Radeon PRO W7900 48GB | no | yes | - |
+| AMD Radeon PRO W7900 48GB | no | yes | - |
 | Radeon AI PRO R9700, RX 9070 XT | no | no | - |
-| Intel Arc Pro B50/B60/B65/B70, B580, B570, A770 | no | no | - |
+| Intel Arc Pro B50/B60/B65/B70, B60 Dual 48GB, B580, B570, A770 | no | no | - |
 
-Counts: AIME 11 of 30 cards; Puget 4 of 30; union 12 of 30 (W7900 is the only addition from Puget). No new training value for 18 cards: A4000, 5060 Ti, PRO 5000 72GB, PRO 4000, 4000 Ada, 5080, 5070 Ti, 5070, 4080 Super, R9700, RX 9070 XT, B50, B60, B65, B70, B580, B570, A770. (Existing CSV already has partial values for a few of these, e.g. A4000 via Bizon, 5070/5070 Ti/9070 XT via the TheRock issue.)
+Counts (from `training-extra.csv` and the master CSV): AIME 11 of 34 cards; Puget 4 of 34; union 12 of 34 (W7900 is the only addition from Puget). No new training value for 22 cards: A4000, 5060 Ti 16GB and 8GB, PRO 5000 72GB, PRO 4000 and SFF, 4000 Ada, A100 80GB PCIe, 5080, 5070 Ti, 5070, 4080 Super, R9700, RX 9070 XT, B50, B60, B60 Dual, B65, B70, B580, B570, A770. (`training-bench.csv` already has partial values for a few of these, e.g. A4000 and A100 via Bizon and Lambda, 5070/5070 Ti/9070 XT via the TheRock issue. Counting both CSVs, 17 of the 34 cards have no training value at all.)
 
 ## Gaps and blocked sites
 
 - Blocked to automated access (HTTP 403 with curl, not bypassed): mlcommons.org training results, openbenchmarking.org profile pages, phoronix.com, geekbench.com, pugetsystems.com 5090/5080 review, gigagpu.com. Their content is unverified.
 - No benchmark found at all with training numbers for: Intel Arc (any), Radeon AI PRO R9700, RX 9070 XT (besides the TheRock issue), RTX 5080, RTX 5060 Ti, PRO 4000 Blackwell, RTX 4000 Ada, PRO 5000 72GB.
-- Practical consequence: for the missing 18 cards the only consistent route is our own run of one fixed script (for example the AIME scripts, ResNet-50 and BERT Large, fp16 AMP and fp32, same PyTorch version, equal batch size) on each card, or scaling estimates from memory bandwidth and tensor throughput clearly marked as estimates.
+- Practical consequence: for the 22 cards without a new value the only consistent route is our own run of one fixed script (for example the AIME scripts, ResNet-50 and BERT Large, fp16 AMP and fp32, same PyTorch version, equal batch size) on each card, or scaling estimates from memory bandwidth and tensor throughput clearly marked as estimates.

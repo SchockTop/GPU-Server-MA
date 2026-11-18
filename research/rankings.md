@@ -28,7 +28,7 @@ Important caveats:
 | 12 | GeForce RTX 5070 Ti 16GB | 7,589 | 1416 | - | 1,399 | 184 |
 | 13 | RTX PRO 4000 Blackwell 24GB | 6,256 | 40 | 5.2.0: 6,786 (n=19) | 2,819 | 451 |
 | 14 | GeForce RTX 5070 12GB | 6,174 | 914 | - | 929 | 150 |
-| 15 | RTX 5000 Ada 32GB | 5,677 | 9 (!) | unreliable: all-versions median 7,655 (n=31); 5.1.0 7,783 (n=8) | 4,710 | 830 |
+| 15 | RTX 5000 Ada 32GB | 5,677 | 9 (!) | unreliable: the 4.5.0 median rests on 9 runs and is about 25 % below the all-versions median 7,655 (n=31), so the card is probably rated too low; 5.1.0 7,783 (n=8) | 4,710 | 830 |
 | 16 | RTX 4500 Ada 24GB | 5,674 | 5 (!) | small n | 2,786 | 491 |
 | 17 | RTX PRO 4000 Blackwell SFF 24GB | 4,718 | 8 (!) | small sample (n=8) | 3,260 | 691 |
 | 18 | RTX 4000 Ada 20GB | 4,446 | 16 | - | 1,940 | 436 |
@@ -40,7 +40,7 @@ Important caveats:
 | 24 | AMD Radeon RX 9070 XT 16GB | 3,279 | 676 | HIP | 949 | 289 |
 | 25 | AMD Radeon AI PRO R9700 32GB | 3,209 | 11 | HIP backend; 5.2.0: 3,331 (n=6) | 2,102 | 655 |
 | 26 | RTX A4000 16GB | 2,956 | 44 | - | 1,964 | 664 |
-| 27 | Intel Arc A770 16GB | 2,448 | 55 | 4.5.0; 5.1.0: 2,609 (n=14); 5.2.0: 2,491 (n=8) | 304 | 124 |
+| 27 | Intel Arc A770 16GB | 2,448 | 55 | 4.5.0; 5.1.0: 2,609 (n=14); 5.2.0: 2,491 (n=8); no orderable new offer (end of life), so no price | - | - |
 | 28 | Intel Arc B580 12GB | 2,373 | 124 | 4.5.0; 5.2.0: 2,842 (n=24) | 387 | 163 |
 | 29 | Intel Arc Pro B60 24GB | 2,133 | 5 (!) | oneAPI, small n | 960 | 450 |
 | 30 | Intel Arc B570 10GB | 1,853 | 7 (!) | 4.5.0; 5.2.0: 2,208 (n=6) | 299 | 161 |
@@ -53,38 +53,43 @@ Backends: NVIDIA OptiX, AMD HIP, Intel oneAPI. V-Ray, Octane and Redshift: see b
 | # | Card | Price low | Blender | EUR/1k pts (low) | EUR/1k pts (typical) | VRAM |
 |---|---|---|---|---|---|---|
 | 1 | GeForce RTX 5060 Ti 8GB | 520 | 4,309 | 121 | - | 8 |
-| 2 | Intel Arc A770 16GB | 304 | 2,448 | 124 | - | 16 |
-| 3 | GeForce RTX 5070 12GB | 929 | 6,174 | 150 | - | 12 |
-| 4 | Intel Arc B570 10GB | 299 | 1,853 | 161 | - | 10 |
-| 5 | Intel Arc B580 12GB | 387 | 2,373 | 163 | - | 12 |
-| 6 | GeForce RTX 5070 Ti 16GB | 1,399 | 7,589 | 184 | - | 16 |
-| 7 | GeForce RTX 5060 Ti 16GB | 799 | 4,309 | 185 | - | 16 |
-| 8 | GeForce RTX 5080 16GB | 1,969 | 9,138 | 215 | 246 | 16 |
-| 9 | AMD Radeon RX 9070 XT 16GB | 949 | 3,279 | 289 | - | 16 |
-| 10 | GeForce RTX 4080 Super 16GB | 2,708 | 8,419 | 322 | - | 16 |
-| 11 | Intel Arc Pro B50 16GB | 569 | 1,546 | 368 | 349 | 16 |
-| 12 | RTX 4000 Ada 20GB | 1,940 | 4,446 | 436 | - | 20 |
-| 13 | Intel Arc Pro B60 24GB | 960 | 2,133 | 450 | - | 24 |
-| 14 | RTX PRO 4000 Blackwell 24GB | 2,819 | 6,256 | 451 | 488 | 24 |
-| 15 | Intel Arc Pro B70 32GB | 1,599 | 3,313 | 483 | 477 | 32 |
-| 16 | RTX 4500 Ada 24GB | 2,786 | 5,674 | 491 | 520 | 24 |
-| 17 | GeForce RTX 5090 32GB | 7,829 | 14,966 | 523 | 601 | 32 |
-| 18 | RTX PRO 4500 Blackwell 32GB | 4,549 | 8,487 | 536 | 566 | 32 |
-| 19 | AMD Radeon AI PRO R9700 32GB | 2,102 | 3,209 | 655 | 505 | 32 |
-| 20 | RTX A4000 16GB | 1,964 | 2,956 | 664 | - | 16 |
-| 21 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 4,718 | 691 | 697 | 24 |
-| 22 | RTX PRO 5000 Blackwell 48GB | 8,119 | 10,929 | 743 | 778 | 48 |
-| 23 | RTX 5000 Ada 32GB | 4,710 | 5,677 | 830 | - | 32 |
-| 24 | RTX 6000 Ada 48GB | 9,592 | 10,655 | 900 | 901 | 48 |
-| 25 | AMD Radeon PRO W7900 48GB | 3,516 | 3,790 | 928 | 976 | 48 |
-| 26 | RTX A5000 24GB | 4,225 | 4,390 | 962 | - | 24 |
-| 27 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 16,737 | 1,048 | 1,089 | 96 |
-| 28 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 14,960 | 1,083 | 1,123 | 96 |
-| 29 | RTX PRO 5000 Blackwell 72GB | 12,624 | 10,849 | 1,164 | 1,392 | 72 |
-| 30 | L40S 48GB | 10,403 | 7,848 | 1,326 | 1,338 | 48 |
-| 31 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 15,519 | 1,330 | 1,353 | 96 |
+| 2 | GeForce RTX 5070 12GB | 929 | 6,174 | 150 | - | 12 |
+| 3 | Intel Arc B570 10GB | 299 | 1,853 | 161 | - | 10 |
+| 4 | Intel Arc B580 12GB | 387 | 2,373 | 163 | - | 12 |
+| 5 | GeForce RTX 5070 Ti 16GB | 1,399 | 7,589 | 184 | - | 16 |
+| 6 | GeForce RTX 5060 Ti 16GB | 799 | 4,309 | 185 | - | 16 |
+| 7 | GeForce RTX 5080 16GB | 1,969 | 9,138 | 215 | 246 | 16 |
+| 8 | AMD Radeon RX 9070 XT 16GB | 949 | 3,279 | 289 | - | 16 |
+| 9 | GeForce RTX 4080 Super 16GB | 2,708 | 8,419 | 322 | - | 16 |
+| 10 | Intel Arc Pro B50 16GB | 569 | 1,546 | 368 | 349 | 16 |
+| 11 | RTX 4000 Ada 20GB | 1,940 | 4,446 | 436 | - | 20 |
+| 12 | Intel Arc Pro B60 24GB | 960 | 2,133 | 450 | - | 24 |
+| 13 | RTX PRO 4000 Blackwell 24GB | 2,819 | 6,256 | 451 | 488 | 24 |
+| 14 | Intel Arc Pro B70 32GB | 1,599 | 3,313 | 483 | 477 | 32 |
+| 15 | RTX 4500 Ada 24GB | 2,786 | 5,674 | 491 | 520 | 24 |
+| 16 | GeForce RTX 5090 32GB | 7,829 | 14,966 | 523 | 601 | 32 |
+| 17 | RTX PRO 4500 Blackwell 32GB | 4,549 | 8,487 | 536 | 566 | 32 |
+| 18 | AMD Radeon AI PRO R9700 32GB | 2,102 | 3,209 | 655 | 505 | 32 |
+| 19 | RTX A4000 16GB | 1,964 | 2,956 | 664 | - | 16 |
+| 20 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 4,718 | 691 | 697 | 24 |
+| 21 | RTX PRO 5000 Blackwell 48GB | 8,119 | 10,929 | 743 | 778 | 48 |
+| 22 | RTX 5000 Ada 32GB | 4,710 | 5,677 | 830 | - | 32 |
+| 23 | RTX 6000 Ada 48GB | 9,592 | 10,655 | 900 | 901 | 48 |
+| 24 | AMD Radeon PRO W7900 48GB | 3,516 | 3,790 | 928 | 976 | 48 |
+| 25 | RTX A5000 24GB | 4,225 | 4,390 | 962 | - | 24 |
+| 26 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 16,737 | 1,048 | 1,089 | 96 |
+| 27 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 14,960 | 1,083 | 1,123 | 96 |
+| 28 | RTX PRO 5000 Blackwell 72GB | 12,624 | 10,849 | 1,164 | 1,392 | 72 |
+| 29 | L40S 48GB | 10,403 | 7,848 | 1,326 | 1,338 | 48 |
+| 30 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 15,519 | 1,330 | 1,353 | 96 |
 
 The RTX 5060 Ti 8GB row uses the Blender score shared with the 16GB card (Open Data does not separate them).
+
+RTX 5000 Ada: the 4.5.0 median (5,677) rests on 9 runs and is about 25 % below the all-versions median (7,655), so the card is probably rated too low here (its EUR per 1,000 points is probably too high).
+
+Intel Arc A770 16GB has no price (no orderable new offer, end of life), so it is left out of this table and of the tables in sections 4 and 5. It stays in the performance tables.
+
+Typical vs low (R9700, Arc Pro B70, Arc Pro B50): "typical" is a 3-month median from a price tracker and "lowest" is the cheapest offer on the check date, so the typical figure can be lower than the lowest one.
 
 ## 2. LLM inference: llama.cpp Llama-2-7B Q4_0, tg128 tokens/s (single user, higher is better)
 
@@ -108,7 +113,7 @@ The RTX 5060 Ti 8GB row uses the Blender score shared with the 16GB card (Open D
 | 16 | RTX A4000 16GB | 85.2 | 2,808 | 16 | llama.cpp #15013 CUDA, FA on | 23 |
 | 17 | Intel Arc B580 12GB | 72.0 | 419 | 12 | llama.cpp #10879 Vulkan, FA on | 5 |
 | 18 | Intel Arc Pro B60 24GB | 68.1 | 727 | 24 | llama.cpp #10879 Vulkan, FA on | 14 |
-| 19 | Intel Arc A770 16GB | 53.1 | 1,120 | 16 | llama.cpp #10879 Vulkan, FA on | 6 |
+| 19 | Intel Arc A770 16GB | 53.1 | 1,120 | 16 | llama.cpp #10879 Vulkan, FA on | - |
 | 20 | Intel Arc B570 10GB | 50.5 | 289 | 10 | llama.cpp #10879 Vulkan, FA on | 6 |
 | 21 | Intel Arc Pro B50 16GB | 47.7 | 1,123 | 16 | llama.cpp #10879 Vulkan, FA on | 12 |
 
@@ -153,76 +158,74 @@ Caveat: GeForce figures are FP16-accumulate; with FP32 accumulate they halve, so
 
 | # | Card | Price low | VRAM GB | EUR/GB (low) | EUR/GB (typical) | Memory |
 |---|---|---|---|---|---|---|
-| 1 | Intel Arc A770 16GB | 304 | 16 | 19 | - | GDDR6 |
-| 2 | Intel Arc B570 10GB | 299 | 10 | 30 | - | GDDR6 |
-| 3 | Intel Arc B580 12GB | 387 | 12 | 32 | - | GDDR6 |
-| 4 | Intel Arc Pro B50 16GB | 569 | 16 | 36 | 34 | GDDR6 |
-| 5 | Intel Arc Pro B60 24GB | 960 | 24 | 40 | - | GDDR6 |
-| 6 | GeForce RTX 5060 Ti 16GB | 799 | 16 | 50 | - | GDDR7 |
-| 7 | Intel Arc Pro B70 32GB | 1,599 | 32 | 50 | 49 | GDDR6 |
-| 8 | Intel Arc Pro B65 32GB | 1,687 | 32 | 53 | - | GDDR6 |
-| 9 | AMD Radeon RX 9070 XT 16GB | 949 | 16 | 59 | - | GDDR6 |
-| 10 | GeForce RTX 5060 Ti 8GB | 520 | 8 | 65 | - | GDDR7 |
-| 11 | AMD Radeon AI PRO R9700 32GB | 2,102 | 32 | 66 | 51 | GDDR6 |
-| 12 | AMD Radeon PRO W7900 48GB | 3,516 | 48 | 73 | 77 | GDDR6 ECC |
-| 13 | GeForce RTX 5070 12GB | 929 | 12 | 77 | - | GDDR7 |
-| 14 | GeForce RTX 5070 Ti 16GB | 1,399 | 16 | 87 | - | GDDR7 |
-| 15 | RTX 4000 Ada 20GB | 1,940 | 20 | 97 | - | GDDR6 ECC |
-| 16 | RTX 4500 Ada 24GB | 2,786 | 24 | 116 | 123 | GDDR6 ECC |
-| 17 | RTX PRO 4000 Blackwell 24GB | 2,819 | 24 | 117 | 127 | GDDR7 ECC |
-| 18 | RTX A4000 16GB | 1,964 | 16 | 123 | - | GDDR6 |
-| 19 | GeForce RTX 5080 16GB | 1,969 | 16 | 123 | 141 | GDDR7 |
-| 20 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 24 | 136 | 137 | GDDR7 ECC |
-| 21 | RTX PRO 4500 Blackwell 32GB | 4,549 | 32 | 142 | 150 | GDDR7 ECC |
-| 22 | RTX 5000 Ada 32GB | 4,710 | 32 | 147 | - | GDDR6 |
-| 23 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 96 | 169 | 175 | GDDR7 ECC |
-| 24 | RTX PRO 5000 Blackwell 48GB | 8,119 | 48 | 169 | 177 | GDDR7 ECC |
-| 25 | GeForce RTX 4080 Super 16GB | 2,708 | 16 | 169 | - | GDDR6X |
-| 26 | RTX PRO 5000 Blackwell 72GB | 12,624 | 72 | 175 | 210 | GDDR7 ECC |
-| 27 | RTX A5000 24GB | 4,225 | 24 | 176 | - | GDDR6 |
-| 28 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 96 | 183 | 190 | GDDR7 ECC |
-| 29 | RTX 6000 Ada 48GB | 9,592 | 48 | 200 | 200 | GDDR6 ECC |
-| 30 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 96 | 215 | 219 | GDDR7 ECC |
-| 31 | L40S 48GB | 10,403 | 48 | 217 | 219 | GDDR6 ECC |
-| 32 | GeForce RTX 5090 32GB | 7,829 | 32 | 245 | 281 | GDDR7 |
+| 1 | Intel Arc B570 10GB | 299 | 10 | 30 | - | GDDR6 |
+| 2 | Intel Arc B580 12GB | 387 | 12 | 32 | - | GDDR6 |
+| 3 | Intel Arc Pro B50 16GB | 569 | 16 | 36 | 34 | GDDR6 |
+| 4 | Intel Arc Pro B60 24GB | 960 | 24 | 40 | - | GDDR6 |
+| 5 | GeForce RTX 5060 Ti 16GB | 799 | 16 | 50 | - | GDDR7 |
+| 6 | Intel Arc Pro B70 32GB | 1,599 | 32 | 50 | 49 | GDDR6 |
+| 7 | Intel Arc Pro B65 32GB | 1,687 | 32 | 53 | - | GDDR6 |
+| 8 | AMD Radeon RX 9070 XT 16GB | 949 | 16 | 59 | - | GDDR6 |
+| 9 | GeForce RTX 5060 Ti 8GB | 520 | 8 | 65 | - | GDDR7 |
+| 10 | AMD Radeon AI PRO R9700 32GB | 2,102 | 32 | 66 | 51 | GDDR6 |
+| 11 | AMD Radeon PRO W7900 48GB | 3,516 | 48 | 73 | 77 | GDDR6 ECC |
+| 12 | GeForce RTX 5070 12GB | 929 | 12 | 77 | - | GDDR7 |
+| 13 | GeForce RTX 5070 Ti 16GB | 1,399 | 16 | 87 | - | GDDR7 |
+| 14 | RTX 4000 Ada 20GB | 1,940 | 20 | 97 | - | GDDR6 ECC |
+| 15 | RTX 4500 Ada 24GB | 2,786 | 24 | 116 | 123 | GDDR6 ECC |
+| 16 | RTX PRO 4000 Blackwell 24GB | 2,819 | 24 | 117 | 127 | GDDR7 ECC |
+| 17 | RTX A4000 16GB | 1,964 | 16 | 123 | - | GDDR6 |
+| 18 | GeForce RTX 5080 16GB | 1,969 | 16 | 123 | 141 | GDDR7 |
+| 19 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 24 | 136 | 137 | GDDR7 ECC |
+| 20 | RTX PRO 4500 Blackwell 32GB | 4,549 | 32 | 142 | 150 | GDDR7 ECC |
+| 21 | RTX 5000 Ada 32GB | 4,710 | 32 | 147 | - | GDDR6 |
+| 22 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 96 | 169 | 175 | GDDR7 ECC |
+| 23 | RTX PRO 5000 Blackwell 48GB | 8,119 | 48 | 169 | 177 | GDDR7 ECC |
+| 24 | GeForce RTX 4080 Super 16GB | 2,708 | 16 | 169 | - | GDDR6X |
+| 25 | RTX PRO 5000 Blackwell 72GB | 12,624 | 72 | 175 | 210 | GDDR7 ECC |
+| 26 | RTX A5000 24GB | 4,225 | 24 | 176 | - | GDDR6 |
+| 27 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 96 | 183 | 190 | GDDR7 ECC |
+| 28 | RTX 6000 Ada 48GB | 9,592 | 48 | 200 | 200 | GDDR6 ECC |
+| 29 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 96 | 215 | 219 | GDDR7 ECC |
+| 30 | L40S 48GB | 10,403 | 48 | 217 | 219 | GDDR6 ECC |
+| 31 | GeForce RTX 5090 32GB | 7,829 | 32 | 245 | 281 | GDDR7 |
 
-Note: for the R9700, Arc Pro B70 and Arc Pro B50 the typical price in the CSV is lower than the lowest price (different dates and sources), so their typical column is lower than the low column.
+Note: for the R9700, Arc Pro B70 and Arc Pro B50 the typical price is below the lowest price. "Typical" is a 3-month median from a price tracker; "lowest" is the cheapest offer on the check date. Arc A770 16GB is not listed (no orderable new offer).
 
 ## 5. EUR per FP32 TFLOPS (lower is better)
 
 | # | Card | Price low | FP32 TFLOPS | EUR/TFLOPS |
 |---|---|---|---|---|
-| 1 | Intel Arc A770 16GB | 304 | 19.7 | 15 |
-| 2 | AMD Radeon RX 9070 XT 16GB | 949 | 48.7 | 19 |
-| 3 | GeForce RTX 5060 Ti 8GB | 520 | 23.7 | 22 |
-| 4 | Intel Arc B570 10GB | 299 | 12.7 | 24 |
-| 5 | Intel Arc B580 12GB | 387 | 14.6 | 27 |
-| 6 | GeForce RTX 5070 12GB | 929 | 30.9 | 30 |
-| 7 | GeForce RTX 5070 Ti 16GB | 1,399 | 43.9 | 32 |
-| 8 | GeForce RTX 5060 Ti 16GB | 799 | 23.7 | 34 |
-| 9 | GeForce RTX 5080 16GB | 1,969 | 56.3 | 35 |
-| 10 | AMD Radeon AI PRO R9700 32GB | 2,102 | 47.8 | 44 |
-| 11 | GeForce RTX 4080 Super 16GB | 2,708 | 51.3 | 53 |
-| 12 | Intel Arc Pro B50 16GB | 569 | 10.65 | 53 |
-| 13 | AMD Radeon PRO W7900 48GB | 3,516 | 61 | 58 |
-| 14 | Intel Arc Pro B70 32GB | 1,599 | 22.9 | 70 |
-| 15 | RTX 4500 Ada 24GB | 2,786 | 39.6 | 70 |
-| 16 | RTX PRO 4000 Blackwell 24GB | 2,819 | 40 | 70 |
-| 17 | RTX 5000 Ada 32GB | 4,710 | 65.3 | 72 |
-| 18 | RTX 4000 Ada 20GB | 1,940 | 26.7 | 73 |
-| 19 | GeForce RTX 5090 32GB | 7,829 | 104.8 | 75 |
-| 20 | Intel Arc Pro B60 24GB | 960 | 12.3 | 78 |
-| 21 | RTX PRO 4500 Blackwell 32GB | 4,549 | 51 | 89 |
-| 22 | RTX A4000 16GB | 1,964 | 19.2 | 102 |
-| 23 | RTX 6000 Ada 48GB | 9,592 | 91.1 | 105 |
-| 24 | L40S 48GB | 10,403 | 91.6 | 114 |
-| 25 | RTX PRO 5000 Blackwell 48GB | 8,119 | 65 | 125 |
-| 26 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 24 | 136 |
-| 27 | Intel Arc Pro B65 32GB | 1,687 | 12.3 | 137 |
-| 28 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 125 | 140 |
-| 29 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 110 | 147 |
-| 30 | RTX A5000 24GB | 4,225 | 27.8 | 152 |
-| 31 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 120 | 172 |
-| 32 | RTX PRO 5000 Blackwell 72GB | 12,624 | 65 | 194 |
+| 1 | AMD Radeon RX 9070 XT 16GB | 949 | 48.7 | 19 |
+| 2 | GeForce RTX 5060 Ti 8GB | 520 | 23.7 | 22 |
+| 3 | Intel Arc B570 10GB | 299 | 12.7 | 24 |
+| 4 | Intel Arc B580 12GB | 387 | 14.6 | 27 |
+| 5 | GeForce RTX 5070 12GB | 929 | 30.9 | 30 |
+| 6 | GeForce RTX 5070 Ti 16GB | 1,399 | 43.9 | 32 |
+| 7 | GeForce RTX 5060 Ti 16GB | 799 | 23.7 | 34 |
+| 8 | GeForce RTX 5080 16GB | 1,969 | 56.3 | 35 |
+| 9 | AMD Radeon AI PRO R9700 32GB | 2,102 | 47.8 | 44 |
+| 10 | GeForce RTX 4080 Super 16GB | 2,708 | 51.3 | 53 |
+| 11 | Intel Arc Pro B50 16GB | 569 | 10.65 | 53 |
+| 12 | AMD Radeon PRO W7900 48GB | 3,516 | 61 | 58 |
+| 13 | Intel Arc Pro B70 32GB | 1,599 | 22.9 | 70 |
+| 14 | RTX 4500 Ada 24GB | 2,786 | 39.6 | 70 |
+| 15 | RTX PRO 4000 Blackwell 24GB | 2,819 | 40 | 70 |
+| 16 | RTX 5000 Ada 32GB | 4,710 | 65.3 | 72 |
+| 17 | RTX 4000 Ada 20GB | 1,940 | 26.7 | 73 |
+| 18 | GeForce RTX 5090 32GB | 7,829 | 104.8 | 75 |
+| 19 | Intel Arc Pro B60 24GB | 960 | 12.3 | 78 |
+| 20 | RTX PRO 4500 Blackwell 32GB | 4,549 | 51 | 89 |
+| 21 | RTX A4000 16GB | 1,964 | 19.2 | 102 |
+| 22 | RTX 6000 Ada 48GB | 9,592 | 91.1 | 105 |
+| 23 | L40S 48GB | 10,403 | 91.6 | 114 |
+| 24 | RTX PRO 5000 Blackwell 48GB | 8,119 | 65 | 125 |
+| 25 | RTX PRO 4000 Blackwell SFF 24GB | 3,260 | 24 | 136 |
+| 26 | Intel Arc Pro B65 32GB | 1,687 | 12.3 | 137 |
+| 27 | RTX PRO 6000 Blackwell Workstation 96GB | 17,548 | 125 | 140 |
+| 28 | RTX PRO 6000 Blackwell Max-Q 96GB | 16,199 | 110 | 147 |
+| 29 | RTX A5000 24GB | 4,225 | 27.8 | 152 |
+| 30 | RTX PRO 6000 Blackwell Server 96GB | 20,645 | 120 | 172 |
+| 31 | RTX PRO 5000 Blackwell 72GB | 12,624 | 65 | 194 |
 
 FP32 TFLOPS on GeForce/AMD count dual-issue lanes; real shader throughput differs by architecture. Use this column only within one vendor generation.

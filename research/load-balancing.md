@@ -1,6 +1,6 @@
-# Dynamic load balancing for a small shared GPU server (research notes)
+# Dynamic load balancing for a shared GPU server (research notes)
 
-Date of research: 2026-11-17. Scope: 5-20 users, 1-few GPU servers, 8-12 mixed GPUs (16-48 GB), workloads: rendering, NN training, LLM fine-tuning, LLM inference. No paid NVIDIA vGPU.
+Date of research: 2026-11-17. Scope: a group of users (roughly 5-20), one to a few GPU servers with several mixed cards (16-48 GB), workloads: rendering, NN training, LLM fine-tuning, LLM inference. No paid NVIDIA vGPU.
 
 Legend: **V** = seen on the project page / docs during this research (URL given). **U** = from memory, not verified now. Versions and dates are as seen on 2026-11-17.
 
@@ -9,7 +9,7 @@ Legend: **V** = seen on the project page / docs during this research (URL given)
 ## 0. Short answer
 
 - Start with **whole-GPU scheduling plus a queue** (single-node k3s or Slurm). Fractions and autoscaling come later.
-- For a 1-3 node team the best-value Kubernetes stack is: **k3s + NVIDIA GPU Operator (or plain device plugin) + Kueue** (queues, quotas, preemption, one ResourceFlavor per GPU model) + **Prometheus/DCGM** for metrics.
+- For a 1-3 node setup the best-value Kubernetes stack is: **k3s + NVIDIA GPU Operator (or plain device plugin) + Kueue** (queues, quotas, preemption, one ResourceFlavor per GPU model) + **Prometheus/DCGM** for metrics.
 - Add **vLLM behind a simple router/LiteLLM + KEDA** only when inference is real. Skip llm-d / Gateway API Inference Extension until there are several GPU nodes serving one model.
 - Rendering: **Flamenco** (Blender-native) with workers as pods, or Kubernetes Jobs with indexed completion for frame ranges.
 - Fractions: **time-slicing** is easy but has no isolation (V). **MIG** exists on data-centre cards and on RTX PRO 4500/5000/6000 Blackwell. **HAMi** or **KAI Scheduler** are the free options for memory-limited fractions on mixed cards, but both add complexity. Treat them as optional.
@@ -39,7 +39,7 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 **NVIDIA GPU Operator + device plugin** (layers a, b, f)
 - Installs driver, container toolkit, device plugin, GPU Feature Discovery, DCGM exporter via Helm. Latest release seen: **v26.7.3, 17 Nov 2026** (v26.7.2 was 14 Oct 2026). A DRA driver v0.5.1 also exists. V: https://github.com/NVIDIA/gpu-operator/releases
 - Licence: Apache-2.0 for the operator (U; the release page did not state it). The drivers it deploys keep NVIDIA's own licence.
-- Mixed GPU models: yes. GPU Feature Discovery puts labels like `nvidia.com/gpu.product`, `nvidia.com/gpu.memory` on nodes (U for the exact label list). One node with different cards is the weak spot: the stock device plugin exposes all cards of a node as the same resource `nvidia.com/gpu`, so you cannot request "the 48 GB one" on the same node with plain labels. Options: separate nodes with node labels (`nvidia.com/gpu.product`), DRA, or HAMi (see below). The MIG strategy (`mixed`) only controls how MIG partitions are exposed; it does not separate non-MIG cards such as an A6000 and a 4090.
+- Mixed GPU models: yes. GPU Feature Discovery puts labels like `nvidia.com/gpu.product`, `nvidia.com/gpu.memory` on nodes (U for the exact label list). One node with different cards is the weak spot: the stock device plugin exposes all cards of a node as the same resource `nvidia.com/gpu`, so you cannot request "the 48 GB one" on the same node with plain labels. Options: separate nodes with node labels (`nvidia.com/gpu.product`), DRA, or HAMi (see below). The MIG strategy (`mixed`) only controls how MIG partitions are exposed; it does not separate non-MIG cards such as two different card models.
 - With time-slicing on, the product label gets a `-SHARED` suffix and the resource can be renamed to `nvidia.com/gpu.shared` (`renameByDefault`). Adjust flavor labels and resource names accordingly (V, device-plugin README).
 - Sharing docs (time-slicing, MIG): V: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
 
@@ -67,7 +67,7 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 - Recommended core of this setting.
 
 **Volcano**
-- CNCF incubating batch scheduler, Apache-2.0 (V: https://github.com/volcano-sh/volcano). Gang scheduling, queues, fair-share. Runs as an additional batch scheduler next to kube-scheduler, but is still heavier to adopt. Latest release seen: v1.16.0. Its built-in GPU sharing has been deprecated since v1.9 in favour of HAMi-based vGPU. Fine if you want an all-in-one batch system, but Kueue is lighter for a small team.
+- CNCF incubating batch scheduler, Apache-2.0 (V: https://github.com/volcano-sh/volcano). Gang scheduling, queues, fair-share. Runs as an additional batch scheduler next to kube-scheduler, but is still heavier to adopt. Latest release seen: v1.16.0. Its built-in GPU sharing has been deprecated since v1.9 in favour of HAMi-based vGPU. Fine if you want an all-in-one batch system, but Kueue is lighter for a small setup.
 
 **NVIDIA KAI Scheduler (open-sourced Run:ai scheduler)**
 - V: NVIDIA open-sourced the **Run:ai scheduler as KAI Scheduler on 1 April 2025, Apache-2.0**. Features named: gang scheduling (PodGroups), hierarchical queues with priority and fairness, GPU sharing. https://developer.nvidia.com/blog/nvidia-open-sources-runai-scheduler-to-foster-community-collaboration/
@@ -84,7 +84,7 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 
 **Slurm (non-Kubernetes alternative)**
 - V: current release listed as **Slurm 26.05**; recent GRES AutoDetect and Prometheus GPU allocation stats. https://slurm.schedmd.com/news.html Licence GPLv2 (U; page silent).
-- Strengths: simple for batch training/fine-tuning, fair-share, QoS preemption, GRES types per GPU model (`Gres=gpu:a6000:1`, `--gres=gpu:rtx4090:1`), accounting. Handles mixed models on one node very naturally (U).
+- Strengths: simple for batch training/fine-tuning, fair-share, QoS preemption, GRES types per GPU model (`Gres=gpu:model-a:1`, `--gres=gpu:model-b:1`), accounting. Handles mixed models on one node very naturally (U).
 - Weak: no native inference serving, autoscaling or scale-to-zero; rendering and desktops need extra glue. Great for 1-2 nodes of batch work.
 
 **Ray / KubeRay**
@@ -98,13 +98,13 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 | **vLLM production stack** | V: Apache-2.0; router with round-robin and session-ID routing (prefix-aware in progress), LMCache KV offload tutorial, Prometheus/Grafana dashboard. The docs have an "Autoscaling with KEDA" tutorial. Release `vllm-stack-0.1.14` is dated 2026-11-07 (first announced Jan 2025). https://github.com/vllm-project/production-stack |
 | **llm-d** | V: Apache-2.0, CNCF sandbox (joined March 2026), founded by Red Hat, Google Cloud, IBM Research, CoreWeave, NVIDIA; sits above vLLM/SGLang; **v1.0 in Oct 2026** (stable v1 config API, multi-tenant QoS); validated on NVIDIA, AMD, Intel GPUs and TPUs; SLO-aware autoscaling listed. https://github.com/llm-d/llm-d Aimed at multi-node clusters; heavy for 1 node. |
 | **Gateway API Inference Extension (GAIE)** | V: official Kubernetes project; extends Gateway API gateways with an Endpoint Picker (EPP) choosing replicas from model-server metrics; InferencePool CRD; works with Envoy Gateway, kgateway, GKE Gateway; both v1 and v1alpha1 API refs exist. https://gateway-api-inference-extension.sigs.k8s.io/ Needs a Gateway implementation. Gains appear with several replicas of the same model. |
-| **LiteLLM proxy** | U: open-source (MIT core, some enterprise features paid) OpenAI-compatible proxy; routing/fallback across backends, per-user keys, budgets. The GAIE page names it as a higher-level AI gateway; LiteLLM can sit in front of a GAIE pool (V). Good for a small team: one URL and keys for all models. |
-| **Triton Inference Server** | V: BSD-3-Clause, NVIDIA; multi-framework, dynamic batching. Best for classic NN serving; for LLMs most small teams use vLLM directly. |
+| **LiteLLM proxy** | U: open-source (MIT core, some enterprise features paid) OpenAI-compatible proxy; routing/fallback across backends, per-user keys, budgets. The GAIE page names it as a higher-level AI gateway; LiteLLM can sit in front of a GAIE pool (V). Good for a small group of users: one URL and keys for all models. |
+| **Triton Inference Server** | V: BSD-3-Clause, NVIDIA; multi-framework, dynamic batching. Best for classic NN serving; for LLMs small setups usually use vLLM directly. |
 | **KServe** | U: CNCF, Apache-2.0; InferenceService CRD. V (outline only): supports scale-to-zero via Knative or raw-deployment mode with KEDA. https://kserve.github.io/website/latest/modelserving/autoscaling/autoscaling/ Heavy (needs Knative or KEDA, Istio/Gateway). Probably too much for 1-3 nodes. |
 | **Knative Serving** | U: scale-to-zero for HTTP services with request buffering (activator), cold start depends on model load. |
 | **KEDA** | V: Prometheus scaler with `query`, `threshold`, `activationThreshold`; examples use `minReplicaCount: 0`; docs advise verifying scale-to-zero against concepts docs. https://keda.sh/docs/latest/scalers/prometheus/ KEDA's HTTP add-on (U) is needed to hold requests while a pod starts from zero; plain Prometheus scaler cannot buffer requests. |
 | **Ollama** | U: very easy, but limited: single-host process, queues requests per model (`OLLAMA_NUM_PARALLEL` was not found in the FAQ, U), loads/unloads models on a keep-alive timer (a poor-man's scale-to-zero of VRAM), no cluster-level routing, no per-user quotas, weak multi-GPU placement control. Fine for personal desktops, not as the shared service. |
-| **GPUStack** | V: Apache-2.0 GPU cluster manager for model serving and GPU instance provisioning; supports NVIDIA, AMD, Ascend and several other vendors; backends vLLM, SGLang, TensorRT-LLM; quick start uses Docker, no Kubernetes needed. Whether it mixes vendors in one cluster: not stated. https://github.com/gpustack/gpustack Attractive for a tiny team that mainly wants LLM serving across mixed GPUs (U for its scheduling quality). |
+| **GPUStack** | V: Apache-2.0 GPU cluster manager for model serving and GPU instance provisioning; supports NVIDIA, AMD, Ascend and several other vendors; backends vLLM, SGLang, TensorRT-LLM; quick start uses Docker, no Kubernetes needed. Whether it mixes vendors in one cluster: not stated. https://github.com/gpustack/gpustack Attractive for a tiny setup that mainly wants LLM serving across mixed GPUs (U for its scheduling quality). |
 
 ### 2.4 Rendering
 
@@ -137,13 +137,13 @@ Cycles/Blender needs no special scheduler support: a render job is just "one GPU
 ### Stage 0: measure (1-2 days, no user impact)
 - Install on each server: **DCGM exporter** (container or package), node exporter, Prometheus, Grafana (U: all free/open-source). Fallback: a cron `nvidia-smi --query-gpu=... --format=csv` logger.
 - Record per GPU: utilisation %, memory used, power, per user/process (nvidia-smi pmon), peak VRAM per job type.
-- Output: who uses which card when, how much VRAM jobs really need, idle share (usually 50-80% for desktop-style use, U). This decides how many "reserved" GPUs you need later.
+- Output: who uses which card when, how much VRAM jobs really need, idle share (usually 50-80% for desktop-style use, U). This decides how many cards need to stay reserved later.
 - Users notice: nothing.
 
 ### Stage 1: whole-GPU scheduling with a queue (2-5 days)
 - Option A: **k3s + NVIDIA driver + container toolkit + GPU Operator (or plain device plugin) + Kueue**. Label nodes/GPUs by model. Users submit with `kubectl`/a thin CLI/Helm chart, or via SkyPilot/dstack on top.
 - Option B: **Slurm** (slurmctld/slurmd on the server, `gres.conf` per GPU model, accounting). Faster if users are comfortable with SSH + `sbatch`.
-- Keep a **reserved pool** of 2-4 GPUs for remote-desktop users (cordon those cards via a separate node label/taint, or `NVIDIA_VISIBLE_DEVICES` split; U for exact mechanism). Everything else is queue-managed.
+- Keep a **reserved pool** of some of the cards for remote-desktop users (cordon those cards via a separate node label/taint, or `NVIDIA_VISIBLE_DEVICES` split; U for exact mechanism). Everything else is queue-managed.
 - Users notice: submitting jobs instead of grabbing a card; shorter waits when the queue is fair; need to learn one submit command.
 
 ### Stage 2: priorities, quotas, preemption, fractions (3-7 days)
@@ -166,7 +166,7 @@ Cycles/Blender needs no special scheduler support: a render job is just "one GPU
 - Users notice: "Submit to farm" from Blender instead of rendering on their desktop session; renders fill idle GPUs.
 
 ### Keeping remote-desktop users working during migration
-1. **Reserve first, shrink later**: start with most cards still "desktop"; move 1-2 cards per month into the pool as usage data (Stage 0) shows idle time.
+1. **Reserve first, shrink later**: start with most cards still reserved for desktops. Move a small number of cards into the pool at each step (for example at a regular review), as the usage data (Stage 0) shows idle time. Stop when desktop users no longer wait.
 2. **Per-card split on the same host**: desktop sessions use only the reserved GPUs; the queue cannot see them (taint/label or device exclusion).
 3. **Desktop as a pod**: U: possible with a container desktop (KasmVNC/Xpra/Selkies style) requesting a GPU through the queue with highest priority. Works for CUDA/OpenGL on NVIDIA; verify per application.
 4. **Desktop as a VM with passthrough**: possible (VFIO) but binds a card exclusively to the VM and complicates the host driver; GeForce passthrough has historic quirks (U). Use only if hard isolation is required.
@@ -184,25 +184,25 @@ All snippets are **illustrative** (not copied from docs unless stated). Check fi
  users --ssh/CLI--> [ queue: Slurm  OR  k3s + Kueue ]
                           |
         +-----------------+------------------+
-        | single GPU server                    |
-        |  reserved: GPU0-GPU3  (remote desktop)
-        |  pool:     GPU4-GPU9  (jobs)         |
+        | one GPU server with N cards          |
+        |  reserved: some cards (remote desktop)
+        |  pool:     the other cards (jobs)    |
         |  DCGM exporter -> Prometheus -> Grafana
         +--------------------------------------+
 ```
 
 Slurm illustrative `gres.conf` / `slurm.conf` lines:
 ```
-# gres.conf
-NodeName=gpu01 Name=gpu Type=a6000   File=/dev/nvidia4,/dev/nvidia5
-NodeName=gpu01 Name=gpu Type=rtx4090 File=/dev/nvidia6,/dev/nvidia7
+# gres.conf (only the pool cards are listed; reserved desktop cards are left out)
+NodeName=gpu01 Name=gpu Type=model-a File=/dev/nvidia4,/dev/nvidia5
+NodeName=gpu01 Name=gpu Type=model-b File=/dev/nvidia6,/dev/nvidia7
 # slurm.conf
 GresTypes=gpu
-NodeName=gpu01 Gres=gpu:a6000:2,gpu:rtx4090:2 ...
+NodeName=gpu01 Gres=gpu:model-a:2,gpu:model-b:2 ...
 PreemptType=preempt/qos
 PreemptMode=REQUEUE
 ```
-Submit: `sbatch --gres=gpu:a6000:1 --qos=batch train.sh`.
+Submit: `sbatch --gres=gpu:model-a:1 --qos=batch train.sh`.
 Fits: 1 node yes. No inference autoscaling; run vLLM as long-lived Slurm jobs or systemd.
 
 ### 4.2 Recommended: k3s + GPU Operator + Kueue + KEDA + LiteLLM + Flamenco
@@ -220,7 +220,7 @@ Fits: 1 node yes. No inference autoscaling; run vLLM as long-lived Slurm jobs or
    [train/finetune Jobs] [vLLM Deployments] <- [LiteLLM / router] <- users, apps
    [Flamenco workers  ]  (1 per model)
            |
-   GPU nodes (label: gpu.product=A6000 / RTX4090 / L4 ...)
+   GPU nodes (label: gpu.product=model-a / model-b / ...)
    reserved desktop GPUs excluded
 ```
 
@@ -228,9 +228,9 @@ Kueue illustrative (one flavor per GPU model):
 ```yaml
 apiVersion: kueue.x-k8s.io/v1beta2
 kind: ResourceFlavor
-metadata: { name: a6000-48g }
+metadata: { name: model-a-48g }
 spec:
-  nodeLabels: { nvidia.com/gpu.product: NVIDIA-RTX-A6000 }
+  nodeLabels: { nvidia.com/gpu.product: MODEL-A }
 ---
 apiVersion: kueue.x-k8s.io/v1beta2
 kind: ClusterQueue
@@ -242,9 +242,9 @@ spec:
   resourceGroups:
   - coveredResources: ["nvidia.com/gpu"]
     flavors:
-    - name: a6000-48g
+    - name: model-a-48g
       resources: [{ name: nvidia.com/gpu, nominalQuota: 2 }]
-    - name: rtx4090-24g
+    - name: model-b-24g
       resources: [{ name: nvidia.com/gpu, nominalQuota: 4 }]
 ```
 Caveat: label values and API version depend on installed versions (in Kueue v0.20.6, `v1beta1` is no longer served; `v1beta2` is current). Also, if two card models sit in one node, the stock plugin cannot tell them apart; use one node per model, or HAMi/DRA. The MIG strategy does not help here.

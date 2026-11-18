@@ -47,7 +47,7 @@ Price evidence: most prices come from hardwaredealz.com (Geizhals data, page tim
 | Intel Arc Pro B50 16GB | 569 | 539 | 478 | Amazon.de via gpuprix (Gunnir B50 LP); typical = tracker 3-month median (2026-11-14, page (aggregator)) | 16 | GDDR6 | 224 | 1,546 (n=10) | 47.7 |
 | Intel Arc B580 12GB | 387 | - | 325 | Geizhals via hardwaredealz.com (ASRock B580 Challenger OC) (2026-11-17, page, undated snippet (fetched today); gpuprix 3-month median 317 (2026-11-14) suggests cheaper offers when in stock) | 12 | GDDR6 | 456 | 2,373 (n=124) | 72.0 |
 | Intel Arc B570 10GB | 299 | - | 251 | Geizhals via hardwaredealz.com; gpuprix Amazon.de ASRock Challenger OC 300 in stock (2026-11-17, page, undated snippet (fetched today); gpuprix 2026-11-14 (300)) | 10 | GDDR6 | 380 | 1,853 (n=7) | 50.5 |
-| Intel Arc A770 16GB | 304 | - | 255 | Alternate via gpuprix (ASRock A770 Challenger SE OC), out of stock (2026-11-14, page (aggregator); EOL card, no in-stock offer seen) | 16 | GDDR6 | 560 | 2,448 (n=55) | 53.1 |
+| Intel Arc A770 16GB | - | - | - | no orderable new offer (end of life); last seen price 304 EUR, not used (2026-11-14, page (aggregator); EOL card, no in-stock offer seen) | 16 | GDDR6 | 560 | 2,448 (n=55) | 53.1 |
 
 ## 2. Compute units and throughput
 
@@ -134,6 +134,6 @@ Price evidence: most prices come from hardwaredealz.com (Geizhals data, page tim
 - **Blower** for PRO 5000/4500/4000 and 6000 Max-Q: PNY spec tables say 'Blower Active Fan'; NVIDIA only says 'Active'.
 - **RTX 5060 Ti 8 GB vs 16 GB**: identical compute; Blender Open Data does not separate them. 8 GB limits LLM use to ~7B at 4-bit.
 - **RTX 5070 price** (929) is the MSI Ventus 2X OC seen on hardwaredealz.com (page re-checked 18.11.2026). The CSV has no typical price for it.
-- Cards without a usable price (A100 80GB PCIe, Arc Pro B60 Dual 48GB) stay in the table for specs and are skipped in price rankings.
-- **Typical price below lowest price:** for the R9700 (2,102 low, 1,622 typical), Arc Pro B70 (1,599 / 1,581) and Arc Pro B50 (569 / 539) the CSV typical price is lower than the lowest price. The CSV does not say why; treat both with care.
+- Cards without a usable price (A100 80GB PCIe, Arc Pro B60 Dual 48GB, Arc A770 16GB: end of life, no orderable new offer) stay in the table for specs and are skipped in price rankings.
+- **Typical price below lowest price:** for the R9700 (2,102 low, 1,622 typical), Arc Pro B70 (1,599 / 1,581) and Arc Pro B50 (569 / 539). "Typical" is a 3-month median from a price tracker; "lowest" is the cheapest offer on the check date.
 - Full source list per row: CSV column `spec_sources`; raw research notes in `raw/`.

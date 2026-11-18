@@ -28,7 +28,7 @@ As of 2026-11-17. Prices are German brutto (see `gpu-master-table.md`); benchmar
 | Kubernetes | GPU Operator v26.x: device plugin, time-slicing, MIG, DRA driver; KAI Scheduler; Run:ai open source since 13 Oct 2026 [V] | ROCm k8s-device-plugin + AMD GPU Operator; partitioning only on Instinct (MI300 CPX/NPS) [V/U]. No sharing feature for Radeon PRO described. | Intel GPU device plugin with `shared-dev-num` sharing; hands out SR-IOV VFs [V] |
 | Virtualisation | vGPU (paid licences) on selected pro/datacenter cards; MIG on RTX PRO 6000/5000/4500 | MxGPU/SR-IOV only on Instinct and Radeon PRO V710, not on R9700/W7900 [V] | SR-IOV: B70 (4 VFs) and B50 (2 VFs) official per Intel; B60 works in community setups (kernel ≥ 6.17), no official count [U] |
 
-Assessment: for a mixed render + AI service run by a small team, the software risk on AMD falls on the team (debugging, version pinning). On NVIDIA it largely does not.
+Assessment: for a mixed render + AI service run by a small group, the software risk on AMD falls on whoever runs it (debugging, version pinning). On NVIDIA it largely does not.
 
 ## 3. Performance and price per benchmark
 
@@ -66,7 +66,7 @@ Price evidence: the R9700 price comes from Amazon.de via the gpuprix aggregator 
 | Sharing / isolation | MIG on RTX PRO 6000/5000/4500; paid vGPU on selected cards | No SR-IOV on Radeon AI PRO / W-series; time-slicing only via generic k8s means |
 
 ## 5. When AMD makes sense
-- The main pain is **LLM VRAM**, and the team is comfortable on Linux with pinned ROCm/vLLM versions. For example, 4x R9700 give 128 GB for about 8,400 EUR, enough for 70B models with long context or several 32B replicas.
+- The main pain is **LLM VRAM**, and the people running it are comfortable on Linux with pinned ROCm/vLLM versions. For example, 4x R9700 give 128 GB for about 8,400 EUR, enough for 70B models with long context or several 32B replicas.
 - Rendering is mostly Blender, where AMD works at lower speed, or runs on separate NVIDIA cards.
 - A mixed fleet is acceptable: NVIDIA for rendering and training, AMD for inference capacity. The cost is two software stacks and two Kubernetes device plugins.
 

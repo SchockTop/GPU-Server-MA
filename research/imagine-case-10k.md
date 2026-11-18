@@ -4,11 +4,11 @@ New hardware only; used cards are not listed.
 
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
-A generic worked example for a small team that wants shared GPU compute for **rendering as a service** (Blender/Cycles, V-Ray, Octane, Redshift; on demand and batch), **neural-network training** (UNet, Transformers), **LLM fine-tuning** and **LLM inference**. It assumes a Kubernetes-style setup where jobs get whole GPUs or GPU slices.
+A generic worked example for a team that wants shared GPU compute for **rendering as a service** (Blender/Cycles, V-Ray, Octane, Redshift; on demand and batch), **neural-network training** (UNet, Transformers), **LLM fine-tuning** and **LLM inference**. It assumes a Kubernetes-style setup where jobs get whole GPUs or GPU slices.
 
 This is not a recommendation. It shows what the money buys and what each option gives up.
 
-Prices are German retail as of 2026-11-17/18 (date per card in `gpu-master-table.md`), brutto incl. 19% VAT, from `gpu-master-table.md`. "Low" is the lowest offer found; "typical" is the middle of the top ten shops. GPU prices moved by 2-30% within weeks in autumn 2026, so re-check before buying.
+Prices are German retail as of 2026-11-17/18 (date per card in `gpu-master-table.md`), brutto incl. 19% VAT, from `gpu-master-table.md`. "Low" is the lowest offer found; "typical" is the figure in the "Typical" column of `gpu-master-table.md`. GPU prices moved by 2-30% within weeks in autumn 2026, so re-check before buying.
 
 > **Brutto or netto matters a lot.** 10,000 EUR brutto is 8,403 EUR net. 10,000 EUR net is 11,900 EUR brutto, which is close to the 12k options below. The RTX 5090 + 2x RTX 5080 option (11,767 brutto, 9,889 net) now fits under 10,000 EUR net.
 
@@ -16,22 +16,24 @@ Blender figures are Open Data 4.5.0 medians per card, simply added up. The sums 
 
 ---
 
-## The four main packages
+## The five main packages
 
-| | A: 2x RTX PRO 4500 Blackwell | B: 1x RTX PRO 5000 Blackwell 48GB | C: 3x RTX PRO 4000 Blackwell | D: 4x GeForce RTX 5080 |
-|---|---|---|---|---|
-| Price brutto (low / typical) | 9,098 / ~9,600 | 8,119 / ~8,500 | 8,457 / ~9,150 | 7,876 / ~9,000 |
-| Net (low) | 7,645 | 6,823 | 7,107 | 6,618 |
-| VRAM total (per card) | 64 GB (32) | 48 GB (48) | 72 GB (24) | 64 GB (16) |
-| Largest single job | 32 GB | **48 GB** | 24 GB | 16 GB |
-| Blender, sum of cards | ~17,000 | ~10,900 | ~18,800 | **~36,600** |
-| llama.cpp 7B tg, per card | 169 t/s | no data (similar bandwidth to 6000 Ada: ~180 expected, not measured) | 136 t/s | 185 t/s |
-| Power | 2x 200 W | 300 W | 3x 145 W | 4x 360 W |
-| Slots / cooling | 2x dual-slot blower | 1x dual-slot blower | 3x **single-slot** blower | 4x 2-3.5-slot axial (partner cards) |
-| ECC | yes | yes | yes | no |
-| Sharing | whole cards or MIG 2x 16 GB (NVIDIA's MIG list: up to 2) | **MIG 2x 24 GB** | whole cards, many small slots | whole cards or time-slicing |
-| vGPU | no | no (only the 72 GB version) | no | no |
-| Driver licence | pro driver | pro driver | pro driver | GeForce EULA excludes "datacenter deployment" (needs legal review) |
+| | A: 2x RTX PRO 4500 Blackwell | B: 1x RTX PRO 5000 Blackwell 48GB | C: 3x RTX PRO 4000 Blackwell | D: 4x GeForce RTX 5080 | E: 1x RTX PRO 5000 Blackwell 48GB + 1x Intel Arc Pro B70 32GB |
+|---|---|---|---|---|---|
+| Price brutto (low / typical) | 9,098 / ~9,600 | 8,119 / ~8,500 | 8,457 / ~9,150 | 7,876 / ~9,000 | 9,718 / ~10,100 |
+| Net (low) | 7,645 | 6,823 | 7,107 | 6,618 | 8,166 |
+| VRAM total (per card) | 64 GB (32) | 48 GB (48) | 72 GB (24) | 64 GB (16) | 80 GB (48 + 32) |
+| Largest single job | 32 GB | **48 GB** | 24 GB | 16 GB | **48 GB** (32 GB on the second card) |
+| Blender, sum of cards | ~17,000 | ~10,900 | ~18,800 | **~36,600** | ~14,200 (B70 value is n=1) |
+| llama.cpp 7B tg, per card | 169 t/s | no data (similar bandwidth to 6000 Ada: ~180 expected, not measured) | 136 t/s | 185 t/s | strong card: no data; B70: 113 t/s |
+| Power | 2x 200 W | 300 W | 3x 145 W | 4x 360 W | 300 W + 230 W |
+| Slots / cooling | 2x dual-slot blower | 1x dual-slot blower | 3x **single-slot** blower | 4x 2-3.5-slot axial (partner cards) | 2x dual-slot blower |
+| ECC | yes | yes | yes | no | yes |
+| Sharing | whole cards or MIG 2x 16 GB (NVIDIA's MIG list: up to 2) | **MIG 2x 24 GB** | whole cards, many small slots | whole cards or time-slicing | strong card: **MIG 2x 24 GB**; B70: up to 4 SR-IOV virtual functions (Intel) |
+| vGPU | no | no (only the 72 GB version) | no | no | no (NVIDIA card); Intel SR-IOV on the B70 |
+| Driver licence | pro driver | pro driver | pro driver | GeForce EULA excludes "datacenter deployment" (needs legal review) | pro driver; Intel driver (sharing under Windows is still immature) |
+
+Footnote: for the Arc Pro B70 (and the R9700 and Arc Pro B50) the typical price is below the lowest price. "Typical" is a 3-month median from a price tracker; "lowest" is the cheapest offer on the check date.
 
 ### What each package is good at
 
@@ -58,6 +60,13 @@ Blender figures are Open Data 4.5.0 medians per card, simply added up. The sums 
 - Large axial-fan cards (2.5-3.5 slots) need airflow and space, so they suit workstations or a roomy chassis better than a dense server.
 - No ECC.
 - The GeForce driver licence excludes datacenter use. Whether a shared department server counts is a legal question.
+
+**E: one strong card plus one card for VM sharing.** 1x RTX PRO 5000 Blackwell 48GB (300 W) + 1x Intel Arc Pro B70 32GB (230 W). Sum of the lowest gross prices: 8,119 + 1,599 = 9,718 EUR brutto (8,166 EUR net = brutto / 1.19). The B70 price is dated 2026-10-26, older than the rest.
+- The strong card handles rendering, training and 70B LLMs at 4-bit with short context.
+- The second card can serve up to 4 light users, each in their own VM, without a per-user fee (4 SR-IOV virtual functions per Intel).
+- Intel sharing under Windows is still immature. Test it first with your own guest image.
+- Alternative: share a vGPU-capable NVIDIA card (for example the RTX 5000 Ada) with a licence from 50 USD per user per year. See `virtualization-licensing.md`.
+- The B70 Blender value rests on a single run (n=1), and the 4-user figure is Intel's, not measured here.
 
 ---
 
