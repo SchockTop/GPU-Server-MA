@@ -122,7 +122,7 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <div class="pk">
   <div class="card"><span class="tag">A · ausgewogen</span><h3>2× RTX PRO 4500 (32 GB)</h3>
     <dl><dt>Preis</dt><dd>9.098 € (netto 7.645 €)</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
-    <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Blower, dicht stapelbar, ECC</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
+    <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Radiallüfter (Blower), dicht einbaubar, fehlerkorrigierender Speicher (ECC)</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
   <div class="card"><span class="tag">B · größtes Modell</span><h3>1× RTX PRO 5000 (48 GB)</h3>
     <dl><dt>Preis</dt><dd>8.119 € (netto 6.823 €)</dd><dt>VRAM</dt><dd>48 GB auf einer Karte</dd><dt>Blender</dt><dd>ca. 10.900</dd><dt>Strom</dt><dd>300 W</dd></dl>
     <ul><li>70B-LLMs mit 4 Bit laufen, mit kurzem Kontext</li><li>Teilbar in 2× 24 GB (MIG)</li><li>Nur ein großer Job gleichzeitig</li><li>Rund 1.900 € bleiben übrig</li></ul></div>
@@ -136,7 +136,7 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
     <dl><dt>Preis</dt><dd>9.718 € (netto 8.166 €)</dd><dt>VRAM</dt><dd>48 GB für große Jobs, 32 GB zum Teilen</dd><dt>Blender</dt><dd>ca. 10.900 auf der starken Karte</dd><dt>Strom</dt><dd>300 W + 230 W</dd></dl>
     <ul><li>Starke Karte für Rendering, Training und 70B-LLMs</li><li>Zweite Karte für bis zu 4 leichte Nutzer in eigenen VMs, ohne Gebühr je Nutzer</li><li>Das Teilen der Intel-Karte ist unter Windows noch unreif: erst testen</li><li>Alternative zur Intel-Karte: eine vGPU-fähige NVIDIA-Karte (z. B. RTX 5000 Ada) mit Lizenz ab 50 $ je Nutzer und Jahr teilen</li></ul></div>
 </div>
-<p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a></p>
+<p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a> (englisch)</p>
 
 
 <div class="filters" id="filters">
@@ -211,6 +211,19 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 </tbody></table></div>
 <p class="small">Nachtrainieren (Fine-Tuning) braucht deutlich mehr Speicher als Inferenz. Herleitung und Werte dazu (englisch): <a href="research/benchmarks.md">benchmarks.md</a>, Abschnitte 3.3 und 4.</p>
 
+<h3 style="margin-top:22px">Viele Nutzer gleichzeitig: Sprachmodell als Dienst</h3>
+<p class="sub">Die Token-Werte in der Tabelle „Alle Karten“ gelten für einen Nutzer mit einer Anfrage. Ein Dienst für viele Nutzer bündelt Anfragen (z. B. mit der Software vLLM) und schafft in Summe ein Vielfaches. Dafür zählen viel VRAM und schneller Speicher.</p>
+<div class="tw"><table>
+<thead><tr><th>Test</th><th>Ergebnis (Token pro Sekunde, alle Nutzer zusammen)</th><th>Quelle</th></tr></thead>
+<tbody>
+<tr><td class="wrap">Modell mit 30 Milliarden Parametern, 400 gleichzeitige Anfragen</td><td class="wrap">RTX 5090: 4.570 · RTX PRO 6000: 8.425 · 4× RTX 5090: 12.744</td><td>CloudRift</td></tr>
+<tr><td class="wrap">Llama 3.3 70B, 400 gleichzeitige Anfragen</td><td class="wrap">RTX PRO 6000: 1.031 · 2× RTX 5090: 1.230</td><td>CloudRift</td></tr>
+<tr><td class="wrap">Modell mit 14 Milliarden Parametern, 32 gleichzeitige Anfragen</td><td class="wrap">RTX PRO 4500 (Server): 1.107 · L40S: 995 · RTX PRO 6000 (Server): 2.283</td><td>StorageReview</td></tr>
+<tr><td class="wrap">Modell mit 27 Milliarden Parametern, 32 gleichzeitige Anfragen</td><td class="wrap">RTX PRO 4500 (Server): 320 · L40S: 480 · RTX PRO 6000 (Server): 616</td><td>StorageReview</td></tr>
+<tr><td class="wrap">Llama 3.1 8B auf AMD, 1 / 4 / 8 gleichzeitige Anfragen</td><td class="wrap">Radeon AI PRO R9700: 29 / 102 / 153</td><td>Puget Systems</td></tr>
+</tbody></table></div>
+<p class="small">Diese Werte stammen aus der Recherche vom 17.11.2026 und sind nicht einzeln an der Quelle nachgeprüft. Jede Zeile ist ein eigener Test; Zeilen untereinander sind nicht vergleichbar. Quellen (englisch): <a href="research/benchmarks.md">benchmarks.md</a>, Abschnitt 3.2.</p>
+
 <h2 id="training">Training: gemessene Werte</h2>
 <p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Die breiteste Messreihe (AIME, erster Kasten) deckt 11 Karten ab; Die großen Benchmark-Reihen helfen nicht: MLPerf Training misst nur ganze Rechenzentrums-Systeme, andere bekannte KI-Benchmarks messen nur Inferenz. Es bleiben einzelne Messreihen von Systemhäusern und Blogs. Deshalb steht hier jede Quelle für sich. Bitte nur Karten innerhalb eines Kastens vergleichen, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser, außer wo „kürzer ist besser“ dabeisteht.</p>
 <div class="pk" id="train"></div>
@@ -238,7 +251,7 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <div class="tw"><table id="tbl"><thead></thead><tbody></tbody></table></div>
 
 <h2 id="b2b">Firmenpreise (B2B)</h2>
-<p class="sub">Preise von Händlern und Systemhäusern, die an Unternehmen verkaufen. Netto ist der Preis ohne Mehrwertsteuer. Viele Systemhäuser zeigen Preise nur nach Anmeldung oder auf Anfrage; Projektpreise liegen oft unter den Listenpreisen.</p>
+<p class="sub">Preise von Händlern und Systemhäusern, die an Unternehmen verkaufen. Netto ist der Preis ohne Mehrwertsteuer. Viele Systemhäuser zeigen Preise nur nach Anmeldung oder auf Anfrage; Projektpreise liegen oft unter den Listenpreisen. Ein Klick auf einen Spaltenkopf sortiert.</p>
 <div id="b2bwrap"></div>
 
 <h2 id="hersteller">AMD, Intel oder NVIDIA?</h2>
@@ -272,7 +285,7 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <tr><td>AMD MxGPU (SR-IOV)</td><td>keine Gebühr gefunden</td><td>stark</td><td>teilweise</td><td>nur Instinct und Radeon PRO V710, keine Workstation-Radeon</td></tr>
 <tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex 170, Arc Pro B50 und B70 (offiziell), B60 (Forenberichte); unter Windows noch unreif</td></tr>
 </tbody></table></div>
-<p class="small">Bezahlte vGPU-Lizenzen lohnen sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
+<p class="small">Bezahlte vGPU-Lizenzen lohnen sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a> (englisch)</p>
 
 <h2 id="lb">Dynamische Lastverteilung (Load Balancing): Jobs automatisch verteilen</h2>
 <p class="sub">Ohne Lastverteilung sucht sich jeder Nutzer selbst eine freie Karte, etwa per Remote-Desktop. Lastverteilung (Load Balancing) heißt: Ein System legt Jobs und Anfragen automatisch auf passende, freie Karten. Das passiert auf mehreren Ebenen, und für jede gibt es kostenlose Werkzeuge.</p>
@@ -296,15 +309,34 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
   <div class="card"><span class="tag">Stufe 4 · 2–4 Tage</span><h3>Renderfarm im selben Pool</h3><p class="small">Flamenco-Worker fordern je eine Karte an und laufen mit niedrigster Priorität. Aus Blender schickt man den Job dann an Flamenco. Lizenzserver für V-Ray oder Octane müssen aus dem Cluster erreichbar sein.</p></div>
 </div>
 <div class="note">Stolpersteine: Time-Slicing trennt den Speicher nicht, ein Job kann den anderen zum Absturz bringen. Bei verschiedenen Kartenmodellen für jedes Modell eine eigene Ressourcenklasse anlegen (in Kueue: ResourceFlavor), sonst landen Jobs auf Karten mit zu wenig VRAM. Mit nur einem Server fällt bei einem Defekt alles aus. Der Aufwand je Stufe ist eine Schätzung.</div>
-<p class="small">Beispielarchitekturen (minimal, empfohlen, erweitert), Konfigurationsbeispiele und der Werkzeugvergleich: <a href="research/load-balancing.md">load-balancing.md</a></p>
+<p class="small">Beispielarchitekturen (minimal, empfohlen, erweitert), Konfigurationsbeispiele und der Werkzeugvergleich: <a href="research/load-balancing.md">load-balancing.md</a> (englisch)</p>
 
 <h2 id="details">Details und Grenzen der Daten</h2>
-<div class="note">Für viele Karten, auch mehrere der neuesten (Blackwell), gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher.</div>
+<div class="note">Für viele Karten, auch mehrere der neuesten (Blackwell), gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Das betrifft vor allem die RTX 5000 Ada: Ihr Wert (5.677) beruht auf 9 Messungen, über alle Blender-Versionen liegt der Median bei 7.655. Sie ist im Rendering deshalb vermutlich zu schlecht bewertet. RTX A5000 und RTX A4000: Das einzige gefundene Angebot stammt von einem Händler, der auch aufbereitete Ware führt; vor einem Kauf prüfen, ob es Neuware ist.</div>
+<h3 style="margin-top:22px">Begriffe</h3>
+<div class="tw"><table><tbody>
+<tr><td>VRAM</td><td class="wrap">Grafikspeicher: der Speicher auf der Karte. Modelle und Szenen müssen hineinpassen.</td></tr>
+<tr><td>LLM</td><td class="wrap">Großes Sprachmodell (Large Language Model). „32B“ heißt 32 Milliarden Parameter.</td></tr>
+<tr><td>Token, Kontext</td><td class="wrap">Ein Token ist ein Wortstück. Der Kontext ist die Textmenge, die das Modell gleichzeitig überblickt; mehr Kontext braucht mehr VRAM.</td></tr>
+<tr><td>4 Bit, 8 Bit, FP16</td><td class="wrap">Wie genau die Zahlen im Modell gespeichert sind. 4 Bit ist stark komprimiert und für den Betrieb üblich, FP16 ist die volle Genauigkeit für Training.</td></tr>
+<tr><td>Inferenz, Training, Fine-Tuning</td><td class="wrap">Inferenz: ein fertiges Modell benutzen. Training: ein Modell neu lernen lassen. Fine-Tuning (z. B. LoRA): ein fertiges Modell nachtrainieren.</td></tr>
+<tr><td>TFLOPS</td><td class="wrap">Billionen Rechenschritte pro Sekunde laut Datenblatt, ein theoretischer Höchstwert.</td></tr>
+<tr><td>CUDA</td><td class="wrap">NVIDIAs Software-Plattform für Berechnungen auf der Karte. AMD nennt seine ROCm, Intel oneAPI.</td></tr>
+<tr><td>VM, Hypervisor</td><td class="wrap">Virtuelle Maschine: ein kompletter Rechner aus Software. Der Hypervisor (z. B. Hyper-V, Proxmox) verteilt die echte Hardware auf die VMs.</td></tr>
+<tr><td>vGPU, SR-IOV, MIG, Time-Slicing</td><td class="wrap">Wege, eine Karte zu teilen. vGPU (NVIDIA, mit Lizenz) und SR-IOV (Intel, AMD) geben VMs feste Teile. MIG schneidet eine Karte in feste Teile für Container. Time-Slicing lässt mehrere Jobs abwechselnd rechnen, ohne den Speicher zu trennen.</td></tr>
+<tr><td>Kubernetes</td><td class="wrap">System, das Programme in Containern automatisch auf Rechner und Karten verteilt.</td></tr>
+<tr><td>ECC</td><td class="wrap">Fehlerkorrigierender Speicher: erkennt und behebt einzelne Speicherfehler, wichtig bei langen Rechenläufen.</td></tr>
+<tr><td>Blower</td><td class="wrap">Radiallüfter, der die warme Luft hinten aus dem Gehäuse bläst. Solche Karten lassen sich dicht nebeneinander einbauen.</td></tr>
+<tr><td>SFF, Max-Q, Server Edition</td><td class="wrap">Bauformen derselben Karte: SFF ist klein und sparsam, Max-Q auf wenig Strom ausgelegt, die Server Edition hat keinen eigenen Lüfter und braucht den Luftstrom des Servers.</td></tr>
+<tr><td>Blackwell, Ada, Ampere</td><td class="wrap">NVIDIAs Kartengenerationen: Blackwell ist die aktuelle (RTX 50, RTX PRO), Ada die vorige, Ampere die davor.</td></tr>
+<tr><td>brutto, netto</td><td class="wrap">Mit und ohne 19 % Mehrwertsteuer.</td></tr>
+</tbody></table></div>
+<h3 style="margin-top:22px">Dokumente</h3>
 <ul>
   <li><a href="research/gpu-master-table.md">Vollständige Tabelle mit Quellen</a> (<a href="research/gpu-master-table.csv">CSV</a>)</li>
-  <li><a href="research/benchmarks.md">Benchmarks</a>: Rendering, Training, LLM-Inferenz, Speicherbedarf</li>
-  <li><a href="research/rankings.md">Rankings</a> nach Leistung und Preis-Leistung</li>
-  <li><a href="research/amd-vs-nvidia.md">AMD gegen NVIDIA</a> (und Intel)</li>
+  <li><a href="research/benchmarks.md">Benchmarks</a> (englisch): Rendering, Training, LLM-Inferenz, Speicherbedarf</li>
+  <li><a href="research/rankings.md">Rankings</a> (englisch) nach Leistung und Preis-Leistung</li>
+  <li><a href="research/amd-vs-nvidia.md">AMD gegen NVIDIA</a> (englisch) (und Intel)</li>
 </ul>
 </main>
 <div id="tip"></div>
@@ -315,7 +347,7 @@ const VN = {nvpro:"NVIDIA Pro", geforce:"NVIDIA GeForce", amd:"AMD", intel:"Inte
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt = (v, d = 0) => v == null || isNaN(v) ? "–" : v.toLocaleString("de-DE", {maximumFractionDigits: d, minimumFractionDigits: d});
-const state = {y: "blender", bar: "blender", sort: "price", dir: 1, ssort: "score"};
+const state = {y: "blender", bar: "blender", sort: "price", dir: 1, ssort: "score", bsort: "net", bdir: 1};
 const UI = {pinned: [], hidden: [], cols: [], closed: []};
 try { Object.assign(UI, JSON.parse(localStorage.getItem("gpu-ui-v1") || "{}")); } catch (e) {}
 function saveUI(){ try { localStorage.setItem("gpu-ui-v1", JSON.stringify(UI)); } catch (e) {} }
@@ -418,14 +450,20 @@ function drawB2B(){
     const ok = groups[k].filter(r => r.shown_as != "brutto_assumed" && r.evidence == "V" && !isNaN(net(r))).sort((a, b) => net(a) - net(b));
     const c = matchCard(k), retail = c && c.price != null ? c.price / 1.19 : null, best = ok[0];
     return {k, n: groups[k].length, best, retail, diff: best && retail ? (net(best) / retail - 1) * 100 : null};
-  }).sort((a, b) => (a.best ? net(a.best) : 1e9) - (b.best ? net(b.best) : 1e9));
-  let h = '<div class="tw"><table><thead><tr><th>Karte</th><th class="num">Günstigster Firmenpreis netto €</th><th>Händler</th><th class="num">Angebote</th><th class="num">Günstigster Handelspreis netto €</th><th class="num">Firmenpreis gegenüber Handel</th></tr></thead><tbody>' +
+  });
+  const BK = {card: s => s.k, net: s => s.best ? net(s.best) : null, n: s => s.n, retail: s => s.retail, diff: s => s.diff}, bk = BK[state.bsort];
+  sum.sort((a, b) => { const x = bk(a), y = bk(b); if (x == null) return y == null ? 0 : 1; if (y == null) return -1;
+    return (typeof x == "number" ? x - y : x.localeCompare(y, "de")) * state.bdir; });
+  const bth = (k, label, numc) => `<th data-b="${k}" class="${numc ? "num" : ""}" ${state.bsort == k ? `aria-sort="${state.bdir > 0 ? "ascending" : "descending"}"` : ""}>${label}</th>`;
+  let h = '<div class="tw"><table><thead><tr>' + bth("card", "Karte", 0) + bth("net", "Günstigster Firmenpreis netto €", 1) + '<th>Händler</th>' + bth("n", "Angebote", 1) + bth("retail", "Günstigster Handelspreis netto €", 1) + bth("diff", "Firmenpreis gegenüber Handel", 1) + '</tr></thead><tbody>' +
     sum.map(s => `<tr><td>${esc(s.k)}</td><td class="num">${s.best ? fmt(net(s.best)) : "–"}</td><td>${s.best ? esc(s.best.reseller) : "kein ausgewiesener Nettopreis"}</td><td class="num">${s.n}</td><td class="num">${fmt(s.retail)}</td><td class="num">${s.diff == null ? "–" : (s.diff > 0 ? "+" : "") + fmt(s.diff, 0) + " %"}</td></tr>`).join("") + "</tbody></table></div>";
   h += '<p class="small">„Handelspreis“ ist das niedrigste Angebot aus dem Preisvergleich für Endkunden, umgerechnet auf netto. Ein Plus heißt: Der günstigste gefundene Firmenhändler ist teurer als das billigste Angebot im Handel. Preise, die nur als Suchtreffer sichtbar waren, zählen hier nicht mit. Alternate nennt Preise inklusive Mehrwertsteuer; der Nettowert ist daraus errechnet.</p>';
   const rows = [...B2B].sort((a, b) => a.card.localeCompare(b.card) || (net(a) || 1e9) - (net(b) || 1e9));
   h += `<details><summary>Alle ${rows.length} Einzelangebote anzeigen</summary><div class="tw" style="margin-top:10px"><table><thead><tr><th>Karte</th><th>Modell</th><th>Händler</th><th class="num">Netto €</th><th class="num">Brutto €</th><th>Lieferbar</th><th>Beleg</th></tr></thead><tbody>` +
     rows.map(r => `<tr><td>${esc(r.card)}</td><td>${esc(r.sku)}</td><td>${/^https?:/.test(r.url) ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.reseller)}</a>` : esc(r.reseller)}</td><td class="num">${fmt(net(r))}</td><td class="num">${fmt(parseFloat(r.price_brutto_eur))}</td><td class="wrap">${esc(r.availability || "–")}</td><td>${r.evidence == "V" ? "auf der Seite gesehen" : "nur Suchtreffer"}</td></tr>`).join("") + "</tbody></table></div></details>";
   $("#b2bwrap").innerHTML = h;
+  document.querySelectorAll("#b2bwrap th[data-b]").forEach(th => th.onclick = () => { const k = th.dataset.b;
+    if (state.bsort == k) state.bdir *= -1; else { state.bsort = k; state.bdir = 1; } drawB2B(); });
 }
 const TRAIN = [
  {t:"ResNet18 auf CIFAR-10, 10 Durchläufe", u:"Sekunden, kürzer ist besser", s:"Fehlerbericht ROCm/TheRock #2510, Dezember 2025 · Werte an der Quelle geprüft", n:"Einzige direkte Messung AMD gegen NVIDIA. Sie stammt aus einem Fehlerbericht zur AMD-Software; die AMD-Werte schwanken je nach Einstellung stark.",
@@ -459,7 +497,7 @@ function drawTrain(){
 }
 const SM = /*SM*/[
   {k:"blender", n:"Rendering", u:"Blender-Punkte je €", w:35},
-  {k:"vram", n:"Speicher", u:"GB VRAM je €", w:20},
+  {k:"vram", n:"Grafikspeicher (VRAM)", u:"GB je €", w:20},
   {k:"llm", n:"LLM-Tempo, kleines Modell", u:"Token/s je €, 7B-Modell", w:10},
   {k:"llm32", n:"LLM-Tempo, großes Modell", u:"Token/s je €, 32B-Modell; 0 unter 24 GB", w:15},
   {k:"train", n:"Training, gemessen", u:"Sequenzen/s je €, BERT Large (AIME); nur 11 Karten", w:10},
