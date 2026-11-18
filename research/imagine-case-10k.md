@@ -29,7 +29,7 @@ Blender figures are Open Data 4.5.0 medians per card, simply added up. The sums 
 | Power | 2x 200 W | 300 W | 3x 145 W | 4x 360 W |
 | Slots / cooling | 2x dual-slot blower | 1x dual-slot blower | 3x **single-slot** blower | 4x 2-3.5-slot axial (partner cards) |
 | ECC | yes | yes | yes | no |
-| Sharing | whole cards; MIG not confirmed for the Workstation Edition | **MIG 2x 24 GB** | whole cards, many small slots | whole cards or time-slicing |
+| Sharing | whole cards or MIG 2x 16 GB (NVIDIA's MIG list: up to 2) | **MIG 2x 24 GB** | whole cards, many small slots | whole cards or time-slicing |
 | vGPU | no | no (only the 72 GB version) | no | no |
 | Driver licence | pro driver | pro driver | pro driver | GeForce EULA excludes "datacenter deployment" (needs legal review) |
 
@@ -50,7 +50,7 @@ Blender figures are Open Data 4.5.0 medians per card, simply added up. The sums 
 **C: 3x PRO 4000 (24 GB each).** The "many users, low power, few slots" option.
 - Single-slot, 145 W, ECC. Three parallel 24 GB jobs.
 - Best rendering throughput among the pro packages.
-- 24 GB is the weak spot for LLMs: 32B at 4-bit spills to the CPU and becomes about 10x slower (measured).
+- 24 GB is the weak spot for LLMs: 32B at 4-bit at long context (32k) spills to the CPU and becomes about 5x slower (measured: 5.3 against 27.8 tokens/s).
 
 **D: 4x RTX 5080 (16 GB each).** The rendering-throughput option.
 - About twice the render throughput of any pro package. Cycles/OptiX, V-Ray, Octane and Redshift all run.

@@ -75,8 +75,9 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 .sl output{text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
 .opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:14px;margin:10px 0}
 .opts label{display:inline-flex;align-items:center;gap:6px}
-.sc{display:grid;grid-template-columns:48px 26px minmax(150px,240px) minmax(140px,1.5fr) 40px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:870px}
-.sc .h{color:var(--ink2);font-weight:600;font-size:12px;line-height:1.25;align-self:end;padding-bottom:4px;border-bottom:1px solid var(--grid)}
+.sc .cv{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.sc{display:grid;grid-template-columns:48px 26px minmax(150px,240px) minmax(140px,1.5fr) 40px 58px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:1010px}
+.sc .h{overflow-wrap:anywhere;color:var(--ink2);font-weight:600;font-size:12px;line-height:1.25;align-self:end;padding-bottom:4px;border-bottom:1px solid var(--grid)}
 .sc .rk{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .sc .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sc .b{height:14px;border-radius:0 4px 4px 0;min-width:2px}
@@ -99,22 +100,44 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <body>
 <main>
 <h1>GPU-Vergleich für Rendering und KI</h1>
-<p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
-<p class="small">Nur Neuware: Gebrauchte Karten sind nicht aufgeführt. Datenstand: 17.11.2026, Preise und Angaben am 18.11.2026 an den Quellen nachgeprüft. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
+<p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze sowie Training und Betrieb großer Sprachmodelle (LLMs) leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
+<p class="small">Nur Neuware: Gebrauchte Karten sind nicht aufgeführt. Datenstand: 17.11.2026. Die meisten Preise und Angaben sind am 18.11.2026 an den Quellen nachgeprüft, einzelne Preise sind älter (Spalte „Preisstand“ in der Tabelle). Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
-  <a href="#score">Gesamtwertung</a><a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#methode">So entstehen die Benchmarks</a><a href="#tabelle">Alle Karten</a>
-  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="virtualisierung.html">Eine Karte, viele VMs</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
+  <a href="#pakete">Beispiel 10.000 €</a><a href="#score">Gesamtwertung</a><a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#passt">Modell und Speicher</a><a href="#training">Training</a><a href="#methode">So entstehen die Benchmarks</a><a href="#tabelle">Alle Karten</a>
+  <a href="#b2b">Firmenpreise</a><a href="#hersteller">AMD, Intel oder NVIDIA</a><a href="#lizenz">Teilen und Lizenzen</a><a href="virtualisierung.html">Eine Karte, viele VMs</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
   <button class="chip" id="closeAll">Alle Abschnitte einklappen</button><button class="chip" id="openAll">Alle ausklappen</button>
 </nav>
 
 <div class="cards">
-  <div class="card"><div class="small">Rendering</div><div class="big">GeForce kostet weniger als halb so viel pro Renderleistung</div>
-    <p class="small">Eine RTX 5080 oder 5070 Ti kostet etwa 185 bis 215 € je 1.000 Blender-Punkte, eine RTX PRO 4000 oder 4500 etwa 450 bis 535 €.</p></div>
+  <div class="card"><div class="small">Rendering</div><div class="big">RTX 5080 und 5070 Ti rendern pro Euro gut doppelt so viel wie RTX PRO 4000 und 4500</div>
+    <p class="small">Eine RTX 5080 oder 5070 Ti kostet etwa 185 bis 215 € je 1.000 Blender-Punkte, eine RTX PRO 4000 oder 4500 etwa 450 bis 540 €. Die RTX 5090 liegt mit gut 520 € auf dem Niveau der Profi-Karten.</p></div>
   <div class="card"><div class="small">LLMs</div><div class="big">Der Speicher entscheidet, nicht die Rechenleistung</div>
-    <p class="small">Ein 32B-Modell (4 Bit) läuft mit kurzem Kontext (4k) auf 24 GB mit etwa 35 Token/s. Bei 32k Kontext passt es nicht mehr in 24 GB und fiel in einem Test auf 5 Token/s; eine 48-GB-Karte schaffte 28. Passt ein Modell nicht in den VRAM, wird es etwa fünfmal langsamer.</p></div>
-  <div class="card"><div class="small">Teilen</div><div class="big">Teilen ist kostenlos, nur nicht zwischen VMs</div>
-    <p class="small">Ganze Karten zuteilen, MIG, Time-Slicing und Run:ai Open Source kosten nichts und passen zu Kubernetes. Eine Karte auf mehrere VMs zu verteilen kostet bei NVIDIA ab 50 $ je Nutzer und Jahr und geht nur mit bestimmten Karten, etwa der RTX 5000 Ada. Keine neue Blackwell-Karte unter 10.000 € kann es.</p></div>
+    <p class="small">Ein Sprachmodell mit 32 Milliarden Parametern (32B, auf 4 Bit komprimiert) braucht bei kurzem Kontext knapp 20 GB Grafikspeicher (VRAM). Mit langem Kontext (32.000 Token) passte es in einem Test nicht mehr auf eine 24-GB-Karte und fiel auf 5 Token pro Sekunde; eine 48-GB-Karte schaffte im selben Test 28. Passt ein Modell nicht in den VRAM, wird es um ein Vielfaches langsamer.</p></div>
+  <div class="card"><div class="small">Teilen</div><div class="big">Jobs teilen ist kostenlos, VMs teilen meist nicht</div>
+    <p class="small">Ganze Karten zuteilen, Karten in feste Teile schneiden (MIG) oder abwechselnd nutzen (Time-Slicing) kostet nichts und passt zu Kubernetes. Eine Karte auf mehrere virtuelle Maschinen (VMs) zu verteilen kostet bei NVIDIA ab 50 $ je Nutzer und Jahr und geht nur mit bestimmten Karten, etwa der RTX 5000 Ada; keine Karte der aktuellen Blackwell-Generation unter 10.000 € kann es. Lizenzfrei geht es nur mit Intel Arc Pro, unter Windows aber noch unreif.</p></div>
 </div>
+
+<h2 id="pakete">Beispiel: Was bekommt man für 10.000 €?</h2>
+<p class="sub">Fünf Beispielpakete, keine Empfehlung. Preise brutto, niedrigstes Angebot; in Klammern netto. Ob das Budget brutto oder netto gemeint ist, ändert, was hineinpasst: 10.000 € brutto sind 8.403 € netto; 10.000 € netto sind 11.900 € brutto.</p>
+<div class="pk">
+  <div class="card"><span class="tag">A · ausgewogen</span><h3>2× RTX PRO 4500 (32 GB)</h3>
+    <dl><dt>Preis</dt><dd>9.098 € (netto 7.645 €)</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
+    <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Blower, dicht stapelbar, ECC</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
+  <div class="card"><span class="tag">B · größtes Modell</span><h3>1× RTX PRO 5000 (48 GB)</h3>
+    <dl><dt>Preis</dt><dd>8.119 € (netto 6.823 €)</dd><dt>VRAM</dt><dd>48 GB auf einer Karte</dd><dt>Blender</dt><dd>ca. 10.900</dd><dt>Strom</dt><dd>300 W</dd></dl>
+    <ul><li>70B-LLMs mit 4 Bit laufen, mit kurzem Kontext</li><li>Teilbar in 2× 24 GB (MIG)</li><li>Nur ein großer Job gleichzeitig</li><li>Rund 1.900 € bleiben übrig</li></ul></div>
+  <div class="card"><span class="tag">C · viele Nutzer</span><h3>3× RTX PRO 4000 (24 GB)</h3>
+    <dl><dt>Preis</dt><dd>8.457 € (netto 7.107 €)</dd><dt>VRAM</dt><dd>72 GB, größter Job 24 GB</dd><dt>Blender</dt><dd>ca. 18.800</dd><dt>Strom</dt><dd>3× 145 W</dd></dl>
+    <ul><li>Drei parallele Jobs</li><li>Nur ein Steckplatz pro Karte, fehlerkorrigierender Speicher (ECC)</li><li>24 GB sind für LLMs knapp</li></ul></div>
+  <div class="card"><span class="tag">D · Render-Durchsatz</span><h3>4× GeForce RTX 5080 (16 GB)</h3>
+    <dl><dt>Preis</dt><dd>7.876 € (netto 6.618 €)</dd><dt>VRAM</dt><dd>64 GB, größter Job 16 GB</dd><dt>Blender</dt><dd>ca. 36.600</dd><dt>Strom</dt><dd>4× 360 W</dd></dl>
+    <ul><li>Etwa doppelt so viel Renderleistung wie die Pakete A bis C</li><li>16 GB begrenzen LLMs auf ca. 14B</li><li>Große Karten, brauchen Platz und Luft</li><li>Die GeForce-Lizenz schließt den Einsatz „im Rechenzentrum“ aus. Der Begriff ist nicht definiert; ob ein Firmenserver darunter fällt, ist rechtlich zu prüfen</li></ul></div>
+  <div class="card"><span class="tag">E · eine starke Karte, eine zum Teilen</span><h3>1× RTX PRO 5000 (48 GB) + 1× Intel Arc Pro B70 (32 GB)</h3>
+    <dl><dt>Preis</dt><dd>9.718 € (netto 8.166 €)</dd><dt>VRAM</dt><dd>48 GB für große Jobs, 32 GB zum Teilen</dd><dt>Blender</dt><dd>ca. 10.900 auf der starken Karte</dd><dt>Strom</dt><dd>300 W + 230 W</dd></dl>
+    <ul><li>Starke Karte für Rendering, Training und 70B-LLMs</li><li>Zweite Karte für bis zu 4 leichte Nutzer in eigenen VMs, ohne Gebühr je Nutzer</li><li>Das Teilen der Intel-Karte ist unter Windows noch unreif: erst testen</li><li>Alternative zur Intel-Karte: eine vGPU-fähige NVIDIA-Karte (z. B. RTX 5000 Ada) mit Lizenz ab 50 $ je Nutzer und Jahr teilen</li></ul></div>
+</div>
+<p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a></p>
+
 
 <div class="filters" id="filters">
   <span class="small">Anzeigen:</span>
@@ -127,10 +150,10 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
   <label><input type="checkbox" id="onlypin">nur angepinnte</label>
 </div>
 <div class="opts small" id="hiddenbar"></div>
-<p class="small">Bedienung: ★ pinnt eine Karte an (sie steht dann überall oben und ist im Diagramm beschriftet), ✕ blendet sie überall aus. Ein Klick auf eine Überschrift klappt den Abschnitt ein. Spaltenköpfe sortieren. Die Auswahl bleibt in diesem Browser gespeichert.</p>
+<p class="small">Bedienung: ★ pinnt eine Karte an: Sie steht dann in Gesamtwertung, Balken und Tabelle oben und ist im Diagramm beschriftet. ✕ blendet sie in diesen Ansichten aus. Ein Klick auf eine Überschrift klappt den Abschnitt ein, ein Klick auf einen Spaltenkopf sortiert. Die Auswahl bleibt in diesem Browser gespeichert.</p>
 
 <h2 id="score">Gesamtwertung mit eigenen Gewichten</h2>
-<p class="sub">Eine Karte kann beim Rendern günstig und beim Speicher teuer sein. Die Gesamtwertung rechnet alle Messwerte je Euro zu einer Zahl zusammen. Die Regler legen fest, wie stark jeder Wert zählt. 100 Punkte hat in jeder Spalte die Karte mit dem besten Wert je Euro unter den angezeigten Karten.</p>
+<p class="sub">Eine Karte kann beim Rendern günstig und beim Speicher teuer sein. Die Gesamtwertung rechnet alle Messwerte je Euro zu einer Zahl zusammen. Die Regler legen fest, wie stark jeder Wert zählt. In jeder Spalte bekommt die Karte mit dem besten Wert je Euro 100 Punkte, die anderen ihren Anteil daran. Wie die einzelnen Messwerte entstehen, steht unter <a href="#methode">So entstehen die Benchmarks</a>.</p>
 <div class="panel">
   <div class="opts"><span class="small">Vorgabe:</span><div class="seg" id="presets"></div></div>
   <div class="sl" id="sliders"></div>
@@ -142,9 +165,10 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
   </div>
   <div style="overflow-x:auto"><div class="sc" id="scorelist"></div></div>
   <p class="small" id="scorenote"></p>
+  <p class="small">Die Wertung kennt nur Preis und Messwerte. Sie berücksichtigt nicht, dass die GeForce-Lizenz den Einsatz „im Rechenzentrum“ ausschließt (ob ein Firmenserver darunter fällt, ist rechtlich zu prüfen), dass Intel- und AMD-Karten kein CUDA haben und dass sich nur wenige Karten auf mehrere VMs aufteilen lassen (siehe <a href="#lizenz">Teilen und Lizenzen</a>). Mit den Häkchen oben lassen sich ganze Gruppen ausblenden.</p>
   <details><summary>So wird gerechnet</summary>
-  <p class="small">Ein Klick auf einen Spaltenkopf sortiert nach diesem Wert; die Nummer links bleibt der Rang in der Gesamtwertung. Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte; die Karte ist dann mit * markiert und ihre Wertung ist weniger belastbar.</p>
-  <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte belegt Platz, Strom und einen Anteil am Server, und Steckplätze sind begrenzt. Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. „LLM-Tempo, großes Modell“ ist Qwen3 32B mit 4 Bit (Hardware Corner, März 2026, 4k Kontext). Gemessen sind nur 4 der aufgeführten Karten; Karten mit weniger als 24 GB bekommen 0, weil das Modell nicht in den Speicher passt, Karten ab 24 GB ohne Messung zählen als fehlend. Die Standardgewichte passen zu einem Rechner, der vor allem rendert und daneben LLMs und Training bedient. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo, weil kein Trainings-Benchmark alle Karten abdeckt.</p></details>
+  <p class="small">Ein Klick auf einen Spaltenkopf sortiert nach diesem Wert; die Nummer links bleibt der Rang in der Gesamtwertung. Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte. Das kann Karten mit wenigen Messungen zu gut aussehen lassen. Deshalb zeigt die Spalte „Abdeckung“, für welchen Anteil der Gewichte ein Messwert vorliegt; Karten unter 70 % bekommen keinen Rang und stehen am Ende.</p>
+  <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte braucht Platz, Strom, Kühlung und einen Teil des Servers, und Steckplätze sind begrenzt. Der Betrag gilt in derselben Basis wie die Preise (brutto oder netto). Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. „LLM-Tempo, großes Modell“ ist Qwen3 32B mit 4 Bit (Hardware Corner, März 2026, 4k Kontext). Gemessen sind nur 4 der aufgeführten Karten; Karten mit weniger als 24 GB bekommen 0, weil das Modell nicht in den Speicher passt, Karten ab 24 GB ohne Messung zählen als fehlend. Die Standardgewichte (Vorgabe „Ausgewogen“) zählen Rendering mit gut einem Drittel, Speicher und LLM-Tempo zusammen mit knapp der Hälfte und Training mit einem Fünftel. „Training, gemessen“ ist das Training des Netzes BERT Large mit halber Genauigkeit (FP16) im Labor des Systemhauses AIME, die breiteste einheitliche Messreihe, die wir gefunden haben; sie deckt aber nur 11 Karten ab. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo. Sie bleibt als zweiter Wert, weil kein Trainings-Benchmark alle Karten abdeckt.</p></details>
 </div>
 
 <h2 id="chart">Preis und Leistung</h2>
@@ -172,11 +196,26 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
   <div class="bars" id="bars"></div>
 </div>
 
+<h2 id="passt">Welches Sprachmodell passt in welchen Grafikspeicher?</h2>
+<p class="sub">Für große Sprachmodelle (LLMs) entscheidet der Grafikspeicher (VRAM), ob ein Modell überhaupt läuft. Die Tabelle ist eine gerechnete Faustregel: Größe des Modells in Milliarden Parametern (B), je nachdem, wie stark es komprimiert ist. Längere Texte (Kontext) brauchen zusätzlichen Speicher.</p>
+<div class="tw"><table>
+<thead><tr><th>VRAM</th><th>4 Bit (üblich für Inferenz)</th><th>8 Bit</th><th>volle Genauigkeit (FP16)</th><th>Gemessen</th></tr></thead>
+<tbody>
+<tr><td>8 GB</td><td>7 bis 8B</td><td>etwa 7B, knapp</td><td>etwa 3B</td><td></td></tr>
+<tr><td>16 GB</td><td>20 bis 24B (14B bei langem Kontext)</td><td>13 bis 14B</td><td>etwa 7B</td><td></td></tr>
+<tr><td>24 GB</td><td>32B nur mit kurzem Kontext</td><td>etwa 20B</td><td>höchstens etwa 11B</td><td class="wrap">32B mit 32.000 Token Kontext passte auf einer 24-GB-Karte nicht mehr ganz in den Speicher</td></tr>
+<tr><td>32 GB</td><td>32 bis 40B bequem</td><td>27 bis 30B</td><td>etwa 14B</td><td></td></tr>
+<tr><td>48 GB</td><td>70B mit etwa 8.000 Token Kontext</td><td>etwa 40B</td><td>etwa 20B</td><td class="wrap">72B: bei 8.000 Token passte fast alles, bei 32.000 Token 12 von 81 Schichten nicht</td></tr>
+<tr><td>72 GB</td><td>70B mit 32.000 Token und mehr</td><td>60 bis 65B</td><td>etwa 32B</td><td></td></tr>
+<tr><td>96 GB</td><td>70B mit sehr langem Kontext; bis etwa 120B</td><td>80 bis 90B</td><td>etwa 40B</td><td class="wrap">70B mit 128.000 Token und 123B mit 64.000 Token liefen auf einer 96-GB-Karte</td></tr>
+</tbody></table></div>
+<p class="small">Nachtrainieren (Fine-Tuning) braucht deutlich mehr Speicher als Inferenz. Herleitung und Werte dazu (englisch): <a href="research/benchmarks.md">benchmarks.md</a>, Abschnitte 3.3 und 4.</p>
+
 <h2 id="training">Training: gemessene Werte</h2>
-<p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Deshalb steht hier jede Quelle für sich. Vergleiche nur Karten innerhalb eines Kastens, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser.</p>
+<p class="sub">Es gibt keinen einzelnen Trainings-Benchmark, der alle Karten mit derselben Methode misst. Die breiteste Messreihe (AIME, erster Kasten) deckt 11 Karten ab; Die großen Benchmark-Reihen helfen nicht: MLPerf Training misst nur ganze Rechenzentrums-Systeme, andere bekannte KI-Benchmarks messen nur Inferenz. Es bleiben einzelne Messreihen von Systemhäusern und Blogs. Deshalb steht hier jede Quelle für sich. Bitte nur Karten innerhalb eines Kastens vergleichen, nicht über Kästen hinweg: Genauigkeit (FP16/FP32), Software und Testsystem unterscheiden sich. Längere Balken sind besser, außer wo „kürzer ist besser“ dabeisteht.</p>
 <div class="pk" id="train"></div>
 <p class="small">RTX 3090, RTX 4090 und RTX A6000 gibt es praktisch nur noch gebraucht. Sie stehen in den Kästen nur als Vergleichswerte, weil viele Messreihen sie enthalten.</p>
-<p class="small">Ohne jeden gemessenen Trainingswert: RTX PRO 5000 72 GB, RTX PRO 4000, RTX 5080, RTX 5060 Ti, RTX 5000 Ada, RTX 4500 Ada, RTX 4000 Ada, alle AMD-Profikarten und alle Intel-Karten. Alle 93 Messwerte mit Quellen: <a href="research/training-bench.md">training-bench.md</a> (<a href="research/training-bench.csv">CSV</a>)</p>
+<p class="small">Die Kästen folgen nicht den Filtern, dem Anpinnen oder dem Ausblenden. Ohne jeden gemessenen Trainingswert: RTX PRO 5000 72 GB, RTX PRO 4000, RTX 4000 Ada, RTX 5080, RTX 5060 Ti, RTX 4080 Super, Radeon AI PRO R9700 und alle Intel-Karten. Alle Messwerte mit Quellen: <a href="research/training-bench.md">training-bench.md</a> (<a href="research/training-bench.csv">CSV</a>); weitere Quellen und was sie abdecken: <a href="research/training-sources.md">training-sources.md</a> (<a href="research/training-extra.csv">CSV</a>)</p>
 
 <h2 id="methode">So entstehen die Benchmarks</h2>
 <p class="sub">Keiner dieser Werte stammt aus einem eigenen Test. Alle sind öffentliche Messungen anderer. Die Tabelle zeigt, was jeweils gemessen wird, wer misst und wie weit man dem Wert trauen kann.</p>
@@ -185,9 +224,9 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <tbody>
 <tr><td><b>Blender-Punkte</b><br><span class="small">Rendering</span></td><td class="wrap">Das Programm „Blender Benchmark“ rendert drei feste Szenen (monster, junkshop, classroom) mit dem Renderer Cycles auf der Grafikkarte. Die Punktzahl ist die Summe der berechneten Samples pro Minute über die drei Szenen.</td><td class="wrap">Nutzer weltweit laden ihre Ergebnisse in die Datenbank Blender Open Data. Hier steht der Median aller Einsendungen je Karte für Blender 4.5.0. Die Spalte n zeigt die Anzahl.</td><td class="wrap">Reine Renderleistung der Karte in Cycles. Gut vergleichbar, weil Szenen und Programm für alle gleich sind.</td><td class="wrap">Die Rechner der Einsender unterscheiden sich (Treiber, Kühlung). Unter 10 Einsendungen ist der Wert unsicher. Die Szenen sind klein und sagen nichts darüber, ob eine große Szene in den Speicher passt. Andere Renderer (V-Ray, Octane, Redshift) verhalten sich ähnlich, aber nicht gleich.</td></tr>
 <tr><td><b>LLM 7B Token/s</b><br><span class="small">kleines Sprachmodell</span></td><td class="wrap">Das Werkzeug llama-bench aus llama.cpp lässt das Modell Llama 2 7B (4 Bit, Q4_0) 128 Token erzeugen und misst die Token pro Sekunde (Wert „tg128“).</td><td class="wrap">Einzelne Nutzer tragen ihre Messung in eine Rangliste auf GitHub ein. Meist eine Messung je Karte.</td><td class="wrap">Antworttempo für einen einzelnen Nutzer mit einem kleinen Modell.</td><td class="wrap">Ein Nutzer, eine Anfrage: sagt wenig über einen Dienst mit vielen gleichzeitigen Anfragen. AMD und Intel laufen über andere Software-Wege (Vulkan, SYCL) als NVIDIA (CUDA). Das Modell ist klein; ob ein großes Modell passt, entscheidet der Speicher.</td></tr>
-<tr><td><b>LLM 32B Token/s</b><br><span class="small">großes Sprachmodell</span></td><td class="wrap">Gleiches Werkzeug, Modell Qwen3 32B (4 Bit), 4.000 Token Kontext.</td><td class="wrap">Die Website Hardware Corner auf eigenen Testrechnern. Eine Messreihe je Karte.</td><td class="wrap">Antworttempo mit einem Modell der Größe, die für ernsthafte Arbeit üblich ist.</td><td class="wrap">Nur wenige Karten gemessen. Kurzer Kontext: Mit langen Texten braucht das Modell mehr Speicher und passt dann nicht mehr auf 24 GB. Die Zahlen sind nicht an der Quelle nachgeprüft (die Seite lädt sie per Skript).</td></tr>
+<tr><td><b>LLM 32B Token/s</b><br><span class="small">großes Sprachmodell</span></td><td class="wrap">Gleiches Werkzeug, Modell Qwen3 32B (4 Bit), 4.000 Token Kontext.</td><td class="wrap">Die Website Hardware Corner auf eigenen Testrechnern. Eine Messreihe je Karte.</td><td class="wrap">Antworttempo mit einem Modell der Größe, die für ernsthafte Arbeit üblich ist.</td><td class="wrap">Nur wenige Karten gemessen. Kurzer Kontext: Mit langen Texten braucht das Modell mehr Speicher und passt dann nicht mehr auf 24 GB.</td></tr>
 <tr><td><b>TFLOPS</b><br><span class="small">Rechenleistung</span></td><td class="wrap">Nichts wird gemessen. Der Wert ist die theoretische Höchstzahl an Rechenschritten pro Sekunde (einfache Genauigkeit, FP32), aus dem Datenblatt oder aus Kernzahl und Takt errechnet.</td><td class="wrap">Hersteller (Datenblatt).</td><td class="wrap">Grobe Größenordnung der rohen Rechenkraft. Dient in der Gesamtwertung als Näherung für das Trainingstempo.</td><td class="wrap">Echtes Training hängt auch von Speicher-Bandbreite, Tensor-Kernen, halber Genauigkeit (FP16) und der Software ab. Zwischen Herstellern nur grob vergleichbar. Als Trainingswert die schwächste Zahl auf dieser Seite.</td></tr>
-<tr><td><b>Trainingswerte</b><br><span class="small">Kästen unter „Training“</span></td><td class="wrap">Ein festes Netz (z. B. ResNet50 für Bilder, BERT für Text) wird trainiert; gemessen werden verarbeitete Bilder oder Textstücke pro Sekunde. Beim LoRA-Test wird ein Sprachmodell nachtrainiert.</td><td class="wrap">Systemhäuser, die GPU-Rechner verkaufen (Exxact, Lambda, Bizon), und einzelne Blogs, jeweils auf eigenen Rechnern.</td><td class="wrap">Echtes Trainingstempo, aber nur für die Karten und Einstellungen dieser einen Quelle.</td><td class="wrap">Jede Quelle nutzt andere Software, Genauigkeit und Stapelgröße. Deshalb nur innerhalb eines Kastens vergleichen. Die Quellen verkaufen selbst Hardware.</td></tr>
+<tr><td><b>Trainingswerte</b><br><span class="small">Kästen unter „Training“</span></td><td class="wrap">Ein festes Netz (z. B. ResNet50 für Bilder, BERT für Text) wird trainiert; gemessen werden verarbeitete Bilder oder Textstücke pro Sekunde. Beim LoRA-Test wird ein Sprachmodell nachtrainiert.</td><td class="wrap">Systemhäuser, die GPU-Rechner verkaufen (AIME, Exxact, Lambda, Bizon), und einzelne Blogs, jeweils auf eigenen Rechnern.</td><td class="wrap">Echtes Trainingstempo, aber nur für die Karten und Einstellungen dieser einen Quelle.</td><td class="wrap">Jede Quelle nutzt andere Software, Genauigkeit und Stapelgröße. Deshalb nur innerhalb eines Kastens vergleichen. Die Quellen verkaufen selbst Hardware.</td></tr>
 <tr><td><b>Preise</b></td><td class="wrap">Niedrigstes Angebot für Neuware im deutschen Handel, einschließlich Mehrwertsteuer.</td><td class="wrap">Preisvergleich und Händlerseiten, am 18.11.2026 nachgeprüft.</td><td class="wrap">Was die Karte an diesem Tag mindestens kostete.</td><td class="wrap">Ändert sich täglich. Das billigste Angebot ist nicht immer lieferbar. Projektpreise von Systemhäusern können darunter liegen.</td></tr>
 </tbody></table></div>
 <div class="note"><b>Selbst nachmessen:</b> Blender-Punkte und LLM-Tempo lassen sich auf vorhandenen Karten in wenigen Minuten selbst messen: mit dem kostenlosen „Blender Benchmark“ (opendata.blender.org) und mit llama-bench aus llama.cpp. Liegt der eigene Wert nahe am Wert in der Tabelle, sind auch die Zahlen der anderen Karten für das eigene Umfeld brauchbar. Für Training ist ein eigener kurzer Lauf mit dem tatsächlich genutzten Netz aussagekräftiger als jeder öffentliche Wert.</div>
@@ -202,23 +241,19 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <p class="sub">Preise von Händlern und Systemhäusern, die an Unternehmen verkaufen. Netto ist der Preis ohne Mehrwertsteuer. Viele Systemhäuser zeigen Preise nur nach Anmeldung oder auf Anfrage; Projektpreise liegen oft unter den Listenpreisen.</p>
 <div id="b2bwrap"></div>
 
-<h2 id="pakete">Beispiel: Was bekommt man für 10.000 €?</h2>
-<p class="sub">Vier Beispielpakete, keine Empfehlung. Preise brutto, niedrigstes Angebot. 10.000 € brutto sind 8.403 € netto; 10.000 € netto sind 11.900 € brutto.</p>
-<div class="pk">
-  <div class="card"><span class="tag">A · ausgewogen</span><h3>2× RTX PRO 4500 (32 GB)</h3>
-    <dl><dt>Preis</dt><dd>9.098 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
-    <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Blower, dicht stapelbar, ECC</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
-  <div class="card"><span class="tag">B · größtes Modell</span><h3>1× RTX PRO 5000 (48 GB)</h3>
-    <dl><dt>Preis</dt><dd>8.119 €</dd><dt>VRAM</dt><dd>48 GB auf einer Karte</dd><dt>Blender</dt><dd>ca. 10.900</dd><dt>Strom</dt><dd>300 W</dd></dl>
-    <ul><li>70B-LLMs mit 4 Bit laufen</li><li>Teilbar in 2× 24 GB (MIG)</li><li>Nur ein großer Job gleichzeitig</li><li>Rund 1.900 € bleiben übrig</li></ul></div>
-  <div class="card"><span class="tag">C · viele Nutzer</span><h3>3× RTX PRO 4000 (24 GB)</h3>
-    <dl><dt>Preis</dt><dd>8.457 €</dd><dt>VRAM</dt><dd>72 GB, größter Job 24 GB</dd><dt>Blender</dt><dd>ca. 18.800</dd><dt>Strom</dt><dd>3× 145 W</dd></dl>
-    <ul><li>Drei parallele Jobs</li><li>Nur ein Slot pro Karte, ECC</li><li>24 GB sind für LLMs knapp</li></ul></div>
-  <div class="card"><span class="tag">D · Render-Durchsatz</span><h3>4× GeForce RTX 5080 (16 GB)</h3>
-    <dl><dt>Preis</dt><dd>7.876 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 16 GB</dd><dt>Blender</dt><dd>ca. 36.600</dd><dt>Strom</dt><dd>4× 360 W</dd></dl>
-    <ul><li>Etwa doppelte Renderleistung</li><li>16 GB begrenzen LLMs auf ca. 14B</li><li>Große Karten, brauchen Platz und Luft</li><li>GeForce-Treiberlizenz schließt Rechenzentren aus (rechtlich prüfen)</li></ul></div>
-</div>
-<p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a></p>
+<h2 id="hersteller">AMD, Intel oder NVIDIA?</h2>
+<p class="sub">Die Karten unterscheiden sich nicht nur in Preis und Tempo, sondern vor allem darin, welche Software auf ihnen läuft.</p>
+<div class="tw"><table>
+<thead><tr><th>Bereich</th><th>NVIDIA</th><th>AMD</th><th>Intel</th></tr></thead>
+<tbody>
+<tr><td>KI-Software</td><td class="wrap">CUDA ist der Standard. Praktisch jede KI-Software läuft zuerst und am besten hier.</td><td class="wrap">Eigene Plattform ROCm. PyTorch und vLLM laufen; Nutzer berichten aber öfter von Fehlern nach Updates.</td><td class="wrap">Eigene Plattform oneAPI. PyTorch läuft, das Umfeld ist kleiner.</td></tr>
+<tr><td>Rendering</td><td class="wrap">Blender, V-Ray, Octane und Redshift laufen alle.</td><td class="wrap">Blender läuft, aber AMDs beste Karten erreichen etwa ein Drittel der Punkte einer ähnlich teuren NVIDIA-Karte. Octane läuft nicht, Redshift nur unter Windows, V-Ray seit 2026.</td><td class="wrap">Blender läuft. V-Ray, Octane und Redshift laufen nicht.</td></tr>
+<tr><td>Training</td><td class="wrap">Alle gemessenen Trainingswerte auf dieser Seite außer zweien stammen von NVIDIA-Karten.</td><td class="wrap">Möglich, aber kaum gemessen. In der einzigen direkten Messung (ein Fehlerbericht) war eine RX 9070 XT 4- bis 16-mal langsamer als eine RTX 5070 Ti.</td><td class="wrap">Keine Messwerte gefunden.</td></tr>
+<tr><td>VRAM je Euro</td><td class="wrap">Teuer: RTX PRO 4500 mit 32 GB etwa 142 € je GB.</td><td class="wrap">Günstiger: Radeon AI PRO R9700 mit 32 GB etwa 66 € je GB.</td><td class="wrap">Am günstigsten: Arc Pro B60 mit 24 GB etwa 40 € je GB.</td></tr>
+<tr><td>Eine Karte auf mehrere VMs</td><td class="wrap">Ausgereift, aber mit Lizenz je Nutzer und nur auf bestimmten Karten.</td><td class="wrap">Nur auf Rechenzentrums-Karten, nicht auf den hier gelisteten.</td><td class="wrap">Lizenzfrei auf Arc Pro, unter Windows noch unreif.</td></tr>
+<tr><td>Kubernetes</td><td class="wrap">Ausgereift: GPU Operator, MIG, Time-Slicing.</td><td class="wrap">Ganze Karten zuteilen geht; Teilen nur auf Rechenzentrums-Karten.</td><td class="wrap">Ganze Karten zuteilen und einfaches Teilen ohne Trennung.</td></tr>
+</tbody></table></div>
+<p class="small">Ausführlich und mit Quellen (englisch): <a href="research/amd-vs-nvidia.md">amd-vs-nvidia.md</a></p>
 
 <h2 id="lizenz">Karten teilen: Kosten und Lizenzen</h2>
 <p class="sub">Mehrere Nutzer auf denselben Karten: Was kostet es, und wie gut sind die Nutzer voneinander getrennt?</p>
@@ -237,10 +272,10 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <tr><td>AMD MxGPU (SR-IOV)</td><td>keine Gebühr gefunden</td><td>stark</td><td>teilweise</td><td>nur Instinct und Radeon PRO V710, keine Workstation-Radeon</td></tr>
 <tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex 170, Arc Pro B50 und B70 (offiziell), B60 (Forenberichte); unter Windows noch unreif</td></tr>
 </tbody></table></div>
-<p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
+<p class="small">Bezahlte vGPU-Lizenzen lohnen sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
 
-<h2 id="lb">Dynamisches Load Balancing: Jobs automatisch verteilen</h2>
-<p class="sub">Heute sucht sich jeder per Remote-Desktop selbst eine freie Karte. Load Balancing heißt: Ein System legt Jobs und Anfragen automatisch auf passende, freie Karten. Das passiert auf mehreren Ebenen, und für jede gibt es kostenlose Werkzeuge.</p>
+<h2 id="lb">Dynamische Lastverteilung (Load Balancing): Jobs automatisch verteilen</h2>
+<p class="sub">Ohne Lastverteilung sucht sich jeder Nutzer selbst eine freie Karte, etwa per Remote-Desktop. Lastverteilung (Load Balancing) heißt: Ein System legt Jobs und Anfragen automatisch auf passende, freie Karten. Das passiert auf mehreren Ebenen, und für jede gibt es kostenlose Werkzeuge.</p>
 <div class="tw"><table>
 <thead><tr><th>Ebene</th><th>Was sie tut</th><th>Werkzeuge (kostenlos)</th></tr></thead>
 <tbody>
@@ -255,16 +290,16 @@ tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
 <h3 style="margin-top:20px">Einführung in Stufen</h3>
 <div class="pk">
   <div class="card"><span class="tag">Stufe 0 · 1–2 Tage</span><h3>Messen</h3><p class="small">Auslastung und VRAM je Karte und Nutzer mitschreiben (DCGM-Exporter, Prometheus, Grafana). Die Nutzer merken nichts. Das Ergebnis zeigt, wie viele Karten für Desktops reserviert bleiben müssen.</p></div>
-  <div class="card"><span class="tag">Stufe 1 · 2–5 Tage</span><h3>Warteschlange für ganze Karten</h3><p class="small">k3s mit GPU Operator und Kueue, oder Slurm. Zwei bis vier Karten bleiben für Remote-Desktop reserviert, der Rest läuft über die Schlange. Nutzer schicken Jobs ab, statt sich eine Karte zu nehmen.</p></div>
-  <div class="card"><span class="tag">Stufe 2 · 3–7 Tage</span><h3>Prioritäten, Kontingente, Teilen</h3><p class="small">Dringende Jobs starten sofort, Batch-Jobs werden pausiert. Voraussetzung: Trainings speichern regelmäßig Checkpoints. Kartenteilung zuerst nur für Notebooks und Entwicklung.</p></div>
-  <div class="card"><span class="tag">Stufe 3 · 3–7 Tage</span><h3>LLM-Dienst mit Autoscaling</h3><p class="small">vLLM je Modell, LiteLLM als eine gemeinsame Adresse, KEDA skaliert nach der Zahl wartender Anfragen. Selten genutzte Modelle können auf null fahren; dafür braucht es eine Zwischenschicht, die Anfragen so lange hält (z. B. das KEDA-HTTP-Add-on, noch Beta), und die erste Anfrage danach ist langsam.</p></div>
+  <div class="card"><span class="tag">Stufe 1 · 2–5 Tage</span><h3>Warteschlange für ganze Karten</h3><p class="small">k3s mit GPU Operator und Kueue, oder Slurm. Ein Teil der Karten bleibt für Remote-Desktops reserviert, der Rest läuft über die Schlange. Nutzer schicken Jobs ab, statt sich eine Karte zu nehmen.</p></div>
+  <div class="card"><span class="tag">Stufe 2 · 3–7 Tage</span><h3>Prioritäten, Kontingente, Teilen</h3><p class="small">Dringende Jobs starten sofort, Batch-Jobs werden pausiert. Voraussetzung: Trainings speichern regelmäßig Checkpoints. Kartenteilung zuerst nur für Jupyter-Notebooks und Entwicklung.</p></div>
+  <div class="card"><span class="tag">Stufe 3 · 3–7 Tage</span><h3>LLM-Dienst mit Autoscaling</h3><p class="small">vLLM je Modell, LiteLLM als eine gemeinsame Adresse, KEDA skaliert nach der Zahl wartender Anfragen. Selten genutzte Modelle lassen sich ganz abschalten. Dann hält eine Zwischenschicht eingehende Anfragen fest, bis das Modell wieder geladen ist (z. B. das KEDA-HTTP-Add-on, noch im Beta-Stadium). Die erste Anfrage dauert dann deutlich länger.</p></div>
   <div class="card"><span class="tag">Stufe 4 · 2–4 Tage</span><h3>Renderfarm im selben Pool</h3><p class="small">Flamenco-Worker fordern je eine Karte an und laufen mit niedrigster Priorität. Aus Blender schickt man den Job dann an Flamenco. Lizenzserver für V-Ray oder Octane müssen aus dem Cluster erreichbar sein.</p></div>
 </div>
-<div class="note">Stolpersteine: Time-Slicing trennt den Speicher nicht, ein Job kann den anderen zum Absturz bringen. Bei gemischten Karten zersplittert der VRAM, deshalb je Kartenmodell eine eigene Klasse anlegen. Mit nur einem Server fällt bei einem Defekt alles aus. Der Aufwand je Stufe ist eine Schätzung.</div>
+<div class="note">Stolpersteine: Time-Slicing trennt den Speicher nicht, ein Job kann den anderen zum Absturz bringen. Bei verschiedenen Kartenmodellen für jedes Modell eine eigene Ressourcenklasse anlegen (in Kueue: ResourceFlavor), sonst landen Jobs auf Karten mit zu wenig VRAM. Mit nur einem Server fällt bei einem Defekt alles aus. Der Aufwand je Stufe ist eine Schätzung.</div>
 <p class="small">Beispielarchitekturen (minimal, empfohlen, erweitert), Konfigurationsbeispiele und der Werkzeugvergleich: <a href="research/load-balancing.md">load-balancing.md</a></p>
 
 <h2 id="details">Details und Grenzen der Daten</h2>
-<div class="note">Für viele Karten, auch mehrere der neuesten (Blackwell), gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Gebrauchtpreise sind Angebotspreise.</div>
+<div class="note">Für viele Karten, auch mehrere der neuesten (Blackwell), gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher.</div>
 <ul>
   <li><a href="research/gpu-master-table.md">Vollständige Tabelle mit Quellen</a> (<a href="research/gpu-master-table.csv">CSV</a>)</li>
   <li><a href="research/benchmarks.md">Benchmarks</a>: Rendering, Training, LLM-Inferenz, Speicherbedarf</li>
@@ -286,7 +321,7 @@ try { Object.assign(UI, JSON.parse(localStorage.getItem("gpu-ui-v1") || "{}")); 
 function saveUI(){ try { localStorage.setItem("gpu-ui-v1", JSON.stringify(UI)); } catch (e) {} }
 const isPin = c => UI.pinned.includes(c.name);
 const ctl = c => { const i = CARDS.indexOf(c), on = isPin(c);
-  return `<span class="ctl"><button class="ib" data-pin="${i}" aria-pressed="${on}" title="${on ? "Lösen" : "Anpinnen"}" aria-label="${on ? "Lösen" : "Anpinnen"}: ${esc(c.name)}">${on ? "★" : "☆"}</button><button class="ib" data-hide="${i}" title="Ausblenden" aria-label="Ausblenden: ${esc(c.name)}">✕</button></span>`; };
+  return `<span class="ctl"><button class="ib" data-pin="${i}" aria-pressed="${on}" title="${on ? "Nicht mehr anpinnen" : "Anpinnen"}" aria-label="${on ? "Nicht mehr anpinnen" : "Anpinnen"}: ${esc(c.name)}">${on ? "★" : "☆"}</button><button class="ib" data-hide="${i}" title="Ausblenden" aria-label="Ausblenden: ${esc(c.name)}">✕</button></span>`; };
 const tip = $("#tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.display = "block";
   const w = tip.offsetWidth, h = tip.offsetHeight;
@@ -345,7 +380,7 @@ function drawScatter(){
 const BM = {blender: c => c.blender ? price(c) / c.blender * 1000 : null, vram: c => c.vram ? price(c) / c.vram : null, llm: c => c.llm ? price(c) / c.llm : null};
 function drawBars(){
   const f = BM[state.bar];
-  const rows = visible().filter(c => price(c) != null).map(c => ({c, v: f(c)})).filter(r => r.v != null).sort((a, b) => a.v - b.v);
+  const rows = visible().filter(c => price(c) != null).map(c => ({c, v: f(c)})).filter(r => r.v != null).sort((a, b) => isPin(b.c) - isPin(a.c) || a.v - b.v);
   const max = Math.max(1, ...rows.map(r => r.v));
   $("#bars").innerHTML = rows.map(r => `<div class="n${isPin(r.c) ? " pinned" : ""}" title="${esc(r.c.name)}">${isPin(r.c) ? "★ " : ""}${esc(r.c.name)}</div><div class="t" data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.v / max * 100}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.v)} €</div>`).join("") || '<div class="small">Keine Karten für diese Auswahl.</div>';
   document.querySelectorAll("#bars .t").forEach(h => { const c = CARDS[h.dataset.i];
@@ -353,10 +388,10 @@ function drawBars(){
 }
 const COLS = [
   ["name", "Karte", c => c.name, 0], ["vendor", "Gruppe", c => VN[c.vendor], 0], ["cond", "Zustand", c => c.used ? "gebraucht" : (c.price == null ? "kein Angebot" : "neu"), 0],
-  ["price", "Preis €", c => price(c), 1], ["vram", "VRAM GB", c => c.vram, 1], ["blender", "Blender", c => c.blender, 1], ["bn", "n", c => c.bn, 1],
-  ["llm", "LLM 7B Token/s", c => c.llm, 1], ["llm32", "LLM 32B Token/s", c => c.llm32, 1], ["pb", "€ / 1.000 Bl.", c => price(c) != null ? BM.blender(c) : null, 1], ["pv", "€ / GB", c => price(c) != null ? BM.vram(c) : null, 1],
+  ["price", "Preis €", c => price(c), 1], ["pdate", "Preisstand", c => c.price == null ? null : (c.pdate || "ohne Datum"), 0], ["vram", "VRAM GB", c => c.vram, 1], ["blender", "Blender", c => c.blender, 1], ["bn", "Anzahl Messungen", c => c.bn, 1],
+  ["llm", "LLM 7B Token/s", c => c.llm, 1], ["llm32", "LLM 32B Token/s", c => c.llm32, 1], ["train", "Training (Sequenzen/s)", c => c.train, 1], ["pb", "€ je 1.000 Blender-Pkt.", c => price(c) != null ? BM.blender(c) : null, 1], ["pv", "€ / GB", c => price(c) != null ? BM.vram(c) : null, 1], ["pt", "€ je Token/s (7B)", c => price(c) != null ? BM.llm(c) : null, 1],
   ["cores", "CUDA-Kerne / Shader", c => c.cores, 1], ["fp32", "TFLOPS FP32", c => c.fp32, 1], ["bw", "Bandbreite GB/s", c => c.bw, 1], ["mem", "Speichertyp", c => c.mem, 0],
-  ["tdp", "Watt", c => c.tdp, 1], ["slots", "Slots", c => c.slots, 0], ["cooling", "Kühlung", c => c.cooling, 0], ["ecc", "ECC", c => c.ecc, 0], ["vgpu", "vGPU", c => c.vgpu, 0], ["mig", "MIG", c => c.mig, 0]
+  ["tdp", "Watt", c => c.tdp, 1], ["slots", "Steckplätze", c => c.slots, 0], ["cooling", "Kühlung", c => c.cooling, 0], ["ecc", "ECC", c => c.ecc, 0], ["vgpu", "vGPU", c => c.vgpu, 0], ["mig", "MIG", c => c.mig, 0]
 ];
 function drawTable(){
   const q = $("#q").value.toLowerCase(), col = COLS.find(c => c[0] == state.sort), cols = COLS.filter(c => !UI.cols.includes(c[0]));
@@ -368,7 +403,7 @@ function drawTable(){
   $("#tbl tbody").innerHTML = rows.map(c => `<tr class="${isPin(c) ? "pin" : ""}"><td>${ctl(c)}</td>` + cols.map(k => { const v = k[2](c);
     return `<td class="${k[3] ? "num" : ""}">${k[0] == "name" ? `<i class="sw" style="background:var(--${c.vendor});margin-right:6px"></i>` : ""}${k[3] ? fmt(v, k[0] == "fp32" ? 1 : 0) : esc(v || "–")}</td>`; }).join("") + "</tr>").join("") || `<tr><td colspan="${cols.length + 1}">Keine Karten für diese Auswahl.</td></tr>`;
   document.querySelectorAll("#tbl th[data-k]").forEach(th => th.onclick = () => { const k = th.dataset.k;
-    if (state.sort == k) state.dir *= -1; else { state.sort = k; state.dir = COLS.find(c => c[0] == k)[3] && !["price", "pb", "pv"].includes(k) ? -1 : 1; } drawTable(); });
+    if (state.sort == k) state.dir *= -1; else { state.sort = k; state.dir = COLS.find(c => c[0] == k)[3] && !["price", "pb", "pv", "pt"].includes(k) ? -1 : 1; } drawTable(); });
 }
 function matchCard(n){
   const k = n.replace(/ WS$/, " Workstation").replace(/^Radeon/, "AMD Radeon");
@@ -393,6 +428,12 @@ function drawB2B(){
   $("#b2bwrap").innerHTML = h;
 }
 const TRAIN = [
+ {t:"ResNet18 auf CIFAR-10, 10 Durchläufe", u:"Sekunden, kürzer ist besser", s:"Fehlerbericht ROCm/TheRock #2510, Dezember 2025 · Werte an der Quelle geprüft", n:"Einzige direkte Messung AMD gegen NVIDIA. Sie stammt aus einem Fehlerbericht zur AMD-Software; die AMD-Werte schwanken je nach Einstellung stark.",
+  d:[["RTX 5070 Ti 16GB",45,"geforce"],["RTX 5070 12GB",91,"geforce"],["RX 9070 XT 16GB (bester Lauf)",200,"amd"],["RX 9070 XT 16GB (schlechtester Lauf)",748,"amd"]]},
+ {t:"SDXL-LoRA (Bildmodell nachtrainieren)", u:"Durchläufe/s", s:"Puget Systems, 2023 · aus dem Diagramm abgelesen", n:"Alte Software von 2023, keine aktuellen Karten.",
+  d:[["RTX 5000 Ada 32GB",1.81,"nvpro"],["RTX 6000 Ada 48GB",1.80,"nvpro"],["RTX A5000 24GB",1.37,"nvpro"],["Radeon PRO W7900 48GB",1.16,"amd"]]},
+ {t:"BERT Large (Transformer), FP16", u:"Sequenzen/s", s:"AIME, November 2025 · Rohdaten der Quelle gelesen", n:"Breiteste einheitliche Messreihe (11 Karten). Stapelgröße je nach Speicher der Karte; PyTorch-Version je nach Kartengeneration. Workstation- und Server-Ausgabe der PRO 6000 haben denselben Wert.",
+  d:[["RTX PRO 6000 WS/Server 96GB",220,"nvpro"],["RTX PRO 6000 Max-Q 96GB",177,"nvpro"],["RTX 5090 32GB",134,"geforce"],["RTX PRO 5000 48GB",133,"nvpro"],["RTX 6000 Ada 48GB",115,"nvpro"],["L40S 48GB",107,"nvpro"],["RTX PRO 4500 32GB",92,"nvpro"],["RTX 5000 Ada 32GB",79,"nvpro"],["RTX A5000 24GB",50,"nvpro"],["RTX 4500 Ada 24GB",48,"nvpro"]]},
  {t:"LLM-Fine-Tuning (LoRA, Llama 3.1 8B)", u:"Token/s", s:"Exxact, Juni 2026 · an der Quelle geprüft", n:"4× RTX PRO 4500 zusammen: 10.717 Token/s (3,86-fach).",
   d:[["RTX PRO 6000 Server 96GB",4962,"nvpro"],["RTX PRO 5000 48GB",3721,"nvpro"],["RTX PRO 4500 32GB",2777,"nvpro"]]},
  {t:"ResNet50 (Bildmodell), FP32", u:"Bilder/s", s:"Exxact, April 2026 · an der Quelle geprüft",
@@ -413,17 +454,18 @@ const TRAIN = [
 function drawTrain(){
   $("#train").innerHTML = TRAIN.map(g => { const max = Math.max(...g.d.map(x => x[1]));
     return `<div class="card"><h3>${g.t}</h3><div class="small" style="margin-bottom:8px">${g.u} · ${g.s}</div>` +
-      g.d.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>${x[0]}</span><span style="font-variant-numeric:tabular-nums">${fmt(x[1])}</span></div><div style="height:10px;border-radius:0 4px 4px 0;width:${x[1] / max * 100}%;background:var(--${x[2]})"></div>`).join("") +
+      g.d.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>${x[0]}</span><span style="font-variant-numeric:tabular-nums">${fmt(x[1], x[1] < 10 ? 2 : 0)}</span></div><div style="height:10px;border-radius:0 4px 4px 0;width:${x[1] / max * 100}%;background:var(--${x[2]})"></div>`).join("") +
       `${g.n ? `<p class="small" style="margin-top:10px">${g.n}</p>` : ""}</div>`; }).join("");
 }
 const SM = /*SM*/[
   {k:"blender", n:"Rendering", u:"Blender-Punkte je €", w:35},
-  {k:"vram", n:"Speicher", u:"GB VRAM je €", w:25},
+  {k:"vram", n:"Speicher", u:"GB VRAM je €", w:20},
   {k:"llm", n:"LLM-Tempo, kleines Modell", u:"Token/s je €, 7B-Modell", w:10},
   {k:"llm32", n:"LLM-Tempo, großes Modell", u:"Token/s je €, 32B-Modell; 0 unter 24 GB", w:15},
-  {k:"fp32", n:"Rechenleistung", u:"TFLOPS je €, Näherung für Training", w:20}
+  {k:"train", n:"Training, gemessen", u:"Sequenzen/s je €, BERT Large (AIME); nur 11 Karten", w:10},
+  {k:"fp32", n:"Rechenleistung", u:"TFLOPS je €, Näherung für Training", w:10}
 ];
-const PRESETS = /*PRESETS*/[["Ausgewogen", {blender:35, vram:20, llm:10, llm32:15, fp32:20}], ["Rendering", {blender:70, vram:10, llm:5, llm32:5, fp32:10}], ["LLM", {blender:5, vram:30, llm:15, llm32:40, fp32:10}], ["Training", {blender:10, vram:30, llm:5, llm32:5, fp32:50}]];
+const PRESETS = /*PRESETS*/[["Ausgewogen", {blender:35, vram:20, llm:10, llm32:15, train:10, fp32:10}], ["Rendering", {blender:70, vram:10, llm:5, llm32:5, train:5, fp32:5}], ["LLM", {blender:5, vram:30, llm:15, llm32:40, train:5, fp32:5}], ["Training", {blender:10, vram:20, llm:5, llm32:5, train:35, fp32:25}]];
 function initScore(){
   $("#sliders").innerHTML = SM.map(m => `<div class="ln">${m.n}<small>${m.u}</small></div><input type="range" min="0" max="100" step="5" value="${m.w}" data-k="${m.k}" aria-label="Gewicht ${m.n}"><output id="o_${m.k}"></output>`).join("");
   document.querySelectorAll("#sliders input").forEach(el => el.addEventListener("input", () => { SM.find(m => m.k == el.dataset.k).w = +el.value; markPreset(); drawScore(); }));
@@ -431,6 +473,7 @@ function initScore(){
   document.querySelectorAll("#presets button").forEach(b => b.onclick = () => { const p = PRESETS[b.dataset.i][1];
     SM.forEach(m => { m.w = p[m.k] ?? 0; document.querySelector(`#sliders [data-k=${m.k}]`).value = m.w; }); markPreset(); drawScore(); });
   ["#slot", "#minv", "#full"].forEach(s => $(s).addEventListener("input", drawScore));
+  markPreset();
   $("#reset").onclick = () => { $("#slot").value = 500; $("#minv").value = "0"; $("#full").checked = false; document.querySelector("#presets button").click(); };
 }
 function markPreset(){ document.querySelectorAll("#presets button").forEach(b => { const p = PRESETS[b.dataset.i][1];
@@ -440,22 +483,23 @@ function drawScore(){
   SM.forEach(m => $("#o_" + m.k).textContent = tot ? fmt(m.w / tot * 100) + " %" : "–");
   const cs = visible().filter(c => price(c) != null && (c.vram || 0) >= minv), eff = c => price(c) + slot;
   const best = {}; SM.forEach(m => best[m.k] = Math.max(0, ...cs.map(c => c[m.k] != null ? c[m.k] / eff(c) : 0)));
-  let rows = cs.map(c => { let s = 0, ws = 0, have = 0; const p = {};
-    SM.forEach(m => { if (c[m.k] != null && best[m.k] > 0){ p[m.k] = c[m.k] / eff(c) / best[m.k] * 100; s += m.w * p[m.k]; ws += m.w; have++; } });
-    return {c, p, have, score: ws ? s / ws : null}; }).filter(r => r.score != null);
-  if ($("#full").checked) rows = rows.filter(r => r.have == SM.length);
-  rows.sort((a, b) => b.score - a.score); rows.forEach((r, i) => r.rank = i + 1);
+  const MINCOV = 0.7;
+  let rows = cs.map(c => { let s = 0, ws = 0; const p = {};
+    SM.forEach(m => { if (c[m.k] != null && best[m.k] > 0){ p[m.k] = c[m.k] / eff(c) / best[m.k] * 100; s += m.w * p[m.k]; ws += m.w; } });
+    const cov = tot ? ws / tot : 0; return {c, p, cov, ok: cov >= MINCOV, score: ws ? s / ws : null}; }).filter(r => r.score != null);
+  if ($("#full").checked) rows = rows.filter(r => r.cov > 0.999);
+  rows.sort((a, b) => b.ok - a.ok || b.score - a.score); let rk = 0; rows.forEach(r => r.rank = r.ok ? ++rk : null);
   const sk = state.ssort;
-  rows.sort((a, b) => isPin(b.c) - isPin(a.c) || (sk == "score" ? b.score - a.score : (b.p[sk] ?? -1) - (a.p[sk] ?? -1)));
+  rows.sort((a, b) => isPin(b.c) - isPin(a.c) || b.ok - a.ok || (sk == "score" ? b.score - a.score : (b.p[sk] ?? -1) - (a.p[sk] ?? -1)));
   $("#scorelist").style.setProperty("--nm", SM.length);
-  $("#scorelist").innerHTML = `<div class="h"></div><div class="h"></div><div class="h">Karte</div><div class="h srt" data-s="score" ${sk == "score" ? 'aria-sort="descending"' : ""}>Gesamtwertung</div><div class="h"></div>` + SM.map(m => `<div class="h srt" data-s="${m.k}" ${sk == m.k ? 'aria-sort="descending"' : ""}>${m.n}<br>${tot ? fmt(m.w / tot * 100) : 0} %</div>`).join("") +
-    rows.map(r => `<div>${ctl(r.c)}</div><div class="rk">${r.rank}</div><div class="n${isPin(r.c) ? " pinned" : ""}" data-i="${CARDS.indexOf(r.c)}"><i class="sw" style="background:var(--${r.c.vendor});margin-right:6px"></i>${esc(r.c.name)}${r.have < SM.length ? " *" : ""}</div><div data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.score}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.score)}</div>` +
+  $("#scorelist").innerHTML = `<div class="h"></div><div class="h"></div><div class="h">Karte</div><div class="h srt" data-s="score" ${sk == "score" ? 'aria-sort="descending"' : ""}>Gesamtwertung</div><div class="h"></div><div class="h">Ab&shy;deckung</div>` + SM.map(m => `<div class="h srt" data-s="${m.k}" ${sk == m.k ? 'aria-sort="descending"' : ""}>${m.n}<br>${tot ? fmt(m.w / tot * 100) : 0} %</div>`).join("") +
+    rows.map(r => `<div>${ctl(r.c)}</div><div class="rk">${r.rank ?? "–"}</div><div class="n${isPin(r.c) ? " pinned" : ""}" data-i="${CARDS.indexOf(r.c)}"><i class="sw" style="background:var(--${r.c.vendor});margin-right:6px"></i>${esc(r.c.name)}</div><div data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.score}%;background:var(--${r.c.vendor});${r.ok ? "" : "opacity:.3"}"></div></div><div class="v" style="${r.ok ? "" : "color:var(--muted)"}">${fmt(r.score)}</div><div class="cv" style="${r.ok ? "" : "color:var(--bad,#b3261e);font-weight:600"}">${fmt(r.cov * 100)} %</div>` +
       SM.map(m => r.p[m.k] == null ? `<div class="m"><span></span><span>–</span></div>` : `<div class="m"><i style="width:${r.p[m.k]}%"></i><span>${fmt(r.p[m.k])}</span></div>`).join("")).join("");
   document.querySelectorAll("#scorelist [data-i]").forEach(h => { const c = CARDS[h.dataset.i];
     h.addEventListener("mousemove", e => showTip(e, tipHtml(c) + `<br>Rechenleistung: ${fmt(c.fp32, 1)} TFLOPS<br>Preis mit Steckplatz: ${fmt(eff(c))} €`)); h.addEventListener("mouseleave", hideTip); });
   document.querySelectorAll("#scorelist .srt").forEach(h => h.onclick = () => { state.ssort = h.dataset.s; drawScore(); });
   const out = visible().length - rows.length;
-  $("#scorenote").textContent = (rows.length ? "" : "Keine Karten für diese Auswahl. ") + (out ? out + " Karten fehlen hier (kein Preis, zu wenig VRAM oder fehlende Messwerte). " : "") + "* = mindestens ein Messwert fehlt, die Wertung stützt sich nur auf die übrigen.";
+  $("#scorenote").textContent = (rows.length ? "" : "Keine Karten für diese Auswahl. ") + (out ? out + " Karten fehlen hier (kein Preis, zu wenig VRAM oder fehlende Messwerte). " : "") + "Abdeckung = Anteil der Gewichte, für den die Karte einen Messwert hat. Karten unter 70 % stehen ohne Rang am Ende, weil ihre Wertung auf zu wenigen Werten beruht. Preise " + (basis() == 1 ? "brutto" : "netto") + ".";
 }
 function seg(id, key, fn){ document.querySelectorAll(id + " button").forEach(b => b.onclick = () => {
   document.querySelectorAll(id + " button").forEach(x => x.setAttribute("aria-pressed", x == b)); state[key] = b.dataset.m; fn(); }); }
@@ -479,7 +523,7 @@ function initSections(){
     UI.closed = UI.closed.filter(x => x != h.id); if (!open) UI.closed.push(h.id); saveUI(); };
   const hs = [...document.querySelectorAll("main > h2[id]")];
   hs.forEach(h => { const body = document.createElement("div"); let n = h.nextSibling;
-    while (n && !(n.nodeType == 1 && n.tagName == "H2")){ const nx = n.nextSibling; body.appendChild(n); n = nx; }
+    while (n && !(n.nodeType == 1 && (n.tagName == "H2" || n.id == "filters"))){ const nx = n.nextSibling; body.appendChild(n); n = nx; }
     h.after(body); h.className = "tgl"; h.tabIndex = 0; h.setAttribute("role", "button"); h.title = "Abschnitt ein- oder ausklappen";
     const open = !UI.closed.includes(h.id); h.setAttribute("aria-expanded", open); body.hidden = !open;
     const flip = () => set(h, h.getAttribute("aria-expanded") != "true");

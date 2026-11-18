@@ -31,13 +31,20 @@ if p.exists():
         if r["model"].startswith("Qwen3 32B") and "Hardware Corner" in r["source"]:
             big[r["card"]] = num(r["tokens_per_s"])
 
+train = {}
+p = R / "training-extra.csv"
+if p.exists():
+    for r in csv.DictReader(open(p, encoding="utf-8", newline="")):
+        if r["benchmark"].startswith("AIME") and r["workload"].startswith("BERT Large") and "torch.compile, fp16 AMP" in r["workload"]:
+            train[r["card"]] = num(r["value"])
+
 cards = []
 for r in csv.DictReader(open(R / "gpu-master-table.csv", encoding="utf-8", newline="")):
     cond = r["condition"]
     cards.append({
         "name": r["name"], "vendor": vendor(r["group"]), "group": r["group"],
         "used": cond.lower().startswith("used") or "(used)" in r["name"],
-        "cond": cond, "price": num(r["price_lowest_eur_brutto"]),
+        "cond": cond, "price": num(r["price_lowest_eur_brutto"]), "pdate": r["price_date"],
         "typ": num(r["price_typical_eur_brutto"]), "src": r["price_source"],
         "vram": num(r["vram_gb"]), "mem": r["memory_type"], "bw": num(r["bandwidth_gbs"]),
         "cores": num(r["cuda_cores_or_shaders"]), "tensor": r["tensor_cores"], "rt": r["rt_cores"],
@@ -46,6 +53,7 @@ for r in csv.DictReader(open(R / "gpu-master-table.csv", encoding="utf-8", newli
         "ecc": r["ecc"], "vgpu": r["vgpu"], "mig": r["mig"],
         "blender": num(r["blender_4_5_median"]), "bn": num(r["blender_n"]),
         "llm32": big.get(r["name"], 0 if (num(r["vram_gb"]) or 0) < 24 else None),
+        "train": train.get(r["name"]),
         "bnote": r["blender_note"], "llm": num(r["llama7b_q4_tg128"]), "lnote": r["llama_note"],
     })
 
