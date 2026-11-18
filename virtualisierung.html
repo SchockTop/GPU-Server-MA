@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eine Grafikkarte, viele VMs</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:#e1e0d9;
+  --nvpro:#2a78d6; --intel:#eda100; --amd:#1baf7a; --fill:#e9e8e2;
+  --good:#006300; --mid:#8a5a00; --bad:#b3261e; --warn-bg:#fff4d6; --warn-ink:#6b4a00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:#2c2c2a;
+    --nvpro:#3987e5; --intel:#c98500; --amd:#199e70; --fill:#2a2a28;
+    --good:#0ca30c; --mid:#e0a93b; --bad:#f2726a; --warn-bg:#3a2d08; --warn-ink:#f3d58a;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px}
+h2{font-size:20px;margin:40px 0 4px}
+h3{font-size:16px;margin:0 0 6px}
+p{margin:6px 0}
+.sub{color:var(--ink2);max-width:75ch}
+.small{font-size:13px;color:var(--ink2)}
+a{color:var(--nvpro)}
+nav{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0 0;font-size:14px}
+.note{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;margin:16px 0;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.card .big{font-size:20px;font-weight:650;line-height:1.25;margin:2px 0 6px}
+.card ul{margin:6px 0 0;padding-left:18px}
+.card li{margin:2px 0}
+.card dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0 0;font-size:13px}
+.card dt{color:var(--ink2)} .card dd{margin:0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 28px;align-items:start}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--ink2);font-size:12px}
+svg .t{fill:var(--ink);font-size:13px;font-weight:600}
+svg .box{fill:var(--fill);stroke:var(--axis)}
+svg .gpu{fill:var(--nvpro);stroke:var(--surface);stroke-width:2}
+svg .ln{stroke:var(--axis);stroke-width:1.5;fill:none}
+svg .w{fill:#fff;font-size:11px;font-weight:600}
+.tw{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--grid);vertical-align:top}
+th{color:var(--ink2);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.w{min-width:200px}
+#wt td:first-child{min-width:200px} #wt td:nth-child(2){min-width:150px} #wt .y,#wt .p,#wt .x{white-space:normal}
+.y,.p,.x{white-space:nowrap;font-weight:600}
+.y{color:var(--good)} .p{color:var(--mid)} .x{color:var(--bad)}
+.y::before{content:"✓ "} .p::before{content:"◐ "} .x::before{content:"✕ "}
+.bars{display:grid;grid-template-columns:minmax(150px,280px) 1fr 110px;gap:5px 10px;align-items:center;font-size:13px;margin-top:10px}
+.bars .b{height:14px;border-radius:0 4px 4px 0;min-width:2px;background:var(--nvpro)}
+.bars .b.i{background:var(--intel)}
+.bars .v{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--axis);border-radius:20px;padding:0 8px;color:var(--ink2)}
+.chk{display:inline-block;font-size:12px;border-radius:20px;padding:0 8px;color:var(--good);border:1px solid currentColor;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2);margin:8px 0}
+.sw{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+</style>
+</head>
+<body>
+<main>
+<p class="small"><a href="index.html">← GPU-Vergleich</a></p>
+<h1>Eine Grafikkarte, viele virtuelle Maschinen</h1>
+<p class="sub">Wenn jeder Nutzer eine eigene virtuelle Maschine (VM) bekommt und jede VM eine ganze Grafikkarte, sind die Steckplätze schnell belegt. Diese Seite erklärt, wie sich eine Karte auf mehrere VMs aufteilen lässt, was Hyper-V damit zu tun hat, was das kostet und welche Wege ohne Lizenzgebühren funktionieren.</p>
+<p class="small">Stand: 18.11.2026. <span class="chk">✓ live geprüft</span> heißt: am 18.11.2026 direkt auf der Seite des Herstellers nachgelesen. Alles andere stammt aus der Recherche vom 17.11.2026; Forenberichte sind als solche benannt.</p>
+<nav><a href="#kurz">Kurzantwort</a><a href="#grund">Grundlagen</a><a href="#arten">Vier Arten zu teilen</a><a href="#hyperv">Hyper-V</a><a href="#wege">Alle Wege im Vergleich</a><a href="#kosten">Kosten</a><a href="#dichte">Nutzer je Karte</a><a href="#intel">Intel und AMD</a><a href="#hv">Hypervisoren</a><a href="#weg">Vorgehen</a><a href="#quellen">Quellen</a></nav>
+
+<h2 id="kurz">Kurzantwort</h2>
+<div class="cards">
+  <div class="card"><div class="small">Kostenlos und offiziell unterstützt</div><div class="big">Gibt es für getrennte Windows-VMs nicht</div>
+    <p class="small">Kein Hersteller bietet heute einen ausgereiften, kostenlosen und unterstützten Weg, eine Karte auf mehrere Windows-VMs zu verteilen.</p></div>
+  <div class="card"><div class="small">Der sichere Weg</div><div class="big">NVIDIA vGPU ab 50 $ je Nutzer und Jahr</div>
+    <p class="small">Läuft auf RTX A5000 und RTX 5000 Ada, nicht auf der RTX A4000. 8 bis 16 Nutzer je Karte. 90 Tage kostenlos testbar.</p></div>
+  <div class="card"><div class="small">Der kostenlose Versuch</div><div class="big">Intel Arc Pro, aber noch unreif</div>
+    <p class="small">Lizenzfrei, 2 bis 7 VMs je Karte. Unter Windows gibt es bestätigte Treiberfehler. Als Pilot geeignet, nicht als Plan.</p></div>
+  <div class="card"><div class="small">Wirklich dynamisch</div><div class="big">Nur ohne eigene VM</div>
+    <p class="small">In VMs ist der Grafikspeicher immer fest zugeteilt. Frei und nach Bedarf geteilt wird nur in Containern oder Sitzungen auf einem gemeinsamen System.</p></div>
+</div>
+
+<h2 id="grund">Grundlagen: Was ist ein Hypervisor, was ist Hyper-V?</h2>
+<div class="two">
+  <div>
+    <p class="sub">Eine <b>virtuelle Maschine</b> ist ein kompletter Rechner aus Software: eigenes Betriebssystem, eigene Programme, eigener Administrator. Mehrere VMs laufen auf einem echten Server.</p>
+    <p class="sub">Der <b>Hypervisor</b> ist die Schicht dazwischen. Er teilt die echte Hardware auf die VMs auf und sorgt dafür, dass keine VM in eine andere hineinsehen kann.</p>
+    <p class="sub"><b>Hyper-V</b> ist der Hypervisor von Microsoft. Er steckt in Windows 11 Pro und in Windows Server. Die bekanntesten Alternativen sind Proxmox (baut auf KVM auf, Open Source) und VMware ESXi.</p>
+    <p class="sub"><b>Warum die Grafikkarte das Problem ist:</b> Prozessorkerne und Arbeitsspeicher lassen sich leicht aufteilen. Eine Grafikkarte wird dagegen von genau einem Treiber gesteuert. Deshalb gibt der Hypervisor im einfachsten Fall die ganze Karte an eine einzige VM. Zum Teilen braucht es Unterstützung von Karte, Treiber und Hypervisor zugleich.</p>
+  </div>
+  <div class="panel">
+    <svg viewBox="0 0 520 250" role="img" aria-label="Schichten: Hardware, Hypervisor, virtuelle Maschinen">
+      <rect class="box" x="10" y="10" width="155" height="84" rx="8"/><text class="t" x="24" y="34">VM 1</text><text x="24" y="54">Windows</text><text x="24" y="72">Nutzer A, eigener Admin</text>
+      <rect class="box" x="182" y="10" width="155" height="84" rx="8"/><text class="t" x="196" y="34">VM 2</text><text x="196" y="54">Linux</text><text x="196" y="72">Nutzer B</text>
+      <rect class="box" x="354" y="10" width="156" height="84" rx="8"/><text class="t" x="368" y="34">VM 3</text><text x="368" y="54">Windows</text><text x="368" y="72">Nutzer C</text>
+      <rect class="box" x="10" y="108" width="500" height="52" rx="8"/><text class="t" x="24" y="130">Hypervisor</text><text x="24" y="148">Hyper-V · Proxmox (KVM) · VMware ESXi: teilt Hardware zu, trennt die VMs</text>
+      <rect class="box" x="10" y="174" width="500" height="66" rx="8"/><text class="t" x="24" y="196">Hardware</text>
+      <rect class="box" x="24" y="206" width="110" height="24" rx="4"/><text x="34" y="222">Prozessor</text>
+      <rect class="box" x="144" y="206" width="130" height="24" rx="4"/><text x="154" y="222">Arbeitsspeicher</text>
+      <rect class="gpu" x="284" y="206" width="212" height="24" rx="4"/><text class="w" x="294" y="222">Grafikkarte: schwer teilbar</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="arten">Vier Arten, eine Karte zu nutzen</h2>
+<p class="sub">Alle Produkte und Fachbegriffe lassen sich einer dieser vier Arten zuordnen. Der blaue Balken ist jeweils eine Grafikkarte, die Kästen darüber sind die Nutzer.</p>
+<div class="cards">
+  <div class="card"><span class="tag">1 · heute üblich</span><h3>Ganze Karte durchreichen</h3>
+    <svg viewBox="0 0 240 96" role="img" aria-label="Eine Karte gehört einer VM">
+      <rect class="box" x="8" y="8" width="224" height="34" rx="6"/><text class="t" x="18" y="30">eine VM</text>
+      <path class="ln" d="M120 42V62"/><rect class="gpu" x="8" y="62" width="224" height="26" rx="4"/><text class="w" x="18" y="79">100 % für eine VM</text></svg>
+    <dl><dt>Trennung</dt><dd>vollständig</dd><dt>Speicher</dt><dd>alles für eine VM</dd><dt>Dynamisch</dt><dd>nein, Leerlauf bleibt ungenutzt</dd><dt>Lizenz</dt><dd>keine</dd><dt>Begriffe</dt><dd>Passthrough, DDA, VFIO</dd></dl></div>
+  <div class="card"><span class="tag">2 · feste Scheiben</span><h3>Karte in feste Teile schneiden</h3>
+    <svg viewBox="0 0 240 96" role="img" aria-label="Vier VMs mit je einem festen Viertel der Karte">
+      <rect class="box" x="8" y="8" width="50" height="34" rx="6"/><rect class="box" x="66" y="8" width="50" height="34" rx="6"/><rect class="box" x="124" y="8" width="50" height="34" rx="6"/><rect class="box" x="182" y="8" width="50" height="34" rx="6"/>
+      <text x="20" y="30">VM 1</text><text x="78" y="30">VM 2</text><text x="136" y="30">VM 3</text><text x="194" y="30">VM 4</text>
+      <path class="ln" d="M33 42V62M91 42V62M149 42V62M207 42V62"/>
+      <rect class="gpu" x="8" y="62" width="56" height="26" rx="4"/><rect class="gpu" x="64" y="62" width="56" height="26" rx="4"/><rect class="gpu" x="120" y="62" width="56" height="26" rx="4"/><rect class="gpu" x="176" y="62" width="56" height="26" rx="4"/>
+      <text class="w" x="20" y="79">4 GB</text><text class="w" x="76" y="79">4 GB</text><text class="w" x="132" y="79">4 GB</text><text class="w" x="188" y="79">4 GB</text></svg>
+    <dl><dt>Trennung</dt><dd>stark, je VM ein eigener Teil</dd><dt>Speicher</dt><dd>fest je VM, vorher festgelegt</dd><dt>Dynamisch</dt><dd>nur die Rechenzeit</dd><dt>Lizenz</dt><dd>NVIDIA: ja · Intel: nein</dd><dt>Begriffe</dt><dd>vGPU, SR-IOV, MxGPU, GPU-P</dd></dl></div>
+  <div class="card"><span class="tag">3 · gemeinsamer Treiber</span><h3>VMs teilen sich den Treiber des Hosts</h3>
+    <svg viewBox="0 0 240 96" role="img" aria-label="VMs nutzen die Karte nach Bedarf über den Treiber des Hosts">
+      <rect class="box" x="8" y="8" width="50" height="34" rx="6"/><rect class="box" x="66" y="8" width="50" height="34" rx="6"/><rect class="box" x="124" y="8" width="50" height="34" rx="6"/><rect class="box" x="182" y="8" width="50" height="34" rx="6"/>
+      <text x="20" y="30">VM 1</text><text x="78" y="30">VM 2</text><text x="136" y="30">VM 3</text><text x="194" y="30">VM 4</text>
+      <path class="ln" d="M33 42V52H207V42M91 42V52M149 42V52M120 52V62"/>
+      <rect class="gpu" x="8" y="62" width="96" height="26" rx="4"/><rect class="gpu" x="104" y="62" width="30" height="26" rx="4"/><rect class="gpu" x="134" y="62" width="62" height="26" rx="4"/><rect class="gpu" x="196" y="62" width="36" height="26" rx="4"/>
+      <text class="w" x="18" y="79">nach Bedarf</text></svg>
+    <dl><dt>Trennung</dt><dd>VM ja, Grafik läuft über den Host</dd><dt>Speicher</dt><dd>gemeinsam, ohne feste Grenze</dd><dt>Dynamisch</dt><dd>ja</dd><dt>Lizenz</dt><dd>keine</dd><dt>Begriffe</dt><dd>GPU-PV, virtio-gpu, Venus</dd></dl></div>
+  <div class="card"><span class="tag">4 · ein System</span><h3>Viele Nutzer auf einem Betriebssystem</h3>
+    <svg viewBox="0 0 240 96" role="img" aria-label="Ein Betriebssystem mit vielen Sitzungen oder Containern teilt eine Karte">
+      <rect class="box" x="8" y="8" width="224" height="34" rx="6"/>
+      <circle cx="28" cy="25" r="7" fill="var(--muted)"/><circle cx="52" cy="25" r="7" fill="var(--muted)"/><circle cx="76" cy="25" r="7" fill="var(--muted)"/><circle cx="100" cy="25" r="7" fill="var(--muted)"/><circle cx="124" cy="25" r="7" fill="var(--muted)"/>
+      <text x="142" y="29">ein System</text>
+      <path class="ln" d="M120 42V62"/>
+      <rect class="gpu" x="8" y="62" width="70" height="26" rx="4"/><rect class="gpu" x="78" y="62" width="24" height="26" rx="4"/><rect class="gpu" x="102" y="62" width="90" height="26" rx="4"/><rect class="gpu" x="192" y="62" width="40" height="26" rx="4"/>
+      <text class="w" x="18" y="79">nach Bedarf</text></svg>
+    <dl><dt>Trennung</dt><dd>schwächer, kein eigener Rechner</dd><dt>Speicher</dt><dd>gemeinsam; Grenzen nur mit Zusatzwerkzeug</dd><dt>Dynamisch</dt><dd>ja</dd><dt>Lizenz</dt><dd>keine für die Karte</dd><dt>Begriffe</dt><dd>Container, RDS-Sitzungen, Kubernetes</dd></dl></div>
+</div>
+<div class="note"><b>Zur Frage „dynamisch zuteilen“:</b> Bei den Arten 1 und 2 steht der Grafikspeicher je VM vorher fest. Bei Art 2 wandert nur die Rechenzeit: Wer gerade nichts tut, gibt seinen Anteil an die anderen ab. Eine andere Speichergröße braucht einen Neustart der VM. Speicher und Rechenzeit ganz nach Bedarf gibt es nur bei den Arten 3 und 4.</div>
+
+<h2 id="hyperv">Hyper-V und die Grafikkarte</h2>
+<p class="sub">Hyper-V kennt drei Wege, einer VM eine Grafikkarte zu geben. Sie entsprechen den Arten 1, 2 und 3 von oben.</p>
+<div class="tw"><table>
+<thead><tr><th>Weg</th><th>Art</th><th>Läuft auf</th><th>Welche Karten</th><th>Lizenz für die Karte</th><th>Einschätzung</th></tr></thead>
+<tbody>
+<tr><td><b>DDA</b><br><span class="small">Discrete Device Assignment</span></td><td>1 · ganze Karte</td><td>Windows Server</td><td class="w">Praktisch alle</td><td class="y">keine</td><td class="w">Ausgereift, aber eine Karte je VM. Löst das Platzproblem nicht.</td></tr>
+<tr><td><b>GPU-P</b><br><span class="small">GPU Partitioning, offiziell</span></td><td>2 · feste Scheiben</td><td>Windows Server 2025, Azure Local</td><td class="w">Nur NVIDIA A2, A10, A16, A40, L2, L4, L40, L40S, RTX PRO 6000 Server Edition und AMD Radeon PRO V710 <span class="chk">✓ live geprüft</span><br>Keine Workstation-Karte wie RTX A4000, A5000 oder RTX 5000 Ada, keine Intel-Karte.</td><td class="x">NVIDIA: vGPU-Lizenz nötig</td><td class="w">Für Produktion gedacht, mit Live-Migration. Gleich große, feste Teile. Mit den üblichen Workstation-Karten nicht nutzbar.</td></tr>
+<tr><td><b>GPU-PV</b><br><span class="small">Para-Virtualisierung, inoffiziell</span></td><td>3 · gemeinsamer Treiber</td><td>Windows 11 Pro als Host</td><td class="w">Fast jede Karte, auch GeForce</td><td class="y">keine</td><td class="w">Von Microsoft und NVIDIA nicht unterstützt. Nur Windows-Gäste. Vulkan geht nicht, DirectX 12 unzuverlässig. Treiberdateien müssen nach jedem Update neu in die VMs kopiert werden. Das bekannteste Einrichtungswerkzeug ist archiviert. Für ein Labor in Ordnung, für einen Firmenserver mit vielen Nutzern nicht.</td></tr>
+</tbody></table></div>
+<p class="small">Hyper-V selbst: In Windows 11 Pro enthalten. Windows Server 2025 kostet laut Microsoft-Preisliste 1.176 $ (Standard, 2 VMs) oder 6.771 $ (Datacenter, beliebig viele VMs) je 16 Prozessorkerne, dazu Zugriffslizenzen.</p>
+
+<h2 id="wege">Alle Wege im Vergleich</h2>
+<p class="sub">Jede Zeile ist ein Weg, mehrere Nutzer auf eine Karte zu bringen. Grün ist gut für das Ziel „viele Nutzer, je eigener Bereich, ohne Gebühr je Nutzer“.</p>
+<div class="tw"><table id="wt">
+<thead><tr><th>Weg</th><th>Karten</th><th>Gebühr je Nutzer</th><th>Eigene VM</th><th>Windows-Gast</th><th>Dynamisch</th><th>Hersteller-Support</th><th>Reife</th></tr></thead>
+<tbody>
+<tr><td>Ganze Karte je VM (Passthrough)</td><td>alle</td><td class="y">keine</td><td class="y">ja</td><td class="y">ja</td><td class="x">nein</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>NVIDIA vGPU, Stufe Virtual PC</td><td>RTX A5000, RTX 5000 Ada und größere</td><td class="p">50 $ im Jahr</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>NVIDIA vGPU, Stufe RTX Virtual Workstation</td><td>wie oben</td><td class="x">250 $ im Jahr</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>Intel Arc Pro mit SR-IOV (Proxmox/KVM)</td><td>Arc Pro B50, B60, B70</td><td class="y">keine</td><td class="y">ja</td><td class="p">mit Fehlern</td><td class="p">nur Rechenzeit</td><td class="p">teils</td><td class="x">niedrig</td></tr>
+<tr><td>AMD MxGPU / Hyper-V GPU-P auf AMD</td><td>nur Radeon PRO V710</td><td class="y">keine gefunden</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="x">nicht zu kaufen</td></tr>
+<tr><td>Hyper-V GPU-PV auf Windows 11</td><td>fast alle</td><td class="y">keine</td><td class="y">ja</td><td class="p">nur Windows</td><td class="y">ja</td><td class="x">nein</td><td class="x">Bastellösung</td></tr>
+<tr><td>virtio-gpu (Venus, Native Context)</td><td>AMD, Intel; NVIDIA nur teilweise</td><td class="y">keine</td><td class="y">ja</td><td class="x">nein</td><td class="y">ja</td><td class="x">nein</td><td class="x">früh</td></tr>
+<tr><td>Windows-Sitzungen auf einem Server (RDS)</td><td>alle</td><td class="p">keine für die Karte; Microsoft-Zugriffslizenzen</td><td class="x">nein, gemeinsames Windows</td><td class="y">ja</td><td class="y">ja</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>Linux-Container mit eigenem Desktop</td><td>alle NVIDIA</td><td class="y">keine</td><td class="x">nein, gemeinsamer Kernel</td><td class="x">nein</td><td class="y">ja</td><td class="p">Open Source</td><td class="p">mittel bis hoch</td></tr>
+</tbody></table></div>
+
+<h2 id="kosten">Was kostet NVIDIA vGPU?</h2>
+<div class="two">
+  <div>
+    <p class="sub">Bezahlt wird je <b>gleichzeitigem Nutzer</b>, nicht je Karte. Es gibt zwei Stufen, die hier zählen:</p>
+    <div class="tw"><table>
+    <thead><tr><th></th><th>Virtual PC</th><th>RTX Virtual Workstation</th></tr></thead>
+    <tbody>
+    <tr><td>Abo je Nutzer und Jahr <span class="chk">✓ live geprüft</span></td><td><b>50 $</b></td><td><b>250 $</b></td></tr>
+    <tr><td>Kauf je Nutzer <span class="chk">✓ live geprüft</span></td><td>100 $ + 25 $ Wartung im Jahr</td><td>450 $ + 100 $ Wartung im Jahr</td></tr>
+    <tr><td>Grafikspeicher je VM</td><td>höchstens 3 GB</td><td>bis zur ganzen Karte</td></tr>
+    <tr><td>CUDA (für KI und GPU-Rendering)</td><td class="x">nein</td><td class="y">ja</td></tr>
+    <tr><td>Gedacht für</td><td>Büro, einfache 3D-Ansicht</td><td>CAD, Rendering, zertifizierte Profi-Programme</td></tr>
+    </tbody></table></div>
+    <p class="small">Dazu kommt ein Lizenzserver (kleine VM oder Cloud-Dienst von NVIDIA). Testversion: 90 Tage, einmalig, für Firmen. Verkauf nur über Partner; Euro-Preise für Virtual PC haben wir nicht gefunden, also ein Angebot einholen. Bildungspreise gelten nur für Schulen und Hochschulen.</p>
+  </div>
+  <div class="panel">
+    <h3>Lizenzkosten über 3 Jahre (Abo, Listenpreis)</h3>
+    <div class="bars">
+      <div>Virtual PC, 8 Nutzer</div><div><div class="b" style="width:10%"></div></div><div class="v">1.200 $</div>
+      <div>Virtual PC, 16 Nutzer</div><div><div class="b" style="width:20%"></div></div><div class="v">2.400 $</div>
+      <div>Virtual Workstation, 8 Nutzer</div><div><div class="b" style="width:50%"></div></div><div class="v">6.000 $</div>
+      <div>Virtual Workstation, 16 Nutzer</div><div><div class="b" style="width:100%"></div></div><div class="v">12.000 $</div>
+    </div>
+    <p class="small" style="margin-top:12px">Zum Vergleich: Eine Intel Arc Pro B70 kostet einmalig etwa 1.300 bis 1.700 € und trägt laut Intel 4 VMs. Für 8 Nutzer wären das zwei Karten und zwei Steckplätze, ohne laufende Gebühr.</p>
+    <p class="small">Die entscheidende Frage ist deshalb: Reichen den leichten Nutzern 3 GB ohne CUDA? Dann kostet der sichere Weg ein Fünftel.</p>
+  </div>
+</div>
+
+<h2 id="dichte">Wie viele Nutzer passen auf eine Karte?</h2>
+<div class="panel">
+  <div class="legend"><span><i class="sw" style="background:var(--nvpro)"></i>NVIDIA vGPU (Lizenz nötig)</span><span><i class="sw" style="background:var(--intel)"></i>Intel SR-IOV (lizenzfrei)</span></div>
+  <div class="bars">
+    <div>RTX 5000 Ada 32 GB, je 2 GB</div><div><div class="b" style="width:100%"></div></div><div class="v">16 VMs</div>
+    <div>RTX 5000 Ada 32 GB, je 4 GB</div><div><div class="b" style="width:50%"></div></div><div class="v">8 VMs</div>
+    <div>RTX A5000 24 GB, je 2 GB</div><div><div class="b" style="width:75%"></div></div><div class="v">12 VMs</div>
+    <div>RTX A5000 24 GB, je 3 GB</div><div><div class="b" style="width:50%"></div></div><div class="v">8 VMs</div>
+    <div>Arc Pro B60 24 GB</div><div><div class="b i" style="width:43.75%"></div></div><div class="v">etwa 7 (Forum)</div>
+    <div>Arc Pro B70 32 GB</div><div><div class="b i" style="width:25%"></div></div><div class="v">4 (laut Intel)</div>
+    <div>Arc Pro B50 16 GB</div><div><div class="b i" style="width:12.5%"></div></div><div class="v">2 (laut Intel)</div>
+    <div>RTX A4000 16 GB</div><div></div><div class="v">nicht teilbar</div>
+  </div>
+  <p class="small" style="margin-top:12px">NVIDIA: Die Zahl folgt aus der gewählten Speichergröße je VM. RTX A5000 und RTX 5000 Ada stehen auf NVIDIAs Liste der unterstützten Karten, die RTX A4000 nicht <span class="chk">✓ live geprüft</span>. Die RTX A5000 muss dafür in einen Modus ohne Bildausgänge geschaltet werden. Intel: Die Zahl legt die Firmware der Karte fest. Intels eigene Seite verweigert automatische Abrufe, deshalb sind diese Zahlen nicht live geprüft. Wie viele leichte 3D-Nutzer eine Arc-Karte wirklich trägt, hat noch niemand veröffentlicht.</p>
+</div>
+
+<h2 id="intel">Intel und AMD im Detail</h2>
+<div class="tw"><table>
+<thead><tr><th>Karte</th><th>Preis</th><th>VMs je Karte</th><th>Stand</th></tr></thead>
+<tbody>
+<tr><td>Intel Arc A770 16 GB und andere Arc für Spieler</td><td>ab etwa 300 €</td><td class="x">1</td><td class="w">Nicht auf Intels Liste für SR-IOV. Nicht teilbar.</td></tr>
+<tr><td>Intel Arc Pro B50 16 GB</td><td>etwa 570 €</td><td>2</td><td class="w">Von Intel offiziell unterstützt, aber zwei Nutzer je Karte lösen das Platzproblem nicht.</td></tr>
+<tr><td>Intel Arc Pro B60 24 GB</td><td>etwa 960 €</td><td>etwa 7</td><td class="w">Zahl aus Forenberichten und abhängig von der Firmware; Intel nennt keine.</td></tr>
+<tr><td><b>Intel Arc Pro B70 32 GB</b></td><td>etwa 1.300 bis 1.700 €</td><td>4</td><td class="w">Bester Kandidat unter den neuen Karten. Vier Teile laut Intel, auf manchen Karten mehr.</td></tr>
+<tr><td>Intel Data Center GPU Flex 170</td><td>nur gebraucht, etwa 1.500 €</td><td>bis 31</td><td class="w">Ausgereift, auch unter VMware. Aber abgekündigt.</td></tr>
+<tr><td>AMD Radeon PRO V710</td><td>kein Handel in der EU</td><td>bis 6</td><td class="w">Einzige aktuelle AMD-Karte, die sich teilen lässt. Praktisch nur in der Cloud zu mieten.</td></tr>
+<tr><td>AMD Radeon PRO W7000, AI PRO R9700, Radeon RX</td><td></td><td class="x">1</td><td class="w">Nicht teilbar.</td></tr>
+</tbody></table></div>
+<div class="note"><b>Risiken bei Intel Arc Pro unter Windows</b> (Stand November 2026): Intel bestätigt einen Treiberfehler („Code 43“), wenn in der Windows-VM die üblichen Sicherheitsfunktionen für Firmenrechner eingeschaltet sind (VBS/HVCI), und nennt keine Lösung. Nutzer berichten, dass die Hardware-Videokodierung unter Remote Desktop nach ein bis zwei Minuten auf Software zurückfällt; das trifft genau den Fall „Desktop aus der Ferne“. Einzelne 3D-Programme starten im geteilten Modus nicht. Nötig sind ein aktueller Linux-Kernel (ab 6.17) und zueinander passende Treiber- und Firmware-Stände. Es gibt keine veröffentlichten Messungen mit mehreren Nutzern.</div>
+
+<h2 id="hv">Welcher Hypervisor kann was?</h2>
+<div class="tw"><table>
+<thead><tr><th>Hypervisor</th><th>Ganze Karte</th><th>NVIDIA vGPU (Lizenz)</th><th>Intel Arc Pro teilen</th><th>Kosten der Plattform</th><th>Einschätzung</th></tr></thead>
+<tbody>
+<tr><td><b>Proxmox VE 9</b> (KVM)</td><td class="y">ja</td><td class="y">ja, ab vGPU 18</td><td class="p">ja, nur Anleitungen aus der Community</td><td class="w">Kostenlos nutzbar. Support-Abo 370 bis 1.100 € je Prozessorsockel und Jahr; für Firmen empfohlen.</td><td class="w">Die meisten Wege offen, geringste Kosten.</td></tr>
+<tr><td><b>Microsoft Hyper-V</b></td><td class="y">ja (DDA)</td><td class="p">nur Server-Karten, siehe oben</td><td class="x">nein</td><td class="w">Windows Server 2025, siehe oben.</td><td class="w">Mit Workstation-Karten bleibt nur die ganze Karte je VM.</td></tr>
+<tr><td><b>VMware vSphere</b></td><td class="y">ja</td><td class="y">ja</td><td class="x">nein, nur Flex</td><td class="w">Seit der Übernahme durch Broadcom teuer, Abrechnung je Prozessorkern.</td><td class="w">Bietet ohne Lizenz nichts über die ganze Karte hinaus.</td></tr>
+<tr><td><b>XCP-ng</b></td><td class="y">ja</td><td class="x">nein</td><td class="x">nein</td><td class="w">Kostenlos, Support optional.</td><td class="w">Kein Weg zum Teilen.</td></tr>
+<tr><td><b>Nutanix AHV</b></td><td class="y">ja</td><td class="y">ja</td><td class="x">nein</td><td class="w">Kommerziell, Preis nicht geprüft.</td><td class="w">Kein lizenzfreier Weg.</td></tr>
+</tbody></table></div>
+
+<h2 id="weg">Vorgehen in Schritten</h2>
+<div class="cards">
+  <div class="card"><span class="tag">Schritt 1</span><h3>Messen</h3><p class="small">Auslastung und Grafikspeicher je Nutzer mitschreiben. Wer braucht mehr als 3 GB? Wer braucht CUDA? Wer braucht zwingend Windows?</p></div>
+  <div class="card"><span class="tag">Schritt 2 · kostenlos</span><h3>vGPU 90 Tage testen</h3><p class="small">Auf einer vorhandenen, unterstützten Karte (RTX A5000, RTX 5000 Ada) die Testversion einrichten. Zeigt mit den echten Programmen, ob die 50-$-Stufe reicht.</p></div>
+  <div class="card"><span class="tag">Schritt 3 · optional</span><h3>Intel-Pilot</h3><p class="small">Eine Arc Pro B70 kaufen und mit dem echten Windows-Abbild, dem echten Remote-Desktop und vier gleichzeitig aktiven VMs prüfen. Vorher keine vorhandene Karte ersetzen.</p></div>
+  <div class="card"><span class="tag">Schritt 4</span><h3>Entscheiden</h3><p class="small">Lizenzkosten über drei Jahre gegen Kartenpreis, Steckplätze und Betriebsaufwand stellen. Nutzer, denen ein eigener Bereich ohne eigene VM genügt, auf Container oder Sitzungen legen.</p></div>
+  <div class="card"><span class="tag">Später</span><h3>Kubernetes</h3><p class="small">Desktops als Container mit Speichergrenzen, Render- und Trainingsjobs in derselben Warteschlange. Übrige Windows-VMs laufen mit KubeVirt weiter. Mehr dazu: <a href="index.html#lb">Load Balancing</a>.</p></div>
+</div>
+<p class="small">Die starke Karte für Rendering und Training ist davon unabhängig. Sie läuft als ganze Karte und braucht keine dieser Lizenzen.</p>
+
+<h2 id="quellen">Quellen und offene Punkte</h2>
+<ul>
+  <li><a href="https://www.nvidia.com/en-us/data-center/buy-grid/">NVIDIA: Preise der vGPU-Software</a> <span class="chk">✓ live geprüft</span></li>
+  <li><a href="https://docs.nvidia.com/vgpu/gpus-supported-by-vgpu.html">NVIDIA: von vGPU unterstützte Karten</a> (Stand der Seite: 29.10.2026) <span class="chk">✓ live geprüft</span></li>
+  <li><a href="https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/gpu-partitioning">Microsoft: GPU Partitioning in Hyper-V, unterstützte Karten</a> <span class="chk">✓ live geprüft</span></li>
+  <li><a href="https://www.nvidia.com/en-us/data-center/resources/vgpu-evaluation/">NVIDIA: 90-Tage-Testversion</a></li>
+  <li><a href="https://docs.nvidia.com/vgpu/packaging-pricing-licensing-guide/latest">NVIDIA: Packaging, Pricing and Licensing Guide</a> (Stufen, 3-GB-Grenze)</li>
+  <li><a href="https://pve.proxmox.com/wiki/NVIDIA_vGPU_on_Proxmox_VE">Proxmox: NVIDIA vGPU</a> · <a href="https://www.proxmox.com/en/products/proxmox-virtual-environment/pricing">Proxmox: Preise</a></li>
+  <li><a href="https://www.intel.com/content/www/us/en/support/articles/000102857.html">Intel: Arc Pro B50 und SR-IOV</a> · <a href="https://forum.level1techs.com/t/the-ultimate-battlemage-battlematrix-proxmox-sr-iov-setup-for-intel-b60-and-b70-gpus/254024">Level1Techs: B60/B70 unter Proxmox</a> (Forum)</li>
+  <li><a href="https://github.com/jamesstringerparsec/Easy-GPU-PV">Easy-GPU-PV</a> (archiviert) · <a href="https://www.microsoft.com/en-us/windows-server/pricing">Microsoft: Preise Windows Server</a></li>
+</ul>
+<div class="note"><b>Noch offen:</b> Ob Virtual PC für die tatsächlich genutzten Programme reicht. Euro-Preise und Mindestmengen beim Händler. Die Zahl der Teile bei Intel-Karten auf dem eigenen Mainboard. Ob NVIDIA für Profi-Karten mit normalem Treiber in einem Sitzungsserver eine Lizenz verlangt; dazu haben wir keine eindeutige Aussage gefunden.</div>
+</main>
+</body>
+</html>

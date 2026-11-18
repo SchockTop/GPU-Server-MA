@@ -24,6 +24,13 @@ def vendor(group):
     return "nvpro"
 
 
+big = {}
+p = R / "llm-large.csv"
+if p.exists():
+    for r in csv.DictReader(open(p, encoding="utf-8", newline="")):
+        if r["model"].startswith("Qwen3 32B") and "Hardware Corner" in r["source"]:
+            big[r["card"]] = num(r["tokens_per_s"])
+
 cards = []
 for r in csv.DictReader(open(R / "gpu-master-table.csv", encoding="utf-8", newline="")):
     cond = r["condition"]
@@ -38,6 +45,7 @@ for r in csv.DictReader(open(R / "gpu-master-table.csv", encoding="utf-8", newli
         "tdp": num(r["tdp_w"]), "slots": r["slots"], "cooling": r["cooling"],
         "ecc": r["ecc"], "vgpu": r["vgpu"], "mig": r["mig"],
         "blender": num(r["blender_4_5_median"]), "bn": num(r["blender_n"]),
+        "llm32": big.get(r["name"], 0 if (num(r["vram_gb"]) or 0) < 24 else None),
         "bnote": r["blender_note"], "llm": num(r["llama7b_q4_tg128"]), "lnote": r["llama_note"],
     })
 

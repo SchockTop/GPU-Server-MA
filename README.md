@@ -11,6 +11,8 @@ Data as of **2026-11-17**. Prices are German retail, brutto incl. 19 % VAT (net 
 | [research/gpu-master-table.md](research/gpu-master-table.md) / [.csv](research/gpu-master-table.csv) | One row per GPU: prices, shader/CUDA cores, tensor/RT cores, VRAM, bandwidth, TFLOPS, power, slots, cooling, ECC, NVLink, vGPU/MIG |
 | [research/benchmarks.md](research/benchmarks.md) | Measured benchmarks: rendering, AI training, LLM inference, VRAM needs |
 | [research/rankings.md](research/rankings.md) | The table sorted by benchmark and by price/performance |
+| [virtualisierung.html](https://schocktop.github.io/GPU-Server-MA/virtualisierung.html) | One GPU for many VMs (German): Hyper-V explained, NVIDIA vGPU cost, Intel/AMD SR-IOV, hypervisor comparison |
+| [research/llm-large.md](research/llm-large.md) | LLM speed for larger models (14B, 32B, 70B) per card, with CSV |
 | [research/load-balancing.md](research/load-balancing.md) | Dynamic load balancing: scheduling, GPU sharing, inference routing, autoscaling, render farm, staged integration path |
 | [research/training-bench.md](research/training-bench.md) / [.csv](research/training-bench.csv) | Measured deep-learning training numbers per source (Exxact, Lambda, Bizon, community) |
 | [research/intel-extra.md](research/intel-extra.md) | Notes on the added Intel cards |

@@ -69,6 +69,21 @@ tr:last-child td{border-bottom:0}
 .pk dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0;font-size:14px}
 .pk dt{color:var(--ink2)} .pk dd{margin:0;font-variant-numeric:tabular-nums}
 details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
+.sl{display:grid;grid-template-columns:minmax(150px,auto) 1fr 52px;gap:8px 14px;align-items:center;margin:14px 0;max-width:760px}
+.sl .ln{font-size:14px} .sl .ln small{display:block;color:var(--ink2);font-size:12px}
+.sl input[type=range]{width:100%;accent-color:var(--ink)}
+.sl output{text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:14px;margin:10px 0}
+.opts label{display:inline-flex;align-items:center;gap:6px}
+.sc{display:grid;grid-template-columns:26px minmax(150px,240px) minmax(140px,1.5fr) 40px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:820px}
+.sc .h{color:var(--ink2);font-weight:600;font-size:12px;line-height:1.25;align-self:end;padding-bottom:4px;border-bottom:1px solid var(--grid)}
+.sc .rk{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.sc .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc .b{height:14px;border-radius:0 4px 4px 0;min-width:2px}
+.sc .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.sc .m{display:grid;grid-template-columns:1fr 26px;gap:6px;align-items:center;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.sc .m i{display:block;height:6px;border-radius:0 3px 3px 0;background:var(--muted);min-width:1px}
+.sc .m span{text-align:right}
 .tag{display:inline-block;font-size:12px;border:1px solid var(--axis);border-radius:20px;padding:0 8px;color:var(--ink2)}
 </style>
 </head>
@@ -78,8 +93,8 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
 <p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
-  <a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#tabelle">Alle Karten</a>
-  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
+  <a href="#score">Gesamtwertung</a><a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#tabelle">Alle Karten</a>
+  <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="virtualisierung.html">Eine Karte, viele VMs</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
 </nav>
 
 <div class="cards">
@@ -100,6 +115,24 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
   <label><input type="checkbox" id="used" checked>Gebrauchte</label>
   <label>Preise <select id="basis"><option value="1">brutto (inkl. 19 % MwSt.)</option><option value="1.19">netto</option></select></label>
   <label>bis <input type="number" id="maxp" min="0" step="500" placeholder="kein Limit" style="width:110px"> €</label>
+</div>
+
+<h2 id="score">Gesamtwertung mit eigenen Gewichten</h2>
+<p class="sub">Eine Karte kann beim Rendern günstig und beim Speicher teuer sein. Die Gesamtwertung rechnet alle Messwerte je Euro zu einer Zahl zusammen. Die Regler legen fest, wie stark jeder Wert zählt. 100 Punkte hat in jeder Spalte die Karte mit dem besten Wert je Euro unter den angezeigten Karten.</p>
+<div class="panel">
+  <div class="opts"><span class="small">Vorgabe:</span><div class="seg" id="presets"></div></div>
+  <div class="sl" id="sliders"></div>
+  <div class="opts">
+    <label>Kosten je Steckplatz <input type="number" id="slot" min="0" step="100" value="500" style="width:90px"> €</label>
+    <label>mindestens <select id="minv"><option value="0">beliebig viel</option><option>12</option><option>16</option><option>24</option><option>32</option><option>48</option></select> GB VRAM</label>
+    <label><input type="checkbox" id="full">nur Karten mit allen Messwerten</label>
+    <button class="seg" id="reset" style="font:inherit;font-size:14px;padding:5px 12px;background:transparent;color:var(--ink2);cursor:pointer">Zurücksetzen</button>
+  </div>
+  <div style="overflow-x:auto"><div class="sc" id="scorelist"></div></div>
+  <p class="small" id="scorenote"></p>
+  <details><summary>So wird gerechnet</summary>
+  <p class="small">Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte; die Karte ist dann mit * markiert und ihre Wertung ist weniger belastbar.</p>
+  <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte belegt Platz, Strom und einen Anteil am Server, und Steckplätze sind begrenzt. Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. „LLM-Tempo, großes Modell“ ist Qwen3 32B mit 4 Bit (Hardware Corner, März 2026, 4k Kontext). Gemessen sind nur 7 Karten; Karten mit weniger als 24 GB bekommen 0, weil das Modell nicht in den Speicher passt, Karten ab 24 GB ohne Messung zählen als fehlend. Die Standardgewichte passen zu einem Rechner, der vor allem rendert und daneben LLMs und Training bedient. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo, weil kein Trainings-Benchmark alle Karten abdeckt.</p></details>
 </div>
 
 <h2 id="chart">Preis und Leistung</h2>
@@ -133,7 +166,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <p class="small">Ohne jeden gemessenen Trainingswert: RTX PRO 5000 72 GB, RTX PRO 4000, RTX 5080, RTX 5060 Ti, RTX 5000 Ada, RTX 4500 Ada, RTX 4000 Ada, alle AMD-Profikarten und alle Intel-Karten. Alle 93 Messwerte mit Quellen: <a href="research/training-bench.md">training-bench.md</a> (<a href="research/training-bench.csv">CSV</a>)</p>
 
 <h2 id="tabelle">Alle Karten</h2>
-<p class="sub">Spaltenkopf anklicken zum Sortieren. Blender: Open Data 4.5.0, Median (n = Anzahl Messungen). LLM: llama.cpp, 7B-Modell mit 4 Bit, Token pro Sekunde.</p>
+<p class="sub">Spaltenkopf anklicken zum Sortieren. Blender: Open Data 4.5.0, Median (n = Anzahl Messungen). LLM 7B: llama.cpp, 7B-Modell mit 4 Bit, Token pro Sekunde. LLM 32B: Qwen3 32B mit 4 Bit (Hardware Corner); 0 heißt, das Modell passt nicht in den Speicher. Größere Modelle samt 70B: <a href="research/llm-large.md">llm-large.md</a> (<a href="research/llm-large.csv">CSV</a>).</p>
 <p><input type="search" id="q" placeholder="Karte suchen …" style="width:min(320px,100%)"></p>
 <div class="tw"><table id="tbl"><thead></thead><tbody></tbody></table></div>
 
@@ -170,12 +203,13 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <tr><td>MPS</td><td>kostenlos</td><td>schwach</td><td>ja</td><td>alle NVIDIA</td></tr>
 <tr><td>MIG (Karte in feste Teile schneiden)</td><td>kostenlos</td><td>in Hardware</td><td>ja</td><td>RTX PRO 6000 (4 Teile), PRO 5000 (2), PRO 4500 Server (2)</td></tr>
 <tr><td>KAI / Run:ai Open Source / HAMi</td><td>kostenlos, ohne Herstellersupport</td><td>per Software</td><td>ja</td><td>NVIDIA</td></tr>
+<tr><td>NVIDIA vGPU (Virtual PC)</td><td>50 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>wie vWS; höchstens 3 GB je VM, kein CUDA</td></tr>
 <tr><td>NVIDIA vGPU (RTX vWS)</td><td>250 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>keine neue Karte unter 10.000 €</td></tr>
 <tr><td>NVIDIA AI Enterprise</td><td>4.500 $ pro GPU und Jahr</td><td>stark (VM)</td><td>ja</td><td>Datacenter-Karten</td></tr>
 <tr><td>AMD MxGPU (SR-IOV)</td><td>keine Gebühr gefunden</td><td>stark</td><td>teilweise</td><td>nur Instinct und Radeon PRO V710, keine Workstation-Radeon</td></tr>
 <tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex; Arc Pro B60/B70 (Reife unklar)</td></tr>
 </tbody></table></div>
-<p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
+<p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
 
 <h2 id="lb">Dynamisches Load Balancing: Jobs automatisch verteilen</h2>
 <p class="sub">Heute sucht sich jeder per Remote-Desktop selbst eine freie Karte. Load Balancing heißt: Ein System legt Jobs und Anfragen automatisch auf passende, freie Karten. Das passiert auf mehreren Ebenen, und für jede gibt es kostenlose Werkzeuge.</p>
@@ -233,7 +267,7 @@ function visible(){
   return CARDS.filter(c => on.has(c.vendor) && (used || !c.used) && (isNaN(max) || (price(c) != null && price(c) <= max)));
 }
 function tipHtml(c){
-  return `<b>${esc(c.name)}</b>${c.used ? "gebraucht · " : ""}${VN[c.vendor]}<br>Preis: ${fmt(price(c))} €<br>VRAM: ${fmt(c.vram)} GB<br>Blender: ${fmt(c.blender)}${c.bn ? " (n=" + fmt(c.bn) + ")" : ""}<br>LLM: ${c.llm ? fmt(c.llm, 0) + " Token/s" : "keine Messung"}`;
+  return `<b>${esc(c.name)}</b>${c.used ? "gebraucht · " : ""}${VN[c.vendor]}<br>Preis: ${fmt(price(c))} €<br>VRAM: ${fmt(c.vram)} GB<br>Blender: ${fmt(c.blender)}${c.bn ? " (n=" + fmt(c.bn) + ")" : ""}<br>LLM 7B: ${c.llm ? fmt(c.llm, 0) + " Token/s" : "keine Messung"}<br>LLM 32B: ${c.llm32 ? fmt(c.llm32, 0) + " Token/s" : c.llm32 === 0 ? "passt nicht in den VRAM" : "keine Messung"}`;
 }
 const YL = {blender:"Blender-Punkte", llm:"Token/s", vram:"GB VRAM", fp32:"TFLOPS (FP32)"};
 function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
@@ -285,7 +319,7 @@ function drawBars(){
 const COLS = [
   ["name", "Karte", c => c.name, 0], ["vendor", "Gruppe", c => VN[c.vendor], 0], ["cond", "Zustand", c => c.used ? "gebraucht" : (c.price == null ? "kein Angebot" : "neu"), 0],
   ["price", "Preis €", c => price(c), 1], ["vram", "VRAM GB", c => c.vram, 1], ["blender", "Blender", c => c.blender, 1], ["bn", "n", c => c.bn, 1],
-  ["llm", "LLM Token/s", c => c.llm, 1], ["pb", "€ / 1.000 Bl.", c => price(c) != null ? BM.blender(c) : null, 1], ["pv", "€ / GB", c => price(c) != null ? BM.vram(c) : null, 1],
+  ["llm", "LLM 7B Token/s", c => c.llm, 1], ["llm32", "LLM 32B Token/s", c => c.llm32, 1], ["pb", "€ / 1.000 Bl.", c => price(c) != null ? BM.blender(c) : null, 1], ["pv", "€ / GB", c => price(c) != null ? BM.vram(c) : null, 1],
   ["cores", "CUDA-Kerne / Shader", c => c.cores, 1], ["fp32", "TFLOPS FP32", c => c.fp32, 1], ["bw", "Bandbreite GB/s", c => c.bw, 1], ["mem", "Speichertyp", c => c.mem, 0],
   ["tdp", "Watt", c => c.tdp, 1], ["slots", "Slots", c => c.slots, 0], ["cooling", "Kühlung", c => c.cooling, 0], ["ecc", "ECC", c => c.ecc, 0], ["vgpu", "vGPU", c => c.vgpu, 0], ["mig", "MIG", c => c.mig, 0]
 ];
@@ -346,13 +380,51 @@ function drawTrain(){
       g.d.map(x => `<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>${x[0]}</span><span style="font-variant-numeric:tabular-nums">${fmt(x[1])}</span></div><div style="height:10px;border-radius:0 4px 4px 0;width:${x[1] / max * 100}%;background:var(--${x[2]})"></div>`).join("") +
       `${g.n ? `<p class="small" style="margin-top:10px">${g.n}</p>` : ""}</div>`; }).join("");
 }
+const SM = /*SM*/[
+  {k:"blender", n:"Rendering", u:"Blender-Punkte je €", w:35},
+  {k:"vram", n:"Speicher", u:"GB VRAM je €", w:25},
+  {k:"llm", n:"LLM-Tempo, kleines Modell", u:"Token/s je €, 7B-Modell", w:10},
+  {k:"llm32", n:"LLM-Tempo, großes Modell", u:"Token/s je €, 32B-Modell; 0 unter 24 GB", w:15},
+  {k:"fp32", n:"Rechenleistung", u:"TFLOPS je €, Näherung für Training", w:20}
+];
+const PRESETS = /*PRESETS*/[["Ausgewogen", {blender:35, vram:20, llm:10, llm32:15, fp32:20}], ["Rendering", {blender:70, vram:10, llm:5, llm32:5, fp32:10}], ["LLM", {blender:5, vram:30, llm:15, llm32:40, fp32:10}], ["Training", {blender:10, vram:30, llm:5, llm32:5, fp32:50}]];
+function initScore(){
+  $("#sliders").innerHTML = SM.map(m => `<div class="ln">${m.n}<small>${m.u}</small></div><input type="range" min="0" max="100" step="5" value="${m.w}" data-k="${m.k}" aria-label="Gewicht ${m.n}"><output id="o_${m.k}"></output>`).join("");
+  document.querySelectorAll("#sliders input").forEach(el => el.addEventListener("input", () => { SM.find(m => m.k == el.dataset.k).w = +el.value; markPreset(); drawScore(); }));
+  $("#presets").innerHTML = PRESETS.map((p, i) => `<button data-i="${i}" aria-pressed="${i == 0}">${p[0]}</button>`).join("");
+  document.querySelectorAll("#presets button").forEach(b => b.onclick = () => { const p = PRESETS[b.dataset.i][1];
+    SM.forEach(m => { m.w = p[m.k] ?? 0; document.querySelector(`#sliders [data-k=${m.k}]`).value = m.w; }); markPreset(); drawScore(); });
+  ["#slot", "#minv", "#full"].forEach(s => $(s).addEventListener("input", drawScore));
+  $("#reset").onclick = () => { $("#slot").value = 500; $("#minv").value = "0"; $("#full").checked = false; document.querySelector("#presets button").click(); };
+}
+function markPreset(){ document.querySelectorAll("#presets button").forEach(b => { const p = PRESETS[b.dataset.i][1];
+  b.setAttribute("aria-pressed", SM.every(m => (p[m.k] ?? 0) == m.w)); }); }
+function drawScore(){
+  const slot = Math.max(0, parseFloat($("#slot").value) || 0), minv = parseFloat($("#minv").value) || 0, tot = SM.reduce((a, m) => a + m.w, 0);
+  SM.forEach(m => $("#o_" + m.k).textContent = tot ? fmt(m.w / tot * 100) + " %" : "–");
+  const cs = visible().filter(c => price(c) != null && (c.vram || 0) >= minv), eff = c => price(c) + slot;
+  const best = {}; SM.forEach(m => best[m.k] = Math.max(0, ...cs.map(c => c[m.k] != null ? c[m.k] / eff(c) : 0)));
+  let rows = cs.map(c => { let s = 0, ws = 0, have = 0; const p = {};
+    SM.forEach(m => { if (c[m.k] != null && best[m.k] > 0){ p[m.k] = c[m.k] / eff(c) / best[m.k] * 100; s += m.w * p[m.k]; ws += m.w; have++; } });
+    return {c, p, have, score: ws ? s / ws : null}; }).filter(r => r.score != null);
+  if ($("#full").checked) rows = rows.filter(r => r.have == SM.length);
+  rows.sort((a, b) => b.score - a.score);
+  $("#scorelist").style.setProperty("--nm", SM.length);
+  $("#scorelist").innerHTML = `<div class="h"></div><div class="h">Karte</div><div class="h">Gesamtwertung</div><div class="h"></div>` + SM.map(m => `<div class="h">${m.n}<br>${tot ? fmt(m.w / tot * 100) : 0} %</div>`).join("") +
+    rows.map((r, i) => `<div class="rk">${i + 1}</div><div class="n" data-i="${CARDS.indexOf(r.c)}"><i class="sw" style="background:var(--${r.c.vendor});margin-right:6px"></i>${esc(r.c.name)}${r.have < SM.length ? " *" : ""}</div><div data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.score}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.score)}</div>` +
+      SM.map(m => r.p[m.k] == null ? `<div class="m"><span></span><span>–</span></div>` : `<div class="m"><i style="width:${r.p[m.k]}%"></i><span>${fmt(r.p[m.k])}</span></div>`).join("")).join("");
+  document.querySelectorAll("#scorelist [data-i]").forEach(h => { const c = CARDS[h.dataset.i];
+    h.addEventListener("mousemove", e => showTip(e, tipHtml(c) + `<br>Rechenleistung: ${fmt(c.fp32, 1)} TFLOPS<br>Preis mit Steckplatz: ${fmt(eff(c))} €`)); h.addEventListener("mouseleave", hideTip); });
+  const out = visible().length - rows.length;
+  $("#scorenote").textContent = (rows.length ? "" : "Keine Karten für diese Auswahl. ") + (out ? out + " Karten fehlen hier (kein Preis, zu wenig VRAM oder fehlende Messwerte). " : "") + "* = mindestens ein Messwert fehlt, die Wertung stützt sich nur auf die übrigen. Blasse Balken sind Gebrauchtkarten.";
+}
 function seg(id, key, fn){ document.querySelectorAll(id + " button").forEach(b => b.onclick = () => {
   document.querySelectorAll(id + " button").forEach(x => x.setAttribute("aria-pressed", x == b)); state[key] = b.dataset.m; fn(); }); }
-function all(){ drawScatter(); drawBars(); drawTable(); }
+function all(){ drawScore(); drawScatter(); drawBars(); drawTable(); }
 seg("#ysel", "y", drawScatter); seg("#bsel", "bar", drawBars);
 document.querySelectorAll("#filters input, #filters select").forEach(el => el.addEventListener("input", all));
 $("#q").addEventListener("input", drawTable);
-all(); drawB2B(); drawTrain();
+initScore(); all(); drawB2B(); drawTrain();
 </script>
 </body>
 </html>
