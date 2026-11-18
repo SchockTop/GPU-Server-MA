@@ -1,5 +1,7 @@
 # GPU-Server-MA
 
+New hardware only; used cards are not listed.
+
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
 Research notes for choosing GPUs for a shared compute setup: rendering as a service (on-demand and batch), neural-network training (UNet, Transformers), LLM training and LLM inference.

@@ -75,7 +75,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 .sl output{text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
 .opts{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:14px;margin:10px 0}
 .opts label{display:inline-flex;align-items:center;gap:6px}
-.sc{display:grid;grid-template-columns:26px minmax(150px,240px) minmax(140px,1.5fr) 40px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:820px}
+.sc{display:grid;grid-template-columns:48px 26px minmax(150px,240px) minmax(140px,1.5fr) 40px repeat(var(--nm),minmax(70px,1fr));gap:5px 10px;align-items:center;font-size:13px;min-width:870px}
 .sc .h{color:var(--ink2);font-weight:600;font-size:12px;line-height:1.25;align-self:end;padding-bottom:4px;border-bottom:1px solid var(--grid)}
 .sc .rk{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .sc .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -84,6 +84,15 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 .sc .m{display:grid;grid-template-columns:1fr 26px;gap:6px;align-items:center;font-variant-numeric:tabular-nums;color:var(--ink2)}
 .sc .m i{display:block;height:6px;border-radius:0 3px 3px 0;background:var(--muted);min-width:1px}
 .sc .m span{text-align:right}
+.ib{font:inherit;font-size:13px;line-height:1;border:0;background:transparent;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:4px}
+.ib:hover{color:var(--ink);background:var(--grid)} .ib[aria-pressed=true]{color:var(--ink)}
+.ctl{white-space:nowrap}
+h2.tgl{cursor:pointer} h2.tgl::before{content:"▾";display:inline-block;width:22px;color:var(--muted)} h2.tgl[aria-expanded=false]::before{content:"▸"}
+h2.tgl[aria-expanded=false]{color:var(--ink2);margin-top:14px}
+tr.pin td,.pinned{font-weight:650} tr.pin td{background:var(--page)}
+.chip{font:inherit;font-size:13px;border:1px solid var(--axis);border-radius:20px;background:transparent;color:var(--ink2);padding:1px 10px;cursor:pointer}
+.chip:hover{color:var(--ink);border-color:var(--ink2)}
+.sc .srt{cursor:pointer} .sc .srt[aria-sort]::after{content:" ▼";font-size:10px}
 .tag{display:inline-block;font-size:12px;border:1px solid var(--axis);border-radius:20px;padding:0 8px;color:var(--ink2)}
 </style>
 </head>
@@ -95,6 +104,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <nav>
   <a href="#score">Gesamtwertung</a><a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#methode">So entstehen die Benchmarks</a><a href="#tabelle">Alle Karten</a>
   <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="virtualisierung.html">Eine Karte, viele VMs</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
+  <button class="chip" id="closeAll">Alle Abschnitte einklappen</button><button class="chip" id="openAll">Alle ausklappen</button>
 </nav>
 
 <div class="cards">
@@ -114,7 +124,10 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
   <label><input type="checkbox" data-v="intel" checked><span class="sw" style="background:var(--intel)"></span>Intel</label>
   <label>Preise <select id="basis"><option value="1">brutto (inkl. 19 % MwSt.)</option><option value="1.19">netto</option></select></label>
   <label>bis <input type="number" id="maxp" min="0" step="500" placeholder="kein Limit" style="width:110px"> €</label>
+  <label><input type="checkbox" id="onlypin">nur angepinnte</label>
 </div>
+<div class="opts small" id="hiddenbar"></div>
+<p class="small">Bedienung: ★ pinnt eine Karte an (sie steht dann überall oben und ist im Diagramm beschriftet), ✕ blendet sie überall aus. Ein Klick auf eine Überschrift klappt den Abschnitt ein. Spaltenköpfe sortieren. Die Auswahl bleibt in diesem Browser gespeichert.</p>
 
 <h2 id="score">Gesamtwertung mit eigenen Gewichten</h2>
 <p class="sub">Eine Karte kann beim Rendern günstig und beim Speicher teuer sein. Die Gesamtwertung rechnet alle Messwerte je Euro zu einer Zahl zusammen. Die Regler legen fest, wie stark jeder Wert zählt. 100 Punkte hat in jeder Spalte die Karte mit dem besten Wert je Euro unter den angezeigten Karten.</p>
@@ -130,7 +143,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
   <div style="overflow-x:auto"><div class="sc" id="scorelist"></div></div>
   <p class="small" id="scorenote"></p>
   <details><summary>So wird gerechnet</summary>
-  <p class="small">Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte; die Karte ist dann mit * markiert und ihre Wertung ist weniger belastbar.</p>
+  <p class="small">Ein Klick auf einen Spaltenkopf sortiert nach diesem Wert; die Nummer links bleibt der Rang in der Gesamtwertung. Für jede Karte und jeden Messwert: Messwert geteilt durch (Kartenpreis + Kosten je Steckplatz). Der beste Wert unter den angezeigten Karten bekommt 100 Punkte, alle anderen ihren Anteil davon. Die Gesamtwertung ist der gewichtete Mittelwert dieser Punkte. Fehlt einer Karte ein Messwert, zählen nur die vorhandenen Werte; die Karte ist dann mit * markiert und ihre Wertung ist weniger belastbar.</p>
   <p class="small">Die Kosten je Steckplatz sind eine Annahme. Jede Karte belegt Platz, Strom und einen Anteil am Server, und Steckplätze sind begrenzt. Ohne diesen Aufschlag (Wert 0) gewinnen fast immer die billigsten Karten, auch wenn man davon viel mehr bräuchte, als in einen Server passen. „LLM-Tempo, großes Modell“ ist Qwen3 32B mit 4 Bit (Hardware Corner, März 2026, 4k Kontext). Gemessen sind nur 4 der aufgeführten Karten; Karten mit weniger als 24 GB bekommen 0, weil das Modell nicht in den Speicher passt, Karten ab 24 GB ohne Messung zählen als fehlend. Die Standardgewichte passen zu einem Rechner, der vor allem rendert und daneben LLMs und Training bedient. „Rechenleistung“ ist die Datenblatt-Angabe in TFLOPS und nur eine Näherung für das Trainingstempo, weil kein Trainings-Benchmark alle Karten abdeckt.</p></details>
 </div>
 
@@ -182,6 +195,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <h2 id="tabelle">Alle Karten</h2>
 <p class="sub">Spaltenkopf anklicken zum Sortieren. Blender: Open Data 4.5.0, Median (n = Anzahl Messungen). LLM 7B: llama.cpp, 7B-Modell mit 4 Bit, Token pro Sekunde. LLM 32B: Qwen3 32B mit 4 Bit (Hardware Corner); 0 heißt, das Modell passt nicht in den Speicher. Größere Modelle samt 70B: <a href="research/llm-large.md">llm-large.md</a> (<a href="research/llm-large.csv">CSV</a>).</p>
 <p><input type="search" id="q" placeholder="Karte suchen …" style="width:min(320px,100%)"></p>
+<details id="colsel"><summary>Spalten ein- und ausblenden</summary><div class="opts" id="colboxes"></div></details>
 <div class="tw"><table id="tbl"><thead></thead><tbody></tbody></table></div>
 
 <h2 id="b2b">Firmenpreise (B2B)</h2>
@@ -266,7 +280,13 @@ const VN = {nvpro:"NVIDIA Pro", geforce:"NVIDIA GeForce", amd:"AMD", intel:"Inte
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt = (v, d = 0) => v == null || isNaN(v) ? "–" : v.toLocaleString("de-DE", {maximumFractionDigits: d, minimumFractionDigits: d});
-const state = {y: "blender", bar: "blender", sort: "price", dir: 1};
+const state = {y: "blender", bar: "blender", sort: "price", dir: 1, ssort: "score"};
+const UI = {pinned: [], hidden: [], cols: [], closed: []};
+try { Object.assign(UI, JSON.parse(localStorage.getItem("gpu-ui-v1") || "{}")); } catch (e) {}
+function saveUI(){ try { localStorage.setItem("gpu-ui-v1", JSON.stringify(UI)); } catch (e) {} }
+const isPin = c => UI.pinned.includes(c.name);
+const ctl = c => { const i = CARDS.indexOf(c), on = isPin(c);
+  return `<span class="ctl"><button class="ib" data-pin="${i}" aria-pressed="${on}" title="${on ? "Lösen" : "Anpinnen"}" aria-label="${on ? "Lösen" : "Anpinnen"}: ${esc(c.name)}">${on ? "★" : "☆"}</button><button class="ib" data-hide="${i}" title="Ausblenden" aria-label="Ausblenden: ${esc(c.name)}">✕</button></span>`; };
 const tip = $("#tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.display = "block";
   const w = tip.offsetWidth, h = tip.offsetHeight;
@@ -278,7 +298,8 @@ function price(c){ return c.price == null ? null : c.price / basis(); }
 function visible(){
   const on = new Set([...document.querySelectorAll("#filters [data-v]")].filter(x => x.checked).map(x => x.dataset.v));
   const max = parseFloat($("#maxp").value);
-  return CARDS.filter(c => on.has(c.vendor) && (isNaN(max) || (price(c) != null && price(c) <= max)));
+  const only = $("#onlypin").checked;
+  return CARDS.filter(c => on.has(c.vendor) && !UI.hidden.includes(c.name) && (!only || isPin(c)) && (isNaN(max) || (price(c) != null && price(c) <= max)));
 }
 function tipHtml(c){
   return `<b>${esc(c.name)}</b>${c.used ? "gebraucht · " : ""}${VN[c.vendor]}<br>Preis: ${fmt(price(c))} €<br>VRAM: ${fmt(c.vram)} GB<br>Blender: ${fmt(c.blender)}${c.bn ? " (n=" + fmt(c.bn) + ")" : ""}<br>LLM 7B: ${c.llm ? fmt(c.llm, 0) + " Token/s" : "keine Messung"}<br>LLM 32B: ${c.llm32 ? fmt(c.llm32, 0) + " Token/s" : c.llm32 === 0 ? "passt nicht in den VRAM" : "keine Messung"}`;
@@ -301,7 +322,7 @@ function drawScatter(){
   s += `<text x="${(L + W - Rm) / 2}" y="${H - 6}" text-anchor="middle">Preis (${basis() == 1 ? "brutto" : "netto"})</text>`;
   s += `<text x="14" y="14">${YL[m]}</text>`;
   const placed = pts.map(c => ({x1: X(price(c)) - 8, y1: Y(c[m]) - 8, x2: X(price(c)) + 8, y2: Y(c[m]) + 8}));
-  const sorted = [...pts].sort((a, b) => b[m] - a[m]);
+  const sorted = [...pts].sort((a, b) => isPin(b) - isPin(a) || b[m] - a[m]);
   let labels = "";
   for (const c of sorted){
     const x = X(price(c)), y = Y(c[m]), short = c.name.replace("GeForce ", "").replace("AMD Radeon ", "").replace("Intel ", "").replace(" Blackwell", "").replace(" Workstation", " WS");
@@ -312,7 +333,7 @@ function drawScatter(){
   }
   s += labels;
   pts.forEach((c, i) => { const x = X(price(c)), y = Y(c[m]);
-    s += `<circle cx="${x}" cy="${y}" r="6" fill="var(--${c.vendor})" stroke="var(--surface)" stroke-width="2" ${c.used ? 'fill-opacity=".45"' : ""}/><circle class="hit" data-i="${CARDS.indexOf(c)}" cx="${x}" cy="${y}" r="13" fill="transparent"/>`; });
+    s += `<circle cx="${x}" cy="${y}" r="${isPin(c) ? 8 : 6}" fill="var(--${c.vendor})" stroke="var(--${isPin(c) ? "ink" : "surface"})" stroke-width="2" ${c.used ? 'fill-opacity=".45"' : ""}/><circle class="hit" data-i="${CARDS.indexOf(c)}" cx="${x}" cy="${y}" r="13" fill="transparent"/>`; });
   s += "</svg>";
   $("#scatter").innerHTML = s;
   document.querySelectorAll("#scatter .hit").forEach(h => { const c = CARDS[h.dataset.i];
@@ -326,7 +347,7 @@ function drawBars(){
   const f = BM[state.bar];
   const rows = visible().filter(c => price(c) != null).map(c => ({c, v: f(c)})).filter(r => r.v != null).sort((a, b) => a.v - b.v);
   const max = Math.max(1, ...rows.map(r => r.v));
-  $("#bars").innerHTML = rows.map(r => `<div class="n" title="${esc(r.c.name)}">${esc(r.c.name)}</div><div class="t" data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.v / max * 100}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.v)} €</div>`).join("") || '<div class="small">Keine Karten für diese Auswahl.</div>';
+  $("#bars").innerHTML = rows.map(r => `<div class="n${isPin(r.c) ? " pinned" : ""}" title="${esc(r.c.name)}">${isPin(r.c) ? "★ " : ""}${esc(r.c.name)}</div><div class="t" data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.v / max * 100}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.v)} €</div>`).join("") || '<div class="small">Keine Karten für diese Auswahl.</div>';
   document.querySelectorAll("#bars .t").forEach(h => { const c = CARDS[h.dataset.i];
     h.addEventListener("mousemove", e => showTip(e, tipHtml(c))); h.addEventListener("mouseleave", hideTip); });
 }
@@ -338,14 +359,15 @@ const COLS = [
   ["tdp", "Watt", c => c.tdp, 1], ["slots", "Slots", c => c.slots, 0], ["cooling", "Kühlung", c => c.cooling, 0], ["ecc", "ECC", c => c.ecc, 0], ["vgpu", "vGPU", c => c.vgpu, 0], ["mig", "MIG", c => c.mig, 0]
 ];
 function drawTable(){
-  const q = $("#q").value.toLowerCase(), col = COLS.find(c => c[0] == state.sort);
+  const q = $("#q").value.toLowerCase(), col = COLS.find(c => c[0] == state.sort), cols = COLS.filter(c => !UI.cols.includes(c[0]));
   const rows = visible().filter(c => c.name.toLowerCase().includes(q)).sort((a, b) => {
+    if (isPin(a) != isPin(b)) return isPin(b) - isPin(a);
     const x = col[2](a), y = col[2](b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
     return (typeof x == "number" ? x - y : String(x).localeCompare(String(y), "de")) * state.dir; });
-  $("#tbl thead").innerHTML = "<tr>" + COLS.map(c => `<th data-k="${c[0]}" class="${c[3] ? "num" : ""}" ${c[0] == state.sort ? `aria-sort="${state.dir > 0 ? "ascending" : "descending"}"` : ""}>${c[1]}</th>`).join("") + "</tr>";
-  $("#tbl tbody").innerHTML = rows.map(c => "<tr>" + COLS.map(k => { const v = k[2](c);
-    return `<td class="${k[3] ? "num" : ""}">${k[0] == "name" ? `<i class="sw" style="background:var(--${c.vendor});margin-right:6px"></i>` : ""}${k[3] ? fmt(v, k[0] == "fp32" ? 1 : 0) : esc(v || "–")}</td>`; }).join("") + "</tr>").join("");
-  document.querySelectorAll("#tbl th").forEach(th => th.onclick = () => { const k = th.dataset.k;
+  $("#tbl thead").innerHTML = "<tr><th></th>" + cols.map(c => `<th data-k="${c[0]}" class="${c[3] ? "num" : ""}" ${c[0] == state.sort ? `aria-sort="${state.dir > 0 ? "ascending" : "descending"}"` : ""}>${c[1]}</th>`).join("") + "</tr>";
+  $("#tbl tbody").innerHTML = rows.map(c => `<tr class="${isPin(c) ? "pin" : ""}"><td>${ctl(c)}</td>` + cols.map(k => { const v = k[2](c);
+    return `<td class="${k[3] ? "num" : ""}">${k[0] == "name" ? `<i class="sw" style="background:var(--${c.vendor});margin-right:6px"></i>` : ""}${k[3] ? fmt(v, k[0] == "fp32" ? 1 : 0) : esc(v || "–")}</td>`; }).join("") + "</tr>").join("") || `<tr><td colspan="${cols.length + 1}">Keine Karten für diese Auswahl.</td></tr>`;
+  document.querySelectorAll("#tbl th[data-k]").forEach(th => th.onclick = () => { const k = th.dataset.k;
     if (state.sort == k) state.dir *= -1; else { state.sort = k; state.dir = COLS.find(c => c[0] == k)[3] && !["price", "pb", "pv"].includes(k) ? -1 : 1; } drawTable(); });
 }
 function matchCard(n){
@@ -422,23 +444,58 @@ function drawScore(){
     SM.forEach(m => { if (c[m.k] != null && best[m.k] > 0){ p[m.k] = c[m.k] / eff(c) / best[m.k] * 100; s += m.w * p[m.k]; ws += m.w; have++; } });
     return {c, p, have, score: ws ? s / ws : null}; }).filter(r => r.score != null);
   if ($("#full").checked) rows = rows.filter(r => r.have == SM.length);
-  rows.sort((a, b) => b.score - a.score);
+  rows.sort((a, b) => b.score - a.score); rows.forEach((r, i) => r.rank = i + 1);
+  const sk = state.ssort;
+  rows.sort((a, b) => isPin(b.c) - isPin(a.c) || (sk == "score" ? b.score - a.score : (b.p[sk] ?? -1) - (a.p[sk] ?? -1)));
   $("#scorelist").style.setProperty("--nm", SM.length);
-  $("#scorelist").innerHTML = `<div class="h"></div><div class="h">Karte</div><div class="h">Gesamtwertung</div><div class="h"></div>` + SM.map(m => `<div class="h">${m.n}<br>${tot ? fmt(m.w / tot * 100) : 0} %</div>`).join("") +
-    rows.map((r, i) => `<div class="rk">${i + 1}</div><div class="n" data-i="${CARDS.indexOf(r.c)}"><i class="sw" style="background:var(--${r.c.vendor});margin-right:6px"></i>${esc(r.c.name)}${r.have < SM.length ? " *" : ""}</div><div data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.score}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.score)}</div>` +
+  $("#scorelist").innerHTML = `<div class="h"></div><div class="h"></div><div class="h">Karte</div><div class="h srt" data-s="score" ${sk == "score" ? 'aria-sort="descending"' : ""}>Gesamtwertung</div><div class="h"></div>` + SM.map(m => `<div class="h srt" data-s="${m.k}" ${sk == m.k ? 'aria-sort="descending"' : ""}>${m.n}<br>${tot ? fmt(m.w / tot * 100) : 0} %</div>`).join("") +
+    rows.map(r => `<div>${ctl(r.c)}</div><div class="rk">${r.rank}</div><div class="n${isPin(r.c) ? " pinned" : ""}" data-i="${CARDS.indexOf(r.c)}"><i class="sw" style="background:var(--${r.c.vendor});margin-right:6px"></i>${esc(r.c.name)}${r.have < SM.length ? " *" : ""}</div><div data-i="${CARDS.indexOf(r.c)}"><div class="b" style="width:${r.score}%;background:var(--${r.c.vendor});${r.c.used ? "opacity:.45" : ""}"></div></div><div class="v">${fmt(r.score)}</div>` +
       SM.map(m => r.p[m.k] == null ? `<div class="m"><span></span><span>–</span></div>` : `<div class="m"><i style="width:${r.p[m.k]}%"></i><span>${fmt(r.p[m.k])}</span></div>`).join("")).join("");
   document.querySelectorAll("#scorelist [data-i]").forEach(h => { const c = CARDS[h.dataset.i];
     h.addEventListener("mousemove", e => showTip(e, tipHtml(c) + `<br>Rechenleistung: ${fmt(c.fp32, 1)} TFLOPS<br>Preis mit Steckplatz: ${fmt(eff(c))} €`)); h.addEventListener("mouseleave", hideTip); });
+  document.querySelectorAll("#scorelist .srt").forEach(h => h.onclick = () => { state.ssort = h.dataset.s; drawScore(); });
   const out = visible().length - rows.length;
   $("#scorenote").textContent = (rows.length ? "" : "Keine Karten für diese Auswahl. ") + (out ? out + " Karten fehlen hier (kein Preis, zu wenig VRAM oder fehlende Messwerte). " : "") + "* = mindestens ein Messwert fehlt, die Wertung stützt sich nur auf die übrigen.";
 }
 function seg(id, key, fn){ document.querySelectorAll(id + " button").forEach(b => b.onclick = () => {
   document.querySelectorAll(id + " button").forEach(x => x.setAttribute("aria-pressed", x == b)); state[key] = b.dataset.m; fn(); }); }
-function all(){ drawScore(); drawScatter(); drawBars(); drawTable(); }
+function drawHidden(){
+  const h = UI.hidden.filter(n => CARDS.some(c => c.name == n)), pn = UI.pinned.filter(n => CARDS.some(c => c.name == n));
+  $("#hiddenbar").innerHTML = (h.length ? `<span>Ausgeblendet (${h.length}):</span>` + h.map(n => `<button class="chip" data-show="${esc(n)}" title="Wieder einblenden">${esc(n)} ✕</button>`).join("") + `<button class="chip" data-show="*">alle einblenden</button>` : "") +
+    (pn.length ? `<span>Angepinnt: ${pn.length}</span><button class="chip" data-unpin="*">alle lösen</button>` : "");
+}
+function all(){ drawHidden(); drawScore(); drawScatter(); drawBars(); drawTable(); }
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-pin],[data-hide],[data-show],[data-unpin]"); if (!b) return;
+  const tog = (arr, n) => { const i = arr.indexOf(n); if (i < 0) arr.push(n); else arr.splice(i, 1); };
+  if (b.dataset.pin != null) tog(UI.pinned, CARDS[b.dataset.pin].name);
+  else if (b.dataset.hide != null) { const n = CARDS[b.dataset.hide].name; if (!UI.hidden.includes(n)) UI.hidden.push(n); }
+  else if (b.dataset.show != null) { if (b.dataset.show == "*") UI.hidden = []; else UI.hidden = UI.hidden.filter(n => n != b.dataset.show); }
+  else if (b.dataset.unpin != null) UI.pinned = [];
+  hideTip(); saveUI(); all();
+});
+function initSections(){
+  const set = (h, open) => { h.setAttribute("aria-expanded", open); h.nextElementSibling.hidden = !open;
+    UI.closed = UI.closed.filter(x => x != h.id); if (!open) UI.closed.push(h.id); saveUI(); };
+  const hs = [...document.querySelectorAll("main > h2[id]")];
+  hs.forEach(h => { const body = document.createElement("div"); let n = h.nextSibling;
+    while (n && !(n.nodeType == 1 && n.tagName == "H2")){ const nx = n.nextSibling; body.appendChild(n); n = nx; }
+    h.after(body); h.className = "tgl"; h.tabIndex = 0; h.setAttribute("role", "button"); h.title = "Abschnitt ein- oder ausklappen";
+    const open = !UI.closed.includes(h.id); h.setAttribute("aria-expanded", open); body.hidden = !open;
+    const flip = () => set(h, h.getAttribute("aria-expanded") != "true");
+    h.onclick = flip; h.onkeydown = e => { if (e.key == "Enter" || e.key == " "){ e.preventDefault(); flip(); } }; });
+  $("#closeAll").onclick = () => hs.forEach(h => set(h, false));
+  $("#openAll").onclick = () => hs.forEach(h => set(h, true));
+  document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", () => { const h = document.getElementById(a.getAttribute("href").slice(1)); if (h && h.classList.contains("tgl")) set(h, true); }));
+}
+function initCols(){
+  $("#colboxes").innerHTML = COLS.slice(1).map(c => `<label><input type="checkbox" data-c="${c[0]}" ${UI.cols.includes(c[0]) ? "" : "checked"}>${c[1]}</label>`).join("");
+  document.querySelectorAll("#colboxes input").forEach(el => el.addEventListener("input", () => { UI.cols = UI.cols.filter(x => x != el.dataset.c); if (!el.checked) UI.cols.push(el.dataset.c); saveUI(); drawTable(); }));
+}
 seg("#ysel", "y", drawScatter); seg("#bsel", "bar", drawBars);
 document.querySelectorAll("#filters input, #filters select").forEach(el => el.addEventListener("input", all));
 $("#q").addEventListener("input", drawTable);
-initScore(); all(); drawB2B(); drawTrain();
+initScore(); initCols(); all(); drawB2B(); drawTrain(); initSections();
 </script>
 </body>
 </html>

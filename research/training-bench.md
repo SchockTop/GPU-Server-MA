@@ -1,5 +1,10 @@
 # Training benchmark scores per GPU (collected 2026-11-17)
 
+New hardware only; used cards are not listed.
+
+RTX 3090, RTX 4090 and RTX A6000 are listed as reference values only; they are practically only available used and are not purchase candidates.
+
+
 Data: `training-bench.csv` (93 rows). Only values read on the source page. Nothing derived. Evidence V = seen in fetched page text (pages were read through a summarising fetcher, so spot-check before publishing). Rows with a `relative_value` are the source's own ratios.
 
 ## Which benchmark as "the training score"?
@@ -25,11 +30,11 @@ Measured number exists:
 - RTX PRO 4500 Blackwell 32GB: Exxact LoRA only
 - GeForce RTX 5090 32GB: nikolasent (community)
 - GeForce RTX 5070 Ti 16GB, GeForce RTX 5070 12GB: one small-model run on a GitHub issue (community, a 10-epoch total time)
-- GeForce RTX 4090 24GB (used): Lambda, Bizon, nikolasent, GitHub issue
-- GeForce RTX 3090 24GB (used): Lambda, Bizon, nikolasent
+- GeForce RTX 4090 24GB: Lambda, Bizon, nikolasent, GitHub issue
+- GeForce RTX 3090 24GB: Lambda, Bizon, nikolasent
 - RTX 6000 Ada 48GB: Lambda, Bizon, Exxact
 - L40S 48GB: Exxact
-- RTX A6000 48GB (used): Lambda, Bizon
+- RTX A6000 48GB: Lambda, Bizon
 - A100 80GB PCIe: Lambda, Bizon
 - RTX A5000 24GB, RTX A4000 16GB: Bizon only
 - AMD Radeon RX 9070 XT 16GB: GitHub issue (community, ROCm Windows, several runs)

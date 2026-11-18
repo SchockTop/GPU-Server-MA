@@ -1,5 +1,7 @@
 # intel-extra notes (2026-11-17)
 
+New hardware only; used cards are not listed.
+
 Rows: B70 (updated), B65 (new), B60 24GB (updated), B60 Dual 48GB Maxsun, B50, B580, B570, A770.
 
 - **B60 32GB does not exist.** The 32 GB card with B60-class silicon is the Arc Pro B65 (20 Xe, 32 GB, 608 GB/s, 200 W, partner boards only, e.g. ASRock Creator). The 32 GB B70 is the bigger die (32 Xe).

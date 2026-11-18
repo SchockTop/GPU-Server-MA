@@ -1,5 +1,7 @@
 # Multi-user GPU sharing: virtualisation options and licence costs
 
+New hardware only; used cards are not listed.
+
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
 As of 2026-11-17. [V] = checked on the cited page (some pages were read through a summarising fetch tool, so re-check key figures against the page before relying on them). [U] = secondary, community or unverified. Prices are NVIDIA list prices in USD; partner quotes differ.

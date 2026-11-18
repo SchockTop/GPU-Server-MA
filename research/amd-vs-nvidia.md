@@ -1,12 +1,14 @@
 # AMD vs NVIDIA (and a note on Intel) for rendering, NN/LLM training and LLM inference
 
+New hardware only; used cards are not listed.
+
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
 As of 2026-11-17. Prices are German brutto (see `gpu-master-table.md`); benchmark sources are in `benchmarks.md`. [V] = checked on a cited page, [U] = secondary or unverified. Sentences marked "Assessment" are our interpretation.
 
 ## 1. Short version
 - **Rendering:** NVIDIA leads clearly. In Blender, AMD's best cards (R9700, W7900) score about a third of a similarly priced NVIDIA card. Octane does not run on AMD, and Redshift supports AMD on Windows only.
-- **LLM inference:** AMD buys the most VRAM per euro, at 32 GB for about 2,100 EUR. Small-model token speed is decent (R9700 about 153 t/s vs 185 t/s on an RTX 5080 in llama.cpp), but under load NVIDIA pulls far ahead (5090 "almost four times faster" on a 27B model [U, ServeTheHome]).
+- **LLM inference:** AMD has the cheapest VRAM per euro among AMD and NVIDIA pro cards: 32 GB for about 2,100 EUR (66 EUR per GB, RTX 4000 Ada: 97). Small-model token speed is decent (R9700 about 153 t/s vs 185 t/s on an RTX 5080 in llama.cpp), but under load NVIDIA pulls far ahead (5090 "almost four times faster" on a 27B model [U, ServeTheHome]).
 - **Training and fine-tuning:** possible on ROCm, but there are no measured comparisons for current cards. FlashAttention, bitsandbytes and Unsloth support on RDNA4 is recent and partly community-maintained.
 - **Operations:** NVIDIA's Kubernetes stack is mature: GPU Operator, MIG, time-slicing, open-source Run:ai. AMD's is solid on Instinct datacenter cards and thinner for Radeon PRO cards.
 

@@ -1,5 +1,7 @@
 # Imagine case: 10,000 EUR for GPUs
 
+New hardware only; used cards are not listed.
+
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
 A generic worked example for a small team that wants shared GPU compute for **rendering as a service** (Blender/Cycles, V-Ray, Octane, Redshift; on demand and batch), **neural-network training** (UNet, Transformers), **LLM fine-tuning** and **LLM inference**. It assumes a Kubernetes-style setup where jobs get whole GPUs or GPU slices.
@@ -64,7 +66,6 @@ Blender figures are Open Data 4.5.0 medians per card, simply added up. The sums 
 | Package | Price brutto (low) | VRAM | Blender sum | Why consider | Why not |
 |---|---|---|---|---|---|
 | 4x Radeon AI PRO R9700 32GB | ~8,400 | **128 GB** | ~12,800 (HIP) | Most VRAM per euro. vLLM with TP=4 runs 70B. ROCm officially supports the card. | Rendering at 1/3 of NVIDIA per card. Octane unsupported. Redshift AMD is Windows-only. ROCm on Linux is limited to Ubuntu LTS/RHEL, and updates have caused regressions. |
-| 2x RTX A6000 48GB (used) | ~8,000-9,000 (asking) | 96 GB | ~10,300 | 48 GB per card plus an **NVLink** pair. Listed for vGPU. | Used, no warranty. Ampere: no FP8/FP4. Slower than a PRO 4500 per card in rendering. |
 | 1x RTX 6000 Ada 48GB | ~9,600 | 48 GB | ~10,700 | 48 GB **with vGPU support**, for teams that need VDI-style virtual workstations. | Costs more than a PRO 5000 48GB for similar speed. No MIG, no FP4. |
 | 1x PRO 4500 + 2x RTX 5080 | ~8,500 | 64 GB (32+16+16) | ~26,800 | Mixed: one 32 GB pro card for LLM and big scenes, two GeForce cards for render throughput. | Two driver/licence classes to manage. Same GeForce caveats. |
 | 5x RTX 5070 Ti 16GB | ~7,000 | 80 GB | ~38,000 | Best render throughput per euro among new 16 GB cards (about 184 EUR per 1,000 Blender points). The 12 GB RTX 5070 is cheaper per point (about 150). | Same as D, with five cards to house and power (5x 300 W). |

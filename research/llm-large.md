@@ -1,5 +1,10 @@
 # Larger-LLM generation speed per GPU (research notes, 2026-11-18)
 
+New hardware only; used cards are not listed.
+
+RTX 3090, RTX 4090 and RTX A6000 are listed as reference values only; they are practically only available used and are not purchase candidates.
+
+
 ## Most consistent source
 Hardware Corner per-GPU pages (https://www.hardware-corner.net/gpu-llm-benchmarks/<gpu>/, "Updated Benchmarks: March 2026"). Same author and method for every card: llama.cpp llama-bench, CUDA, Q4_K quant, token generation at 4k/16k/32k... context. Rows in the CSV use the 4k column (the other contexts are on the same pages). Models and counts:
 - Qwen3 14B Q4_K: 11 cards (5090, PRO 6000, PRO 5000 48GB, 4090, 6000 Ada, 5080, 5070 Ti, 3090, 5070, A6000, 5060 Ti 16GB)

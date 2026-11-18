@@ -1,5 +1,7 @@
 # B2B / business-reseller GPU prices, Germany (as of 2026-11-17, re-checked 2026-11-18)
 
+New hardware only; used cards are not listed.
+
 Prices and facts re-checked at the sources on 18 Nov 2026.
 
 Evidence: V = seen on the fetched page, U = only in a search snippet. EUR, VAT 19%. Net = brutto/1.19 where the page showed only one of them (computed values rounded). `shown_as`: net+gross = page showed both; brutto = page showed gross, net computed; net = page showed net, brutto computed. Alternate prices include VAT (brutto).

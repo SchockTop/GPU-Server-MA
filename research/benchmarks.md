@@ -1,5 +1,10 @@
 # GPU benchmarks per use case
 
+New hardware only; used cards are not listed.
+
+RTX 3090, RTX 4090 and RTX A6000 are listed as reference values only; they are practically only available used and are not purchase candidates.
+
+
 Collected 2026-11-17. Only measured values with a source; anything we calculated is marked **DERIVED**. "no data" means we looked and found nothing usable. Most sources are single runs or user-submitted data, so treat small differences (under ~10%) as noise.
 
 Use cases covered: (1) rendering, (2) neural-network training, (3) LLM inference, (4) LLM fine-tuning memory needs.
