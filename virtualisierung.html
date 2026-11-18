@@ -80,9 +80,9 @@ td.w{min-width:200px}
   <div class="card"><div class="small">Kostenlos und offiziell unterstützt</div><div class="big">Gibt es für getrennte Windows-VMs nicht</div>
     <p class="small">Kein Hersteller bietet heute einen ausgereiften, kostenlosen und unterstützten Weg, eine Karte auf mehrere Windows-VMs zu verteilen.</p></div>
   <div class="card"><div class="small">Der sichere Weg</div><div class="big">NVIDIA vGPU ab 50 $ je Nutzer und Jahr</div>
-    <p class="small">Läuft auf RTX A5000 und RTX 5000 Ada, nicht auf der RTX A4000. 8 bis 16 Nutzer je Karte. 90 Tage kostenlos testbar.</p></div>
+    <p class="small">Läuft unter anderem auf RTX A5000 und RTX 5000 Ada, nicht auf der RTX A4000. 8 bis 16 Nutzer je Karte. 90 Tage kostenlos testbar.</p></div>
   <div class="card"><div class="small">Der kostenlose Versuch</div><div class="big">Intel Arc Pro, aber noch unreif</div>
-    <p class="small">Lizenzfrei, 2 bis 7 VMs je Karte. Unter Windows gibt es bestätigte Treiberfehler. Als Pilot geeignet, nicht als Plan.</p></div>
+    <p class="small">Lizenzfrei. Von Intel freigegeben sind 2 VMs (B50) und 4 VMs (B70) je Karte. Unter Windows gibt es einen bestätigten Treiberfehler. Als Pilot geeignet, nicht als Plan.</p></div>
   <div class="card"><div class="small">Wirklich dynamisch</div><div class="big">Nur ohne eigene VM</div>
     <p class="small">In VMs ist der Grafikspeicher immer fest zugeteilt. Frei und nach Bedarf geteilt wird nur in Containern oder Sitzungen auf einem gemeinsamen System.</p></div>
 </div>
@@ -150,22 +150,22 @@ td.w{min-width:200px}
 <div class="tw"><table>
 <thead><tr><th>Weg</th><th>Art</th><th>Läuft auf</th><th>Welche Karten</th><th>Lizenz für die Karte</th><th>Einschätzung</th></tr></thead>
 <tbody>
-<tr><td><b>DDA</b><br><span class="small">Discrete Device Assignment</span></td><td>1 · ganze Karte</td><td>Windows Server</td><td class="w">Praktisch alle</td><td class="y">keine</td><td class="w">Ausgereift, aber eine Karte je VM. Löst das Platzproblem nicht.</td></tr>
-<tr><td><b>GPU-P</b><br><span class="small">GPU Partitioning, offiziell</span></td><td>2 · feste Scheiben</td><td>Windows Server 2025, Azure Local</td><td class="w">Nur NVIDIA A2, A10, A16, A40, L2, L4, L40, L40S, RTX PRO 6000 Server Edition und AMD Radeon PRO V710 <span class="chk">✓ live geprüft</span><br>Keine Workstation-Karte wie RTX A4000, A5000 oder RTX 5000 Ada, keine Intel-Karte.</td><td class="x">NVIDIA: vGPU-Lizenz nötig</td><td class="w">Für Produktion gedacht, mit Live-Migration. Gleich große, feste Teile. Mit den üblichen Workstation-Karten nicht nutzbar.</td></tr>
-<tr><td><b>GPU-PV</b><br><span class="small">Para-Virtualisierung, inoffiziell</span></td><td>3 · gemeinsamer Treiber</td><td>Windows 11 Pro als Host</td><td class="w">Fast jede Karte, auch GeForce</td><td class="y">keine</td><td class="w">Von Microsoft und NVIDIA nicht unterstützt. Nur Windows-Gäste. Vulkan geht nicht, DirectX 12 unzuverlässig. Treiberdateien müssen nach jedem Update neu in die VMs kopiert werden. Das bekannteste Einrichtungswerkzeug ist archiviert. Für ein Labor in Ordnung, für einen Firmenserver mit vielen Nutzern nicht.</td></tr>
+<tr><td><b>DDA</b><br><span class="small">Discrete Device Assignment</span></td><td>1 · ganze Karte</td><td>Windows Server</td><td class="w">Viele Karten. Der Hersteller muss den Betrieb in einer VM zulassen, manche sperren Verbraucherkarten.</td><td class="y">keine</td><td class="w">Ausgereift, aber eine Karte je VM. Löst das Platzproblem nicht.</td></tr>
+<tr><td><b>GPU-P</b><br><span class="small">GPU Partitioning, offiziell</span></td><td>2 · feste Scheiben</td><td>Windows Server 2025, Azure Local</td><td class="w">Nur NVIDIA A2, A10, A16, A40, L2, L4, L40, L40S, RTX PRO 6000 Server Edition und AMD Radeon PRO V710 (Liste für Windows Server; Azure Local nennt weniger Karten) <span class="chk">✓ live geprüft</span><br>Keine Workstation-Karte wie RTX A4000, A5000 oder RTX 5000 Ada, keine Intel-Karte.</td><td class="x">NVIDIA: vGPU-Lizenz nötig</td><td class="w">Für Produktion gedacht. Gleich große, feste Teile. Live-Migration braucht neuere Server-Prozessoren (EPYC 7003 oder Xeon Sapphire Rapids aufwärts), ein Ausfall-Cluster die Datacenter-Edition. Mit den üblichen Workstation-Karten nicht nutzbar.</td></tr>
+<tr><td><b>GPU-PV</b><br><span class="small">Para-Virtualisierung, inoffiziell</span></td><td>3 · gemeinsamer Treiber</td><td>Windows 10 (ab 20H1) oder 11 als Host, Pro, Enterprise oder Education</td><td class="w">Fast jede Karte, auch GeForce</td><td class="y">keine</td><td class="w">Gehört nicht zu den Wegen, die Microsoft dokumentiert und unterstützt. Nur Windows-Gäste. Laut Anleitung des Einrichtungswerkzeugs läuft OpenGL nicht immer und Remote Desktop nur mit 30 Bildern pro Sekunde; Nutzer berichten, dass Vulkan nicht geht. Treiberdateien müssen nach jedem Update neu in die VMs kopiert werden. Das bekannteste Einrichtungswerkzeug ist archiviert. Für ein Labor in Ordnung, für einen Firmenserver mit vielen Nutzern nicht.</td></tr>
 </tbody></table></div>
-<p class="small">Hyper-V selbst: In Windows 11 Pro enthalten. Windows Server 2025 kostet laut Microsoft-Preisliste 1.176 $ (Standard, 2 VMs) oder 6.771 $ (Datacenter, beliebig viele VMs) je 16 Prozessorkerne, dazu Zugriffslizenzen.</p>
+<p class="small">Hyper-V selbst: In Windows 11 Pro enthalten. Windows Server 2025 kostet laut Microsoft 1.176 $ (Standard, 2 VMs) oder 6.771 $ (Datacenter, beliebig viele VMs) je 16 Prozessorkerne. Das sind unverbindliche US-Listenpreise; dazu kommen Zugriffslizenzen, den echten Preis nennt der Händler.</p>
 
 <h2 id="wege">Alle Wege im Vergleich</h2>
 <p class="sub">Jede Zeile ist ein Weg, mehrere Nutzer auf eine Karte zu bringen. Grün ist gut für das Ziel „viele Nutzer, je eigener Bereich, ohne Gebühr je Nutzer“.</p>
 <div class="tw"><table id="wt">
 <thead><tr><th>Weg</th><th>Karten</th><th>Gebühr je Nutzer</th><th>Eigene VM</th><th>Windows-Gast</th><th>Dynamisch</th><th>Hersteller-Support</th><th>Reife</th></tr></thead>
 <tbody>
-<tr><td>Ganze Karte je VM (Passthrough)</td><td>alle</td><td class="y">keine</td><td class="y">ja</td><td class="y">ja</td><td class="x">nein</td><td class="y">ja</td><td class="y">hoch</td></tr>
-<tr><td>NVIDIA vGPU, Stufe Virtual PC</td><td>RTX A5000, RTX 5000 Ada und größere</td><td class="p">50 $ im Jahr</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>Ganze Karte je VM (Passthrough)</td><td>alle; GeForce mit Lizenzvorbehalt</td><td class="y">keine</td><td class="y">ja</td><td class="y">ja</td><td class="x">nein</td><td class="y">ja</td><td class="y">hoch</td></tr>
+<tr><td>NVIDIA vGPU, Stufe Virtual PC</td><td>z. B. RTX A5000, RTX 5000 Ada, RTX 6000 Ada (Liste bei NVIDIA prüfen)</td><td class="p">50 $ im Jahr</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="y">hoch</td></tr>
 <tr><td>NVIDIA vGPU, Stufe RTX Virtual Workstation</td><td>wie oben</td><td class="x">250 $ im Jahr</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="y">hoch</td></tr>
 <tr><td>Intel Arc Pro mit SR-IOV (Proxmox/KVM)</td><td>Arc Pro B50, B60, B70</td><td class="y">keine</td><td class="y">ja</td><td class="p">mit Fehlern</td><td class="p">nur Rechenzeit</td><td class="p">teils</td><td class="x">niedrig</td></tr>
-<tr><td>AMD MxGPU / Hyper-V GPU-P auf AMD</td><td>nur Radeon PRO V710</td><td class="y">keine gefunden</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="x">nicht zu kaufen</td></tr>
+<tr><td>AMD MxGPU / Hyper-V GPU-P auf AMD</td><td>Radeon PRO V710, Instinct-Rechenkarten</td><td class="y">keine gefunden</td><td class="y">ja</td><td class="y">ja</td><td class="p">nur Rechenzeit</td><td class="y">ja</td><td class="x">V710 im Handel nicht gefunden</td></tr>
 <tr><td>Hyper-V GPU-PV auf Windows 11</td><td>fast alle</td><td class="y">keine</td><td class="y">ja</td><td class="p">nur Windows</td><td class="y">ja</td><td class="x">nein</td><td class="x">Bastellösung</td></tr>
 <tr><td>virtio-gpu (Venus, Native Context)</td><td>AMD, Intel; NVIDIA nur teilweise</td><td class="y">keine</td><td class="y">ja</td><td class="x">nein</td><td class="y">ja</td><td class="x">nein</td><td class="x">früh</td></tr>
 <tr><td>Windows-Sitzungen auf einem Server (RDS)</td><td>alle</td><td class="p">keine für die Karte; Microsoft-Zugriffslizenzen</td><td class="x">nein, gemeinsames Windows</td><td class="y">ja</td><td class="y">ja</td><td class="y">ja</td><td class="y">hoch</td></tr>
@@ -180,12 +180,12 @@ td.w{min-width:200px}
     <thead><tr><th></th><th>Virtual PC</th><th>RTX Virtual Workstation</th></tr></thead>
     <tbody>
     <tr><td>Abo je Nutzer und Jahr <span class="chk">✓ live geprüft</span></td><td><b>50 $</b></td><td><b>250 $</b></td></tr>
-    <tr><td>Kauf je Nutzer <span class="chk">✓ live geprüft</span></td><td>100 $ + 25 $ Wartung im Jahr</td><td>450 $ + 100 $ Wartung im Jahr</td></tr>
+    <tr><td>Kauf je Nutzer <span class="chk">✓ live geprüft</span></td><td>100 $ + 25 $ Wartung im Jahr; mit 5 Jahren Pflicht-Wartung mind. 225 $</td><td>450 $ + 100 $ Wartung im Jahr; mit 5 Jahren Pflicht-Wartung mind. 950 $</td></tr>
     <tr><td>Grafikspeicher je VM</td><td>höchstens 3 GB</td><td>bis zur ganzen Karte</td></tr>
     <tr><td>CUDA (für KI und GPU-Rendering)</td><td class="x">nein</td><td class="y">ja</td></tr>
     <tr><td>Gedacht für</td><td>Büro, einfache 3D-Ansicht</td><td>CAD, Rendering, zertifizierte Profi-Programme</td></tr>
     </tbody></table></div>
-    <p class="small">Dazu kommt ein Lizenzserver (kleine VM oder Cloud-Dienst von NVIDIA). Testversion: 90 Tage, einmalig, für Firmen. Verkauf nur über Partner; Euro-Preise für Virtual PC haben wir nicht gefunden, also ein Angebot einholen. Bildungspreise gelten nur für Schulen und Hochschulen.</p>
+    <p class="small">Dazu kommt ein Lizenzserver (kleine VM oder Cloud-Dienst von NVIDIA). Beim Kauf verlangt NVIDIA laut Preisleitfaden Wartung für mehrere Jahre im Voraus (der Leitfaden nennt 5 Jahre, die Kaufseite 4 oder 5). Testversion: 90 Tage, einmalig, für Firmen. Die Testlizenz ist die Workstation-Stufe; NVIDIAs Testseite nennt die RTX 5000 Ada, nicht die RTX A5000, und als Hypervisor VMware, Citrix, Red Hat und Nutanix. Verkauf nur über Partner; Euro-Preise für Virtual PC haben wir nicht gefunden, also ein Angebot einholen. Bildungspreise gelten nur für Schulen und Hochschulen.</p>
   </div>
   <div class="panel">
     <h3>Lizenzkosten über 3 Jahre (Abo, Listenpreis)</h3>
@@ -195,7 +195,7 @@ td.w{min-width:200px}
       <div>Virtual Workstation, 8 Nutzer</div><div><div class="b" style="width:50%"></div></div><div class="v">6.000 $</div>
       <div>Virtual Workstation, 16 Nutzer</div><div><div class="b" style="width:100%"></div></div><div class="v">12.000 $</div>
     </div>
-    <p class="small" style="margin-top:12px">Zum Vergleich: Eine Intel Arc Pro B70 kostet einmalig etwa 1.300 bis 1.700 € und trägt laut Intel 4 VMs. Für 8 Nutzer wären das zwei Karten und zwei Steckplätze, ohne laufende Gebühr.</p>
+    <p class="small" style="margin-top:12px">Zum Vergleich: Eine Intel Arc Pro B70 kostet einmalig ab etwa 1.600 € (inkl. MwSt.) und trägt laut Intel 4 VMs. Für 8 Nutzer wären das zwei Karten und zwei Steckplätze, ohne laufende Gebühr.</p>
     <p class="small">Die entscheidende Frage ist deshalb: Reichen den leichten Nutzern 3 GB ohne CUDA? Dann kostet der sichere Weg ein Fünftel.</p>
   </div>
 </div>
@@ -208,12 +208,12 @@ td.w{min-width:200px}
     <div>RTX 5000 Ada 32 GB, je 4 GB</div><div><div class="b" style="width:50%"></div></div><div class="v">8 VMs</div>
     <div>RTX A5000 24 GB, je 2 GB</div><div><div class="b" style="width:75%"></div></div><div class="v">12 VMs</div>
     <div>RTX A5000 24 GB, je 3 GB</div><div><div class="b" style="width:50%"></div></div><div class="v">8 VMs</div>
-    <div>Arc Pro B60 24 GB</div><div><div class="b i" style="width:43.75%"></div></div><div class="v">etwa 7 (Forum)</div>
+    <div>Arc Pro B60 24 GB</div><div><div class="b i" style="width:37.5%"></div></div><div class="v">ab 6 (Forum)</div>
     <div>Arc Pro B70 32 GB</div><div><div class="b i" style="width:25%"></div></div><div class="v">4 (laut Intel)</div>
     <div>Arc Pro B50 16 GB</div><div><div class="b i" style="width:12.5%"></div></div><div class="v">2 (laut Intel)</div>
     <div>RTX A4000 16 GB</div><div></div><div class="v">nicht teilbar</div>
   </div>
-  <p class="small" style="margin-top:12px">NVIDIA: Die Zahl folgt aus der gewählten Speichergröße je VM. RTX A5000 und RTX 5000 Ada stehen auf NVIDIAs Liste der unterstützten Karten, die RTX A4000 nicht <span class="chk">✓ live geprüft</span>. Die RTX A5000 muss dafür in einen Modus ohne Bildausgänge geschaltet werden. Intel: Die Zahl legt die Firmware der Karte fest. Intels eigene Seite verweigert automatische Abrufe, deshalb sind diese Zahlen nicht live geprüft. Wie viele leichte 3D-Nutzer eine Arc-Karte wirklich trägt, hat noch niemand veröffentlicht.</p>
+  <p class="small" style="margin-top:12px">NVIDIA: Die Zahl folgt aus der gewählten Speichergröße je VM. RTX A5000 und RTX 5000 Ada stehen auf NVIDIAs Liste der unterstützten Karten, die RTX A4000 nicht <span class="chk">✓ live geprüft</span>. RTX A5000 und RTX 5000 Ada müssen dafür in einen Modus ohne Bildausgänge geschaltet werden. Intel: Die Zahl legt die Firmware der Karte fest. Intels eigene Seite verweigert automatische Abrufe, deshalb sind diese Zahlen nicht live geprüft. Wie viele leichte 3D-Nutzer eine Arc-Karte wirklich trägt, hat noch niemand veröffentlicht.</p>
 </div>
 
 <h2 id="intel">Intel und AMD im Detail</h2>
@@ -222,19 +222,19 @@ td.w{min-width:200px}
 <tbody>
 <tr><td>Intel Arc A770 16 GB und andere Arc für Spieler</td><td>ab etwa 300 €</td><td class="x">1</td><td class="w">Nicht auf Intels Liste für SR-IOV. Nicht teilbar.</td></tr>
 <tr><td>Intel Arc Pro B50 16 GB</td><td>etwa 570 €</td><td>2</td><td class="w">Von Intel offiziell unterstützt, aber zwei Nutzer je Karte lösen das Platzproblem nicht.</td></tr>
-<tr><td>Intel Arc Pro B60 24 GB</td><td>etwa 960 €</td><td>etwa 7</td><td class="w">Zahl aus Forenberichten und abhängig von der Firmware; Intel nennt keine.</td></tr>
-<tr><td><b>Intel Arc Pro B70 32 GB</b></td><td>etwa 1.300 bis 1.700 €</td><td>4</td><td class="w">Bester Kandidat unter den neuen Karten. Vier Teile laut Intel, auf manchen Karten mehr.</td></tr>
-<tr><td>Intel Data Center GPU Flex 170</td><td>nur gebraucht, etwa 1.500 €</td><td>bis 31</td><td class="w">Ausgereift, auch unter VMware. Aber abgekündigt.</td></tr>
-<tr><td>AMD Radeon PRO V710</td><td>kein Handel in der EU</td><td>bis 6</td><td class="w">Einzige aktuelle AMD-Karte, die sich teilen lässt. Praktisch nur in der Cloud zu mieten.</td></tr>
+<tr><td>Intel Arc Pro B60 24 GB</td><td>etwa 960 €</td><td>6 bis 24</td><td class="w">Zahl aus Forenberichten, je nach Firmware des Kartenherstellers; Intel nennt keine.</td></tr>
+<tr><td><b>Intel Arc Pro B70 32 GB</b></td><td>ab etwa 1.600 €</td><td>4</td><td class="w">Bester Kandidat unter den neuen Karten. Vier Teile laut Intel; mehr sind von Intel nicht freigegeben.</td></tr>
+<tr><td>Intel Data Center GPU Flex 170</td><td>nur gebraucht, etwa 1.500 €</td><td>bis 31</td><td class="w">Ausgereift, auch unter VMware. Intel stellt die Verwaltungssoftware dafür ein; ein Nachfolger ist nicht angekündigt.</td></tr>
+<tr><td>AMD Radeon PRO V710</td><td>im deutschen Handel nicht gefunden</td><td>1 bis 12</td><td class="w">Die einzige teilbare Radeon-Karte; dazu kommen die Instinct-Rechenkarten. Vor allem in der Cloud (Azure) verfügbar.</td></tr>
 <tr><td>AMD Radeon PRO W7000, AI PRO R9700, Radeon RX</td><td></td><td class="x">1</td><td class="w">Nicht teilbar.</td></tr>
 </tbody></table></div>
-<div class="note"><b>Risiken bei Intel Arc Pro unter Windows</b> (Stand November 2026): Intel bestätigt einen Treiberfehler („Code 43“), wenn in der Windows-VM die üblichen Sicherheitsfunktionen für Firmenrechner eingeschaltet sind (VBS/HVCI), und nennt keine Lösung. Nutzer berichten, dass die Hardware-Videokodierung unter Remote Desktop nach ein bis zwei Minuten auf Software zurückfällt; das trifft genau den Fall „Desktop aus der Ferne“. Einzelne 3D-Programme starten im geteilten Modus nicht. Nötig sind ein aktueller Linux-Kernel (ab 6.17) und zueinander passende Treiber- und Firmware-Stände. Es gibt keine veröffentlichten Messungen mit mehreren Nutzern.</div>
+<div class="note"><b>Risiken bei Intel Arc Pro unter Windows</b> (Stand November 2026): Intel bestätigt einen Treiberfehler („Code 43“) in Windows-VMs auf geteilten Arc-Pro-Karten und untersucht ihn noch; eine Lösung gibt es bisher nicht. Nutzer bringen ihn mit den Sicherheitsfunktionen für Firmenrechner (VBS/HVCI) in Verbindung. Nutzer berichten, dass die Hardware-Videokodierung unter Remote Desktop nach ein bis zwei Minuten auf Software zurückfällt; das trifft genau den Fall „Desktop aus der Ferne“. Einzelne 3D-Programme starten im geteilten Modus nicht. Nötig sind ein aktueller Linux-Kernel (ab 6.17) und zueinander passende Treiber- und Firmware-Stände. Es gibt keine veröffentlichten Messungen mit mehreren Nutzern.</div>
 
 <h2 id="hv">Welcher Hypervisor kann was?</h2>
 <div class="tw"><table>
 <thead><tr><th>Hypervisor</th><th>Ganze Karte</th><th>NVIDIA vGPU (Lizenz)</th><th>Intel Arc Pro teilen</th><th>Kosten der Plattform</th><th>Einschätzung</th></tr></thead>
 <tbody>
-<tr><td><b>Proxmox VE 9</b> (KVM)</td><td class="y">ja</td><td class="y">ja, ab vGPU 18</td><td class="p">ja, nur Anleitungen aus der Community</td><td class="w">Kostenlos nutzbar. Support-Abo 370 bis 1.100 € je Prozessorsockel und Jahr; für Firmen empfohlen.</td><td class="w">Die meisten Wege offen, geringste Kosten.</td></tr>
+<tr><td><b>Proxmox VE 9</b> (KVM)</td><td class="y">ja</td><td class="y">ja, ab vGPU 18</td><td class="p">ja, nur Anleitungen aus der Community</td><td class="w">Kostenlos nutzbar. Support-Abo 370 bis 1.100 € netto je Prozessorsockel und Jahr; für Firmen empfohlen.</td><td class="w">Die meisten Wege offen, geringste Kosten.</td></tr>
 <tr><td><b>Microsoft Hyper-V</b></td><td class="y">ja (DDA)</td><td class="p">nur Server-Karten, siehe oben</td><td class="x">nein</td><td class="w">Windows Server 2025, siehe oben.</td><td class="w">Mit Workstation-Karten bleibt nur die ganze Karte je VM.</td></tr>
 <tr><td><b>VMware vSphere</b></td><td class="y">ja</td><td class="y">ja</td><td class="x">nein, nur Flex</td><td class="w">Seit der Übernahme durch Broadcom teuer, Abrechnung je Prozessorkern.</td><td class="w">Bietet ohne Lizenz nichts über die ganze Karte hinaus.</td></tr>
 <tr><td><b>XCP-ng</b></td><td class="y">ja</td><td class="x">nein</td><td class="x">nein</td><td class="w">Kostenlos, Support optional.</td><td class="w">Kein Weg zum Teilen.</td></tr>
@@ -244,7 +244,7 @@ td.w{min-width:200px}
 <h2 id="weg">Vorgehen in Schritten</h2>
 <div class="cards">
   <div class="card"><span class="tag">Schritt 1</span><h3>Messen</h3><p class="small">Auslastung und Grafikspeicher je Nutzer mitschreiben. Wer braucht mehr als 3 GB? Wer braucht CUDA? Wer braucht zwingend Windows?</p></div>
-  <div class="card"><span class="tag">Schritt 2 · kostenlos</span><h3>vGPU 90 Tage testen</h3><p class="small">Auf einer vorhandenen, unterstützten Karte (RTX A5000, RTX 5000 Ada) die Testversion einrichten. Zeigt mit den echten Programmen, ob die 50-$-Stufe reicht.</p></div>
+  <div class="card"><span class="tag">Schritt 2 · kostenlos</span><h3>vGPU 90 Tage testen</h3><p class="small">Auf einer unterstützten Karte die Testversion einrichten (NVIDIAs Testseite nennt die RTX 5000 Ada). Die Testlizenz ist die Workstation-Stufe: Ob die 50-$-Stufe reicht, zeigt sich, wenn man mit höchstens 3 GB je VM und ohne CUDA testet.</p></div>
   <div class="card"><span class="tag">Schritt 3 · optional</span><h3>Intel-Pilot</h3><p class="small">Eine Arc Pro B70 kaufen und mit dem echten Windows-Abbild, dem echten Remote-Desktop und vier gleichzeitig aktiven VMs prüfen. Vorher keine vorhandene Karte ersetzen.</p></div>
   <div class="card"><span class="tag">Schritt 4</span><h3>Entscheiden</h3><p class="small">Lizenzkosten über drei Jahre gegen Kartenpreis, Steckplätze und Betriebsaufwand stellen. Nutzer, denen ein eigener Bereich ohne eigene VM genügt, auf Container oder Sitzungen legen.</p></div>
   <div class="card"><span class="tag">Später</span><h3>Kubernetes</h3><p class="small">Desktops als Container mit Speichergrenzen, Render- und Trainingsjobs in derselben Warteschlange. Übrige Windows-VMs laufen mit KubeVirt weiter. Mehr dazu: <a href="index.html#lb">Load Balancing</a>.</p></div>

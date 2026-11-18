@@ -12,7 +12,7 @@ Legend: **V** = seen on the project page / docs during this research (URL given)
 - For a 1-3 node team the best-value Kubernetes stack is: **k3s + NVIDIA GPU Operator (or plain device plugin) + Kueue** (queues, quotas, preemption, one ResourceFlavor per GPU model) + **Prometheus/DCGM** for metrics.
 - Add **vLLM behind a simple router/LiteLLM + KEDA** only when inference is real. Skip llm-d / Gateway API Inference Extension until there are several GPU nodes serving one model.
 - Rendering: **Flamenco** (Blender-native) with workers as pods, or Kubernetes Jobs with indexed completion for frame ranges.
-- Fractions: **time-slicing** is easy but has no isolation (V). **MIG** only exists on a few data-centre cards. **HAMi** or **KAI Scheduler** are the free options for memory-limited fractions on mixed cards, but both add complexity. Treat them as optional.
+- Fractions: **time-slicing** is easy but has no isolation (V). **MIG** exists on data-centre cards and on RTX PRO 4500/5000/6000 Blackwell. **HAMi** or **KAI Scheduler** are the free options for memory-limited fractions on mixed cards, but both add complexity. Treat them as optional.
 - True "dynamic" balancing on a small box is mostly: queue + priorities + preemption + checkpointing + scale-to-zero. Not live migration of running jobs (not available for GPU work in practice).
 
 ---
@@ -37,17 +37,18 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 ### 2.1 Kubernetes GPU basics
 
 **NVIDIA GPU Operator + device plugin** (layers a, b, f)
-- Installs driver, container toolkit, device plugin, GPU Feature Discovery, DCGM exporter via Helm. Latest release seen: **v26.7.2, 14 Oct (2026)**. V: https://github.com/NVIDIA/gpu-operator/releases
+- Installs driver, container toolkit, device plugin, GPU Feature Discovery, DCGM exporter via Helm. Latest release seen: **v26.7.3, 17 Nov 2026** (v26.7.2 was 14 Oct 2026). A DRA driver v0.5.1 also exists. V: https://github.com/NVIDIA/gpu-operator/releases
 - Licence: Apache-2.0 for the operator (U; the release page did not state it). The drivers it deploys keep NVIDIA's own licence.
-- Mixed GPU models: yes. GPU Feature Discovery puts labels like `nvidia.com/gpu.product`, `nvidia.com/gpu.memory` on nodes (U for the exact label list). One node with different cards is the weak spot: the stock device plugin exposes all cards of a node as the same resource `nvidia.com/gpu`, so you cannot request "the 48 GB one" on the same node with plain labels. Options: MIG-strategy `mixed`, separate nodes, DRA, or HAMi (see below).
+- Mixed GPU models: yes. GPU Feature Discovery puts labels like `nvidia.com/gpu.product`, `nvidia.com/gpu.memory` on nodes (U for the exact label list). One node with different cards is the weak spot: the stock device plugin exposes all cards of a node as the same resource `nvidia.com/gpu`, so you cannot request "the 48 GB one" on the same node with plain labels. Options: separate nodes with node labels (`nvidia.com/gpu.product`), DRA, or HAMi (see below). The MIG strategy (`mixed`) only controls how MIG partitions are exposed; it does not separate non-MIG cards such as an A6000 and a 4090.
+- With time-slicing on, the product label gets a `-SHARED` suffix and the resource can be renamed to `nvidia.com/gpu.shared` (`renameByDefault`). Adjust flavor labels and resource names accordingly (V, device-plugin README).
 - Sharing docs (time-slicing, MIG): V: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html
 
 **Time-slicing** (b)
 - Free, works on any CUDA card including GeForce. V (same page): "there is no memory or fault-isolation between replicas"; a pod requesting 2 slices does not get proportional compute; DCGM exporter cannot attribute metrics per container when time-slicing is on; the operator does not watch the ConfigMap (restart the device plugin after editing). Per-node config via label `nvidia.com/device-plugin.config=<key>` (V), so different card types can get different replica counts.
 
-**MPS** (b): CUDA Multi-Process Service lets processes share a GPU concurrently with optional per-client memory/thread limits. Not covered on the GPU Operator sharing page (V: absent). Support level in the device plugin: U.
+**MPS** (b): CUDA Multi-Process Service lets processes share a GPU concurrently with optional per-client memory/thread limits. Not covered on the GPU Operator sharing page (V: absent). The NVIDIA k8s-device-plugin README documents MPS as experimental since v0.15.0 (V). It is set per node, excludes time-slicing on the same node and does not work together with MIG.
 
-**MIG** (b): hardware-isolated partitions (V, same page). Only on specific data-centre cards (A30/A100/H100 class and some newer RTX PRO workstation cards, U). Not on typical RTX A-series or GeForce. For a mixed workstation fleet, MIG is mostly irrelevant.
+**MIG** (b): hardware-isolated partitions (V, same page). On data-centre cards (A30/A100/H100 class) and on RTX PRO 4500/5000/6000 Blackwell (NVIDIA MIG guide, V). Not on typical RTX A-series or GeForce. For a mixed workstation fleet, MIG is mostly irrelevant.
 
 **Dynamic Resource Allocation (DRA)** (a, b, f)
 - V: **stable (GA) since Kubernetes v1.35**, feature gate locked on; objects: ResourceSlice, DeviceClass, ResourceClaim, ResourceClaimTemplate. https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/
@@ -66,17 +67,18 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 - Recommended core of this setting.
 
 **Volcano**
-- CNCF incubating batch scheduler, Apache-2.0 (V: https://github.com/volcano-sh/volcano). Gang scheduling, queues, fair-share. Replaces the scheduler, so heavier to adopt. GPU sharing details not verified. Fine if you want an all-in-one batch system, but Kueue is lighter for a small team.
+- CNCF incubating batch scheduler, Apache-2.0 (V: https://github.com/volcano-sh/volcano). Gang scheduling, queues, fair-share. Runs as an additional batch scheduler next to kube-scheduler, but is still heavier to adopt. Latest release seen: v1.16.0. Its built-in GPU sharing has been deprecated since v1.9 in favour of HAMi-based vGPU. Fine if you want an all-in-one batch system, but Kueue is lighter for a small team.
 
 **NVIDIA KAI Scheduler (open-sourced Run:ai scheduler)**
-- V: NVIDIA open-sourced the **Run:ai scheduler as KAI Scheduler on 1 April 2025, Apache-2.0**. Features named: gang scheduling (PodGroups), hierarchical queues with priority and fairness, GPU sharing. Still packaged as part of the commercial NVIDIA Run:ai platform. https://developer.nvidia.com/blog/nvidia-open-sources-runai-scheduler-to-foster-community-collaboration/
-- V: repo is a **CNCF Sandbox** project; v0.10.0 highlighted (Oct 2025); native Ray/KubeRay integration; prerequisites: Kubernetes, Helm, GPU Operator. https://github.com/NVIDIA/KAI-Scheduler (the page did not show the newest version; check releases).
-- Not verified: fraction request syntax in current release (from memory, pods use annotations like `gpu-fraction: "0.5"` and optionally `gpu-memory`; U). Not open-sourced (as far as seen): the Run:ai control plane, UI, and the commercial platform (the blog does not list them; U).
-- KAI fractions are time-slicing-like (no hard memory isolation, U). Mixed models: it can place by node labels; per-card VRAM awareness within one node is not verified.
+- V: NVIDIA open-sourced the **Run:ai scheduler as KAI Scheduler on 1 April 2025, Apache-2.0**. Features named: gang scheduling (PodGroups), hierarchical queues with priority and fairness, GPU sharing. https://developer.nvidia.com/blog/nvidia-open-sources-runai-scheduler-to-foster-community-collaboration/
+- V: repo is a **CNCF Sandbox** project; latest release **v0.19.0 (11 Nov 2026)**; native Ray/KubeRay integration; prerequisites: Kubernetes, Helm, GPU Operator. https://github.com/NVIDIA/KAI-Scheduler
+- Fraction request syntax: pods use `gpu-fraction: "0.5"` annotations (confirmed by audit) and optionally `gpu-memory`.
+- Run:ai platform: since 13 Oct 2026 the full Run:ai platform is open source (NGC Community Product, NVIDIA Software License Agreement applies, no NVIDIA support), see `virtualization-licensing.md`.
+- KAI memory enforcement: the default mode (`NonMemoryEnforced`) does not enforce GPU memory. The `HamiCore` and `NvFractions` modes do. Mixed models: it can place by node labels; per-card VRAM awareness within one node is not verified.
 - Maybe, for stage 2 if fractions and fairness between users are needed. Overlaps with Kueue; running both needs care (U).
 
 **HAMi** (CNCF incubating)
-- V: Apache-2.0; "Kubernetes GPU virtualization and heterogeneous accelerator scheduling", isolates device memory and compute; topics list NVIDIA plus several Chinese accelerator vendors; AMD not mentioned on the page. https://github.com/Project-HAMi/HAMi
+- V: Apache-2.0; "Kubernetes GPU virtualization and heterogeneous accelerator scheduling", isolates device memory and compute; the docs list NVIDIA, AMD and other vendors; latest release seen: v2.11.0. https://github.com/Project-HAMi/HAMi
 - U: lets a pod request e.g. `nvidia.com/gpumem: 8000` and `nvidia.com/gpucores: 30`, enforced by an in-container interception library (software limit, not hardware isolation); can select GPU by type/UUID via annotations; sees each physical card separately, so it handles mixed cards on one node better than the stock plugin.
 - Risk: intercepting CUDA calls can break with new driver/CUDA versions and some frameworks. Test per workload.
 
@@ -93,22 +95,22 @@ Important distinction: Kubernetes by default counts GPUs as integers (`nvidia.co
 
 | Tool | Facts |
 |---|---|
-| **vLLM production stack** | V: Apache-2.0; router with round-robin and session-ID routing (prefix-aware in progress), LMCache KV offload tutorial, Prometheus/Grafana dashboard. Autoscaling listed as roadmap, page does not mention KEDA. No release numbers visible (first announced Jan 2025). https://github.com/vllm-project/production-stack |
+| **vLLM production stack** | V: Apache-2.0; router with round-robin and session-ID routing (prefix-aware in progress), LMCache KV offload tutorial, Prometheus/Grafana dashboard. The docs have an "Autoscaling with KEDA" tutorial. Release `vllm-stack-0.1.14` is dated 2026-11-07 (first announced Jan 2025). https://github.com/vllm-project/production-stack |
 | **llm-d** | V: Apache-2.0, CNCF sandbox (joined March 2026), founded by Red Hat, Google Cloud, IBM Research, CoreWeave, NVIDIA; sits above vLLM/SGLang; **v1.0 in Oct 2026** (stable v1 config API, multi-tenant QoS); validated on NVIDIA, AMD, Intel GPUs and TPUs; SLO-aware autoscaling listed. https://github.com/llm-d/llm-d Aimed at multi-node clusters; heavy for 1 node. |
 | **Gateway API Inference Extension (GAIE)** | V: official Kubernetes project; extends Gateway API gateways with an Endpoint Picker (EPP) choosing replicas from model-server metrics; InferencePool CRD; works with Envoy Gateway, kgateway, GKE Gateway; both v1 and v1alpha1 API refs exist. https://gateway-api-inference-extension.sigs.k8s.io/ Needs a Gateway implementation. Gains appear with several replicas of the same model. |
-| **LiteLLM proxy** | U: open-source (MIT core, some enterprise features paid) OpenAI-compatible proxy; routing/fallback across backends, per-user keys, budgets. Page named as a gateway option on the GAIE page (V). Good for a small team: one URL and keys for all models. |
-| **Triton Inference Server** | U: Apache/BSD-style, NVIDIA; multi-framework, dynamic batching. Best for classic NN serving; for LLMs most small teams use vLLM directly. |
+| **LiteLLM proxy** | U: open-source (MIT core, some enterprise features paid) OpenAI-compatible proxy; routing/fallback across backends, per-user keys, budgets. The GAIE page names it as a higher-level AI gateway; LiteLLM can sit in front of a GAIE pool (V). Good for a small team: one URL and keys for all models. |
+| **Triton Inference Server** | V: BSD-3-Clause, NVIDIA; multi-framework, dynamic batching. Best for classic NN serving; for LLMs most small teams use vLLM directly. |
 | **KServe** | U: CNCF, Apache-2.0; InferenceService CRD. V (outline only): supports scale-to-zero via Knative or raw-deployment mode with KEDA. https://kserve.github.io/website/latest/modelserving/autoscaling/autoscaling/ Heavy (needs Knative or KEDA, Istio/Gateway). Probably too much for 1-3 nodes. |
 | **Knative Serving** | U: scale-to-zero for HTTP services with request buffering (activator), cold start depends on model load. |
 | **KEDA** | V: Prometheus scaler with `query`, `threshold`, `activationThreshold`; examples use `minReplicaCount: 0`; docs advise verifying scale-to-zero against concepts docs. https://keda.sh/docs/latest/scalers/prometheus/ KEDA's HTTP add-on (U) is needed to hold requests while a pod starts from zero; plain Prometheus scaler cannot buffer requests. |
-| **Ollama** | U: very easy, but limited: single-host process, queues requests per model with `OLLAMA_NUM_PARALLEL`, loads/unloads models on a keep-alive timer (a poor-man's scale-to-zero of VRAM), no cluster-level routing, no per-user quotas, weak multi-GPU placement control. Fine for personal desktops, not as the shared service. |
+| **Ollama** | U: very easy, but limited: single-host process, queues requests per model (`OLLAMA_NUM_PARALLEL` was not found in the FAQ, U), loads/unloads models on a keep-alive timer (a poor-man's scale-to-zero of VRAM), no cluster-level routing, no per-user quotas, weak multi-GPU placement control. Fine for personal desktops, not as the shared service. |
 | **GPUStack** | V: Apache-2.0 GPU cluster manager for model serving and GPU instance provisioning; supports NVIDIA, AMD, Ascend and several other vendors; backends vLLM, SGLang, TensorRT-LLM; quick start uses Docker, no Kubernetes needed. Whether it mixes vendors in one cluster: not stated. https://github.com/gpustack/gpustack Attractive for a tiny team that mainly wants LLM serving across mixed GPUs (U for its scheduling quality). |
 
 ### 2.4 Rendering
 
 | Tool | Facts |
 |---|---|
-| **Blender Flamenco** | V: all components GPLv3, free; core in Go + SQLite; job types written in JavaScript; "in active development at Blender Studio" (no version number seen). https://flamenco.blender.org/ U: Manager + Workers (each worker runs Blender headless) + shared storage; per-worker tags; Cycles GPU supported through Blender settings. Best fit for Blender/Cycles. |
+| **Blender Flamenco** | V: all components GPLv3, free; core in Go + SQLite; job types written in JavaScript; "in active development at Blender Studio"; stable 3.9.3, experimental 3.10-beta1. https://flamenco.blender.org/ U: Manager + Workers (each worker runs Blender headless) + shared storage; per-worker tags; Cycles GPU supported through Blender settings. Best fit for Blender/Cycles. |
 | **Kubernetes Jobs, indexed completion** | U: `completionMode: Indexed` gives each pod `JOB_COMPLETION_INDEX`, which maps to a frame or frame chunk. Works with Kueue for quotas/priorities. No render-specific UI; needs shared storage for scenes/output. |
 | **OpenCue** | V: Apache-2.0 (Academy Software Foundation), Python 3.6+ badge, no GPU/Blender info on page. https://github.com/AcademySoftwareFoundation/OpenCue U: designed for studio pipelines; heavier than Flamenco. |
 | **AWS Thinkbox Deadline 10** | V: Deadline 10 is free downloadable software; **License-Free Mode allows up to ten workers without a licence** (since 10.1); usage-based licensing for third-party apps moved to **AWS Deadline Cloud UBL** (pay-as-you-go via AWS bill); **legacy Thinkbox UBL ended 30 Sep 2025**. https://docs.thinkboxsoftware.com/products/deadline/10.4/1_User%20Manual/manual/licensing-usage-based.html and https://aws.amazon.com/thinkbox-deadline/ . No 2026 announcement found; the 10-worker limit is relevant for a farm of this size. |
@@ -145,7 +147,7 @@ Cycles/Blender needs no special scheduler support: a render job is just "one GPU
 - Users notice: submitting jobs instead of grabbing a card; shorter waits when the queue is fair; need to learn one submit command.
 
 ### Stage 2: priorities, quotas, preemption, fractions (3-7 days)
-- Kueue: `ClusterQueue` per team/role with nominal quota, `cohort` borrowing, `WorkloadPriorityClass` (interactive > render-urgent > training > backfill), preemption policy `LowerPriority`.
+- Kueue: `ClusterQueue` per team/role with nominal quota, `cohortName` borrowing (v1beta2 field), `WorkloadPriorityClass` (interactive > render-urgent > training > backfill), preemption policy `LowerPriority`.
 - Make training **preemption-safe** (checkpoint every N minutes, resume from latest, `restartPolicy` / `backoffLimit`). Without this, preemption wastes work.
 - Fractions: start with **time-slicing on small-card nodes** (2-4 replicas) for notebooks/dev only; for memory-limited sharing evaluate **HAMi** or **KAI Scheduler**. Keep production training on whole GPUs.
 - Users notice: urgent jobs start fast; batch jobs may be paused/restarted; quotas visible.
@@ -224,13 +226,13 @@ Fits: 1 node yes. No inference autoscaling; run vLLM as long-lived Slurm jobs or
 
 Kueue illustrative (one flavor per GPU model):
 ```yaml
-apiVersion: kueue.x-k8s.io/v1beta1
+apiVersion: kueue.x-k8s.io/v1beta2
 kind: ResourceFlavor
 metadata: { name: a6000-48g }
 spec:
   nodeLabels: { nvidia.com/gpu.product: NVIDIA-RTX-A6000 }
 ---
-apiVersion: kueue.x-k8s.io/v1beta1
+apiVersion: kueue.x-k8s.io/v1beta2
 kind: ClusterQueue
 metadata: { name: shared-gpu }
 spec:
@@ -245,13 +247,16 @@ spec:
     - name: rtx4090-24g
       resources: [{ name: nvidia.com/gpu, nominalQuota: 4 }]
 ```
-Caveat: label values and API version (`v1beta1` vs newer) depend on installed versions. Also, if two card models sit in one node, the stock plugin cannot tell them apart; use one node per model, MIG-`mixed`, or HAMi/DRA.
+Caveat: label values and API version depend on installed versions (in Kueue v0.20.6, `v1beta1` is no longer served; `v1beta2` is current). Also, if two card models sit in one node, the stock plugin cannot tell them apart; use one node per model, or HAMi/DRA. The MIG strategy does not help here.
 
 Flamenco worker as a Deployment (illustrative):
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
-metadata: { name: flamenco-worker }
+metadata:
+  name: flamenco-worker
+  labels:
+    kueue.x-k8s.io/queue-name: render   # Kueue reads the queue label from the Deployment (Deployment integration is on by default since v0.15)
 spec:
   replicas: 2
   selector: { matchLabels: { app: flamenco-worker } }
@@ -259,7 +264,6 @@ spec:
     metadata:
       labels:
         app: flamenco-worker
-        kueue.x-k8s.io/queue-name: render   # note: plain Deployments need Kueue's pod-integration enabled (U)
     spec:
       priorityClassName: render-backfill
       containers:
@@ -308,7 +312,7 @@ Fits: 1 node yes (control plane + GPU on same host), though a single host is a s
    Flamenco / Indexed Jobs as lowest-priority backfill
 ```
 
-KAI fraction request (illustrative; annotation name from memory, U, check the KAI docs):
+KAI fraction request (illustrative; check the KAI docs; a matching Queue object named `team-a` must exist first, see the KAI docs for its syntax):
 ```yaml
 metadata:
   labels:    { kai.scheduler/queue: team-a }
@@ -359,7 +363,7 @@ Fits: 1 node no (overkill). Remember V: the scheduler does not preempt for DRA r
 | GPU Operator + device plugin | a, f | Apache-2.0 (U), free | Labels per model; same-node mix limited | Medium | yes | **yes** (base layer) |
 | Time-slicing | b | free, in plugin | any CUDA card | Low | yes | maybe (dev/notebooks only; no isolation V) |
 | MPS | b | free, in driver | NVIDIA only | Medium | yes | maybe (small jobs, same user) |
-| MIG | b | free, hardware-bound | data-centre cards only | Medium | yes | no (cards not supported, U) |
+| MIG | b | free, hardware-bound | data-centre cards and RTX PRO 4500/5000/6000 Blackwell | Medium | yes | no for mixed older cards (not supported); maybe on RTX PRO Blackwell |
 | DRA | a, b, f | Kubernetes, GA in v1.35 (V) | attribute-based (U) | High | yes | maybe (watch it; no preemption V) |
 | NFD / GFD labels | f | Apache-2.0 (U) | node-level labels | Low | yes | yes (comes with operator) |
 | Kueue | a, e, f | Apache-2.0 (U), free | flavor per GPU model | Medium | yes | **yes** (queues, quotas, preemption) |
@@ -393,8 +397,8 @@ Fits: 1 node no (overkill). Remember V: the scheduler does not preempt for DRA r
 
 ## 7. Not verified in this pass
 
-- Exact current versions of KAI Scheduler, HAMi, Volcano, KubeRay, vLLM production stack, SkyPilot (pages showed no release number).
-- KAI fraction syntax, HAMi resource names, NVIDIA DRA driver maturity, MPS support in the device plugin, DRA partitioning/consumable capacity.
+- Exact current versions of KubeRay and SkyPilot (pages showed no release number). KAI, HAMi, Volcano and the vLLM production stack were updated by the audit.
+- NVIDIA DRA driver maturity, DRA partitioning/consumable capacity.
 - Licences marked U (GPU Operator, Kueue, k3s, LiteLLM, Triton, KServe, Ollama, ClearML, Afanasy, Nomad BSL).
 - Deadline 2026 licensing changes (none found; latest docs seen are 10.4).
 - Behaviour of Flamenco with multiple GPUs per worker, V-Ray/Octane containerised licensing.

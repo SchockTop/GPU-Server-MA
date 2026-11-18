@@ -1,5 +1,7 @@
 # Multi-user GPU sharing: virtualisation options and licence costs
 
+Prices and facts re-checked at the sources on 18 Nov 2026.
+
 As of 2026-11-17. [V] = checked on the cited page (some pages were read through a summarising fetch tool, so re-check key figures against the page before relying on them). [U] = secondary, community or unverified. Prices are NVIDIA list prices in USD; partner quotes differ.
 
 Context: a small team moving from remote desktops to Kubernetes-style shared compute for rendering, training and LLM inference.
@@ -16,7 +18,7 @@ Source: [NVIDIA vGPU Packaging, Pricing and Licensing Guide](https://docs.nvidia
 |---|---|---|---|
 | vApps | 10 USD | 20 USD + 5 USD/yr support | no |
 | vPC | 50 USD | 100 USD + 25 USD/yr | no |
-| **RTX vWS** | **250 USD** (4-yr 206.25, 5-yr 180 per year) | **450 USD + 100 USD/yr** (5 years of support must be bought) | **yes** |
+| **RTX vWS** | **250 USD** (4-yr 206.25, 5-yr 180 per year) | **450 USD + 100 USD/yr** (the pricing guide says 5 years of support must be bought; the buy page says "four or five year increments"; to be confirmed) | **yes** |
 | vWS Education | 50 USD | 99 USD + 25 USD/yr | yes (qualified education institutions only) |
 
 - Only RTX vWS includes CUDA/OpenCL, so rendering and AI inside VMs need vWS [V].
@@ -33,7 +35,7 @@ Source: [NVAIE pricing, updated 2 Sep 2026](https://docs.nvidia.com/ai-enterpris
 
 ### 1.3 Without a licence
 - From the vGPU 16 licensing guide [V]: full speed for 20 minutes after VM boot, then 15 fps with reduced CUDA performance. After 24 hours: 3 fps, and **CUDA calls fail**.
-- We could not check the same schedule for the current release (v20/21) [U].
+- We could not check the same schedule for the current release (v20/21) [U]. A later audit did not find it in the current docs either, so treat the 15 fps and 24-hour figures as unverified.
 - A one-time **90-day evaluation licence** exists; it needs a corporate e-mail address [V NVIDIA blog / U details].
 
 ### 1.4 Which cards support vGPU
@@ -51,10 +53,10 @@ Source: [docs.nvidia.com/vgpu/gpus-supported-by-vgpu.html](https://docs.nvidia.c
 | | **all GeForce** |
 
 - On Linux KVM, the A6000, A5500, A5000 and A40 run in displayless mode only [V].
-- The per-hypervisor validated lists differ. For example, the PRO 5000 72 GB is missing from the KVM release notes [V].
+- The per-hypervisor validated lists differ. For example, the PRO 5000 72 GB is listed only for Red Hat Enterprise Linux KVM. It is not listed for generic Linux KVM (which is what Proxmox uses), Ubuntu, VMware, Windows Server or Azure Local [V].
 - Hypervisors: VMware vSphere, RHEL KVM, Ubuntu, Nutanix AHV, Citrix XenServer and Azure Local per the support matrix. **Proxmox VE** has been a validated KVM platform since vGPU 18, with support provided by Proxmox. XCP-ng: no evidence of support [V/U].
 
-Assessment: of the new cards that fit a ~10k budget, none is vGPU-capable. The cheapest vGPU-capable new card is the RTX 5000 Ada (~5,200 EUR). Among Blackwell cards, the cheapest is the PRO 5000 72 GB (~14,100 EUR).
+Assessment: none of the Blackwell PRO 4000/4500/5000 48 GB/6000 Workstation cards is vGPU-capable. The cheapest vGPU-capable new card is the RTX 5000 Ada (~4,700 EUR); the RTX 6000 Ada (~9,600 EUR) is also under 10k. Among Blackwell cards, the cheapest vGPU-capable one is the PRO 5000 72 GB, from about 12,600 EUR (lowest retail price 12,624, Nov 2026).
 
 ## 2. Free NVIDIA options
 
@@ -62,7 +64,7 @@ Assessment: of the new cards that fit a ~10k budget, none is vGPU-capable. The c
 |---|---|---|---|
 | **Whole-GPU scheduling** (Kubernetes device plugin, Slurm) | Each job/pod gets whole GPUs | Full (one job per card) | all |
 | **PCI passthrough** to VMs (Proxmox/KVM) | One whole GPU per VM with the normal driver | Full | all pro cards. GeForce works technically; licence caveat below. "No licence needed" is common practice; we found no NVIDIA page stating it explicitly [U] |
-| **MIG** (Multi-Instance GPU) | Hardware partitions with their own memory, cache and SMs | **Hardware memory + fault isolation** [V] | RTX PRO 6000 Blackwell (WS, Max-Q, Server): up to 4. RTX PRO 5000 48 GB: 2 (2x24); PRO 5000 72 GB: 2 (2x36, per datasheet). PRO 4500: Server Ed. 2; Workstation Ed. **unconfirmed** (Lenovo says no). A100/H100: up to 7. [V] |
+| **MIG** (Multi-Instance GPU) | Hardware partitions with their own memory, cache and SMs | **Hardware memory + fault isolation** [V] | RTX PRO 6000 Blackwell (WS, Max-Q, Server): up to 4. RTX PRO 5000 48 GB: 2 (2x24); PRO 5000 72 GB: 2 (2x36, per datasheet). PRO 4500: Server Ed. 2; the Workstation Ed. is not split out in NVIDIA's MIG guide, which lists "RTX PRO 4500 Blackwell" 32 GB with 2 instances (2 x 16 GB), but the Workstation product page does not mention MIG (Lenovo says no). A100/H100: up to 7. [V] |
 | **Time-slicing** (GPU Operator ConfigMap) | Several pods share a GPU in turns | **None**: no memory or fault isolation [V] | all NVIDIA |
 | **MPS** (Multi-Process Service) | Concurrent kernels from several processes; MPS v3 adds SM/memory limits | Separate address spaces, but one fatal fault hits all clients; same-user by default [V] | all CUDA GPUs |
 | **GPU Operator** | Installs driver, device plugin, MIG manager, monitoring on Kubernetes | n/a | all NVIDIA |
@@ -72,9 +74,9 @@ Assessment: of the new cards that fit a ~10k budget, none is vGPU-capable. The c
 | **Kubernetes DRA** | Dynamic Resource Allocation, GA in Kubernetes 1.35; NVIDIA DRA driver exists | depends on driver | NVIDIA, Intel [V/U] |
 
 Notes:
-- MIG gives compute slices only: no graphics/OptiX viewport rendering in MIG mode.
-- MIG needs display outputs off (compute mode), Linux, and partly a VBIOS update. For a render service, MIG suits inference and fine-tuning slices, while render jobs take whole cards.
-- **GeForce in a shared server:** the GeForce driver licence, section 2.8, says the software "is not licensed for datacenter deployment" ([nvidia.com/en-us/drivers/geforce-license](https://www.nvidia.com/en-us/drivers/geforce-license/), version 25 Feb 2025) [V]. "Datacenter" is not defined, so whether a department server counts is a question for your legal team.
+- On A100/H100, MIG gives compute slices only: no graphics/OptiX viewport rendering. RTX PRO Blackwell cards (PRO 6000, 5000, 4500) also have graphics MIG profiles (`+gfx`).
+- MIG needs Linux and partly a VBIOS update. On A100/H100 the display outputs must be off (compute mode). For a render service, MIG suits inference and fine-tuning slices, while render jobs take whole cards.
+- **GeForce in a shared server:** the GeForce driver licence, section 2.8, says: "You agree that GeForce or Titan SOFTWARE: (i) is licensed for use only on GeForce or Titan hardware products you own, and (ii) is not licensed for datacenter deployment." Section 2.7 also bars you from using the software to "provide commercial hosting services with the SOFTWARE" ([nvidia.com/en-us/drivers/geforce-license](https://www.nvidia.com/en-us/drivers/geforce-license/), version 25 Feb 2025) [V]. "Datacenter" is not defined, so whether a department server counts is a question for your legal team.
 
 ## 3. AMD
 - **MxGPU (SR-IOV):** supported on Instinct MI210X, MI300X, MI325X, MI350X/MI355X and the **Radeon PRO V710** only, on QEMU/KVM [V]. The documentation names no licence fee; we found none [U].
@@ -85,7 +87,7 @@ Notes:
 
 ## 4. Intel
 - **Data Center GPU Flex:** SR-IOV with a licence-free Intel stack [U, not re-verified].
-- **Arc Pro B60/B70:** SR-IOV works in community Proxmox setups (kernel ≥ 6.17, firmware-defined VF count) [U]. Upstream vGPU profile provisioning is planned for Linux 7.5 [U]. We found no official Intel support statement.
+- **Arc Pro B60/B70:** SR-IOV works in community Proxmox setups (kernel ≥ 6.17, firmware-defined VF count) [U]. Upstream vGPU profile provisioning is planned for Linux 7.5 [U]. Intel officially lists B70 = 4 VFs and B50 = 2 VFs (support article 000103382, reviewed 2026-10-01; read via a summarising tool, so re-check). Intel gives no official B60 count.
 - **Kubernetes:** the Intel GPU device plugin offers `shared-dev-num` (several containers per GPU, no isolation) and hands out SR-IOV VFs once configured [V].
 
 ## 5. Practical comparison
@@ -98,10 +100,10 @@ Notes:
 | MPS | free | weak (shared fault domain) | yes | all NVIDIA | Many small inference processes from one team |
 | MIG | free | **hardware** | **yes** (GPU Operator, DRA) | RTX PRO 6000 (4), PRO 5000 48/72 (2), PRO 4500 Server (2), A100/H100 | Best free isolation; compute only |
 | KAI / Run:ai OSS / HAMi | free (no vendor support) | scheduler / software | **yes** | NVIDIA (HAMi broader) | Quotas, queues, fair share, fractions |
-| NVIDIA vGPU RTX vWS | 250 USD/CCU/yr, or 450 + 100/yr perpetual | strong (VM, fixed slices) | partly (VDI, or Kubernetes inside VMs) | see 1.4 (none of the new <10k cards) | Only option for shared graphics desktops on one GPU |
+| NVIDIA vGPU RTX vWS | 250 USD/CCU/yr, or 450 + 100/yr perpetual | strong (VM, fixed slices) | partly (VDI, or Kubernetes inside VMs) | see 1.4 (none of the new Blackwell cards under 10k EUR; RTX 5000 Ada ~4,700 EUR and RTX 6000 Ada ~9,600 EUR are vGPU-capable) | Only option for shared graphics desktops on one GPU |
 | NVIDIA AI Enterprise (vGPU for Compute) | 4,500 USD/GPU/yr (EDU/Inception 1,125) | strong (VM) | yes | datacenter / qualified cards | Expensive for a small team |
 | AMD MxGPU SR-IOV | no fee found | strong (VF) | partly | Instinct MI2xx/MI3xx, Radeon PRO V710 | Not available on workstation Radeon |
 | AMD CPX/NPS partitioning | free | hardware-like | yes (AMD GPU Operator) | Instinct MI300 series | Datacenter only |
-| Intel SR-IOV | free | VF | partly | Flex; Arc Pro B60/B70 (community) | Maturity uncertain |
+| Intel SR-IOV | free | VF | partly | Flex; Arc Pro B50 (2 VFs) and B70 (4 VFs) officially per Intel; B60 (community) | Maturity uncertain |
 
 Assessment for a render + AI service: free tools cover the Kubernetes goal well. Use whole-GPU scheduling for render jobs and training, MIG or time-slicing for small inference and notebook slices, and KAI/Run:ai for queues and quotas. Paid vGPU matters mainly if several users need **graphical remote desktops sharing one physical GPU**. Even then, licence costs per concurrent user add up, and only a few cards qualify.

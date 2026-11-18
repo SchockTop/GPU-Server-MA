@@ -91,19 +91,19 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <main>
 <h1>GPU-Vergleich für Rendering und KI</h1>
 <p class="sub">Welche Grafikkarte lohnt sich für einen gemeinsam genutzten Rechner, der Rendering als Dienst, Training neuronaler Netze und LLM-Inferenz leisten soll? Diese Seite fasst Preise, technische Daten und Benchmarks von {{N}} Karten zusammen.</p>
-<p class="small">Datenstand: 17.11.2026. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
+<p class="small">Datenstand: 17.11.2026, Preise und Angaben am 18.11.2026 an den Quellen nachgeprüft. Preise aus dem deutschen Handel. GPU-Preise ändern sich schnell, vor einem Kauf neu prüfen.</p>
 <nav>
   <a href="#score">Gesamtwertung</a><a href="#chart">Preis und Leistung</a><a href="#pl">Preis-Leistung</a><a href="#training">Training</a><a href="#tabelle">Alle Karten</a>
   <a href="#b2b">Firmenpreise</a><a href="#pakete">Beispiel 10.000 €</a><a href="#lizenz">Teilen und Lizenzen</a><a href="virtualisierung.html">Eine Karte, viele VMs</a><a href="#lb">Load Balancing</a><a href="#details">Details</a>
 </nav>
 
 <div class="cards">
-  <div class="card"><div class="small">Rendering</div><div class="big">GeForce kostet halb so viel pro Renderleistung</div>
-    <p class="small">Eine RTX 5080 oder 5070 Ti kostet etwa 230 bis 240 € je 1.000 Blender-Punkte, eine RTX PRO 4000 oder 4500 etwa 440 bis 540 €.</p></div>
+  <div class="card"><div class="small">Rendering</div><div class="big">GeForce kostet weniger als halb so viel pro Renderleistung</div>
+    <p class="small">Eine RTX 5080 oder 5070 Ti kostet etwa 185 bis 215 € je 1.000 Blender-Punkte, eine RTX PRO 4000 oder 4500 etwa 450 bis 535 €.</p></div>
   <div class="card"><div class="small">LLMs</div><div class="big">Der Speicher entscheidet, nicht die Rechenleistung</div>
-    <p class="small">Ein 32B-Modell (4 Bit) läuft auf 24 GB mit 5 Token/s, auf 48 GB mit 28 Token/s. Passt ein Modell nicht in den VRAM, wird es etwa zehnmal langsamer.</p></div>
-  <div class="card"><div class="small">Teilen</div><div class="big">Keine neue Karte unter 10.000 € kann NVIDIA vGPU</div>
-    <p class="small">Die kostenlosen Wege (ganze Karten zuteilen, MIG, Time-Slicing, Run:ai Open Source) passen ohnehin besser zu Kubernetes.</p></div>
+    <p class="small">Ein 32B-Modell (4 Bit) läuft mit kurzem Kontext (4k) auf 24 GB mit etwa 35 Token/s. Bei 32k Kontext passt es nicht mehr in 24 GB und fiel in einem Test auf 5 Token/s; eine 48-GB-Karte schaffte 28. Passt ein Modell nicht in den VRAM, wird es etwa fünfmal langsamer.</p></div>
+  <div class="card"><div class="small">Teilen</div><div class="big">Teilen ist kostenlos, nur nicht zwischen VMs</div>
+    <p class="small">Ganze Karten zuteilen, MIG, Time-Slicing und Run:ai Open Source kosten nichts und passen zu Kubernetes. Eine Karte auf mehrere VMs zu verteilen kostet bei NVIDIA ab 50 $ je Nutzer und Jahr und geht nur mit bestimmten Karten, etwa der RTX 5000 Ada. Keine neue Blackwell-Karte unter 10.000 € kann es.</p></div>
 </div>
 
 <div class="filters" id="filters">
@@ -178,16 +178,16 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <p class="sub">Vier Beispielpakete, keine Empfehlung. Preise brutto, niedrigstes Angebot. 10.000 € brutto sind 8.403 € netto; 10.000 € netto sind 11.900 € brutto.</p>
 <div class="pk">
   <div class="card"><span class="tag">A · ausgewogen</span><h3>2× RTX PRO 4500 (32 GB)</h3>
-    <dl><dt>Preis</dt><dd>9.118 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
+    <dl><dt>Preis</dt><dd>9.098 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 32 GB</dd><dt>Blender</dt><dd>ca. 17.000</dd><dt>Strom</dt><dd>2× 200 W</dd></dl>
     <ul><li>Zwei unabhängige 32-GB-Jobs</li><li>32B-LLMs passen auf eine Karte</li><li>Blower, dicht stapelbar, ECC</li><li>Rendering pro Euro mittelmäßig</li></ul></div>
   <div class="card"><span class="tag">B · größtes Modell</span><h3>1× RTX PRO 5000 (48 GB)</h3>
     <dl><dt>Preis</dt><dd>8.119 €</dd><dt>VRAM</dt><dd>48 GB auf einer Karte</dd><dt>Blender</dt><dd>ca. 10.900</dd><dt>Strom</dt><dd>300 W</dd></dl>
     <ul><li>70B-LLMs mit 4 Bit laufen</li><li>Teilbar in 2× 24 GB (MIG)</li><li>Nur ein großer Job gleichzeitig</li><li>Rund 1.900 € bleiben übrig</li></ul></div>
   <div class="card"><span class="tag">C · viele Nutzer</span><h3>3× RTX PRO 4000 (24 GB)</h3>
-    <dl><dt>Preis</dt><dd>8.325 €</dd><dt>VRAM</dt><dd>72 GB, größter Job 24 GB</dd><dt>Blender</dt><dd>ca. 18.800</dd><dt>Strom</dt><dd>3× 145 W</dd></dl>
+    <dl><dt>Preis</dt><dd>8.457 €</dd><dt>VRAM</dt><dd>72 GB, größter Job 24 GB</dd><dt>Blender</dt><dd>ca. 18.800</dd><dt>Strom</dt><dd>3× 145 W</dd></dl>
     <ul><li>Drei parallele Jobs</li><li>Nur ein Slot pro Karte, ECC</li><li>24 GB sind für LLMs knapp</li></ul></div>
   <div class="card"><span class="tag">D · Render-Durchsatz</span><h3>4× GeForce RTX 5080 (16 GB)</h3>
-    <dl><dt>Preis</dt><dd>8.780 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 16 GB</dd><dt>Blender</dt><dd>ca. 36.600</dd><dt>Strom</dt><dd>4× 360 W</dd></dl>
+    <dl><dt>Preis</dt><dd>7.876 €</dd><dt>VRAM</dt><dd>64 GB, größter Job 16 GB</dd><dt>Blender</dt><dd>ca. 36.600</dd><dt>Strom</dt><dd>4× 360 W</dd></dl>
     <ul><li>Etwa doppelte Renderleistung</li><li>16 GB begrenzen LLMs auf ca. 14B</li><li>Große Karten, brauchen Platz und Luft</li><li>GeForce-Treiberlizenz schließt Rechenzentren aus (rechtlich prüfen)</li></ul></div>
 </div>
 <p class="small">Die Blender-Summen gelten nur, wenn sich die Arbeit auf mehrere Karten verteilen lässt. Mehr dazu, auch für 12.000 bis 15.000 €: <a href="research/imagine-case-10k.md">imagine-case-10k.md</a></p>
@@ -201,13 +201,13 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <tr><td>Passthrough an VMs</td><td>kostenlos</td><td>voll, pro Karte</td><td>teilweise</td><td>alle Pro-Karten; GeForce mit Lizenzvorbehalt</td></tr>
 <tr><td>Time-Slicing</td><td>kostenlos</td><td>keine</td><td>ja</td><td>alle NVIDIA</td></tr>
 <tr><td>MPS</td><td>kostenlos</td><td>schwach</td><td>ja</td><td>alle NVIDIA</td></tr>
-<tr><td>MIG (Karte in feste Teile schneiden)</td><td>kostenlos</td><td>in Hardware</td><td>ja</td><td>RTX PRO 6000 (4 Teile), PRO 5000 (2), PRO 4500 Server (2)</td></tr>
+<tr><td>MIG (Karte in feste Teile schneiden)</td><td>kostenlos</td><td>in Hardware</td><td>ja</td><td>RTX PRO 6000 (4 Teile), PRO 5000 (2), PRO 4500 (2)</td></tr>
 <tr><td>KAI / Run:ai Open Source / HAMi</td><td>kostenlos, ohne Herstellersupport</td><td>per Software</td><td>ja</td><td>NVIDIA</td></tr>
 <tr><td>NVIDIA vGPU (Virtual PC)</td><td>50 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>wie vWS; höchstens 3 GB je VM, kein CUDA</td></tr>
-<tr><td>NVIDIA vGPU (RTX vWS)</td><td>250 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>keine neue Karte unter 10.000 €</td></tr>
-<tr><td>NVIDIA AI Enterprise</td><td>4.500 $ pro GPU und Jahr</td><td>stark (VM)</td><td>ja</td><td>Datacenter-Karten</td></tr>
+<tr><td>NVIDIA vGPU (RTX vWS)</td><td>250 $ pro gleichzeitigem Nutzer und Jahr</td><td>stark (VM)</td><td>teilweise</td><td>z. B. RTX A5000, RTX 5000 Ada, RTX 6000 Ada; keine neue Blackwell-Karte unter 10.000 €</td></tr>
+<tr><td>NVIDIA AI Enterprise</td><td>4.500 $ pro GPU und Jahr</td><td>stark (VM)</td><td>ja</td><td>unterstützte Karten laut NVIDIA-Liste</td></tr>
 <tr><td>AMD MxGPU (SR-IOV)</td><td>keine Gebühr gefunden</td><td>stark</td><td>teilweise</td><td>nur Instinct und Radeon PRO V710, keine Workstation-Radeon</td></tr>
-<tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex; Arc Pro B60/B70 (Reife unklar)</td></tr>
+<tr><td>Intel SR-IOV</td><td>kostenlos</td><td>mittel</td><td>teilweise</td><td>Flex 170, Arc Pro B50 und B70 (offiziell), B60 (Forenberichte); unter Windows noch unreif</td></tr>
 </tbody></table></div>
 <p class="small">Bezahltes vGPU lohnt sich vor allem, wenn mehrere Nutzer grafische Remote-Desktops auf einer Karte teilen. Ausführlich erklärt, mit Hyper-V, Intel und den Kosten: <a href="virtualisierung.html">Eine Karte, viele virtuelle Maschinen</a>. Details: <a href="research/virtualization-licensing.md">virtualization-licensing.md</a></p>
 
@@ -219,7 +219,7 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
 <tr><td>Warteschlange</td><td class="wrap">Render- und Trainingsjobs warten in einer Schlange und starten, sobald eine passende Karte frei ist</td><td class="wrap">Kueue (Kubernetes), Slurm, Volcano</td></tr>
 <tr><td>Passende Karte wählen</td><td class="wrap">Der Job nennt seinen Bedarf (z. B. 32 GB VRAM) und landet auf dem richtigen Kartenmodell</td><td class="wrap">NVIDIA GPU Operator mit Labels je Modell, Kueue ResourceFlavor</td></tr>
 <tr><td>Prioritäten und Unterbrechung</td><td class="wrap">Interaktive Arbeit verdrängt Batch-Jobs; unterbrochene Trainings setzen am letzten Checkpoint fort</td><td class="wrap">Kueue-Prioritätsklassen, KAI Scheduler (Run:ai-Scheduler, Open Source)</td></tr>
-<tr><td>Karten teilen</td><td class="wrap">Mehrere kleine Jobs auf einer Karte</td><td class="wrap">Time-Slicing (ohne Speichertrennung), MIG, HAMi, KAI</td></tr>
+<tr><td>Karten teilen</td><td class="wrap">Mehrere kleine Jobs auf einer Karte</td><td class="wrap">Time-Slicing (ohne Speichertrennung), MPS, MIG, HAMi, KAI</td></tr>
 <tr><td>Anfragen verteilen</td><td class="wrap">LLM-Anfragen gehen an eine Adresse und werden auf laufende Modell-Instanzen verteilt</td><td class="wrap">vLLM hinter LiteLLM; bei mehreren Servern llm-d</td></tr>
 <tr><td>Autoscaling</td><td class="wrap">Wenig genutzte Dienste fahren herunter und geben ihre Karte für Render- oder Trainingsjobs frei</td><td class="wrap">KEDA</td></tr>
 <tr><td>Renderfarm</td><td class="wrap">Renderjobs füllen als niedrigste Priorität die ungenutzten Karten</td><td class="wrap">Flamenco (Blender), Kubernetes-Jobs je Frame-Bereich</td></tr>
@@ -229,14 +229,14 @@ details{margin:12px 0} summary{cursor:pointer;color:var(--nvpro)}
   <div class="card"><span class="tag">Stufe 0 · 1–2 Tage</span><h3>Messen</h3><p class="small">Auslastung und VRAM je Karte und Nutzer mitschreiben (DCGM-Exporter, Prometheus, Grafana). Die Nutzer merken nichts. Das Ergebnis zeigt, wie viele Karten für Desktops reserviert bleiben müssen.</p></div>
   <div class="card"><span class="tag">Stufe 1 · 2–5 Tage</span><h3>Warteschlange für ganze Karten</h3><p class="small">k3s mit GPU Operator und Kueue, oder Slurm. Zwei bis vier Karten bleiben für Remote-Desktop reserviert, der Rest läuft über die Schlange. Nutzer schicken Jobs ab, statt sich eine Karte zu nehmen.</p></div>
   <div class="card"><span class="tag">Stufe 2 · 3–7 Tage</span><h3>Prioritäten, Kontingente, Teilen</h3><p class="small">Dringende Jobs starten sofort, Batch-Jobs werden pausiert. Voraussetzung: Trainings speichern regelmäßig Checkpoints. Kartenteilung zuerst nur für Notebooks und Entwicklung.</p></div>
-  <div class="card"><span class="tag">Stufe 3 · 3–7 Tage</span><h3>LLM-Dienst mit Autoscaling</h3><p class="small">vLLM je Modell, LiteLLM als eine gemeinsame Adresse, KEDA skaliert nach Wartezeit. Selten genutzte Modelle fahren auf null; die erste Anfrage danach ist langsam.</p></div>
-  <div class="card"><span class="tag">Stufe 4 · 2–4 Tage</span><h3>Renderfarm im selben Pool</h3><p class="small">Flamenco-Worker fordern je eine Karte an und laufen mit niedrigster Priorität. In Blender heißt es dann „An die Farm senden“. Lizenzserver für V-Ray oder Octane müssen aus dem Cluster erreichbar sein.</p></div>
+  <div class="card"><span class="tag">Stufe 3 · 3–7 Tage</span><h3>LLM-Dienst mit Autoscaling</h3><p class="small">vLLM je Modell, LiteLLM als eine gemeinsame Adresse, KEDA skaliert nach der Zahl wartender Anfragen. Selten genutzte Modelle können auf null fahren; dafür braucht es eine Zwischenschicht, die Anfragen so lange hält (z. B. das KEDA-HTTP-Add-on, noch Beta), und die erste Anfrage danach ist langsam.</p></div>
+  <div class="card"><span class="tag">Stufe 4 · 2–4 Tage</span><h3>Renderfarm im selben Pool</h3><p class="small">Flamenco-Worker fordern je eine Karte an und laufen mit niedrigster Priorität. Aus Blender schickt man den Job dann an Flamenco. Lizenzserver für V-Ray oder Octane müssen aus dem Cluster erreichbar sein.</p></div>
 </div>
 <div class="note">Stolpersteine: Time-Slicing trennt den Speicher nicht, ein Job kann den anderen zum Absturz bringen. Bei gemischten Karten zersplittert der VRAM, deshalb je Kartenmodell eine eigene Klasse anlegen. Mit nur einem Server fällt bei einem Defekt alles aus. Der Aufwand je Stufe ist eine Schätzung.</div>
 <p class="small">Beispielarchitekturen (minimal, empfohlen, erweitert), Konfigurationsbeispiele und der Werkzeugvergleich: <a href="research/load-balancing.md">load-balancing.md</a></p>
 
 <h2 id="details">Details und Grenzen der Daten</h2>
-<div class="note">Für die neuesten Karten (Blackwell) gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Gebrauchtpreise sind Angebotspreise.</div>
+<div class="note">Für viele Karten, auch mehrere der neuesten (Blackwell), gibt es keine öffentlich gemessenen Trainings-Benchmarks; die TFLOPS-Werte sind Angaben aus Datenblättern. Blender-Werte mit weniger als 10 Messungen sind unsicher. Gebrauchtpreise sind Angebotspreise.</div>
 <ul>
   <li><a href="research/gpu-master-table.md">Vollständige Tabelle mit Quellen</a> (<a href="research/gpu-master-table.csv">CSV</a>)</li>
   <li><a href="research/benchmarks.md">Benchmarks</a>: Rendering, Training, LLM-Inferenz, Speicherbedarf</li>
@@ -350,7 +350,7 @@ function drawB2B(){
   }).sort((a, b) => (a.best ? net(a.best) : 1e9) - (b.best ? net(b.best) : 1e9));
   let h = '<div class="tw"><table><thead><tr><th>Karte</th><th class="num">Günstigster Firmenpreis netto €</th><th>Händler</th><th class="num">Angebote</th><th class="num">Günstigster Handelspreis netto €</th><th class="num">Firmenpreis gegenüber Handel</th></tr></thead><tbody>' +
     sum.map(s => `<tr><td>${esc(s.k)}</td><td class="num">${s.best ? fmt(net(s.best)) : "–"}</td><td>${s.best ? esc(s.best.reseller) : "kein ausgewiesener Nettopreis"}</td><td class="num">${s.n}</td><td class="num">${fmt(s.retail)}</td><td class="num">${s.diff == null ? "–" : (s.diff > 0 ? "+" : "") + fmt(s.diff, 0) + " %"}</td></tr>`).join("") + "</tbody></table></div>";
-  h += '<p class="small">„Handelspreis“ ist das niedrigste Angebot aus dem Preisvergleich für Endkunden, umgerechnet auf netto. Ein Plus heißt: Der günstigste gefundene Firmenhändler ist teurer als das billigste Angebot im Handel. Angebote ohne ausgewiesene Mehrwertsteuer (Alternate) und Preise, die nur als Suchtreffer sichtbar waren, zählen hier nicht mit.</p>';
+  h += '<p class="small">„Handelspreis“ ist das niedrigste Angebot aus dem Preisvergleich für Endkunden, umgerechnet auf netto. Ein Plus heißt: Der günstigste gefundene Firmenhändler ist teurer als das billigste Angebot im Handel. Preise, die nur als Suchtreffer sichtbar waren, zählen hier nicht mit. Alternate nennt Preise inklusive Mehrwertsteuer; der Nettowert ist daraus errechnet.</p>';
   const rows = [...B2B].sort((a, b) => a.card.localeCompare(b.card) || (net(a) || 1e9) - (net(b) || 1e9));
   h += `<details><summary>Alle ${rows.length} Einzelangebote anzeigen</summary><div class="tw" style="margin-top:10px"><table><thead><tr><th>Karte</th><th>Modell</th><th>Händler</th><th class="num">Netto €</th><th class="num">Brutto €</th><th>Lieferbar</th><th>Beleg</th></tr></thead><tbody>` +
     rows.map(r => `<tr><td>${esc(r.card)}</td><td>${esc(r.sku)}</td><td>${/^https?:/.test(r.url) ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.reseller)}</a>` : esc(r.reseller)}</td><td class="num">${fmt(net(r))}</td><td class="num">${fmt(parseFloat(r.price_brutto_eur))}</td><td class="wrap">${esc(r.availability || "–")}</td><td>${r.evidence == "V" ? "auf der Seite gesehen" : "nur Suchtreffer"}</td></tr>`).join("") + "</tbody></table></div></details>";
@@ -367,11 +367,11 @@ const TRAIN = [
   d:[["A100 80GB",1527,"nvpro"],["RTX 4090 24GB",1301,"geforce"],["RTX 6000 Ada 48GB",1146,"nvpro"],["RTX A6000 48GB",916,"nvpro"],["RTX 3090 24GB",905,"geforce"]]},
  {t:"BERT Large (Transformer), FP16", u:"Sequenzen/s", s:"Lambda, 2023 · an der Quelle geprüft",
   d:[["A100 80GB",140,"nvpro"],["RTX 4090 24GB",93,"geforce"],["RTX 6000 Ada 48GB",79,"nvpro"],["RTX A6000 48GB",68,"nvpro"],["RTX 3090 24GB",52,"geforce"]]},
- {t:"ResNet50, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · nicht gegengeprüft",
+ {t:"ResNet50, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · Werte an der Quelle geprüft",
   d:[["RTX 5090 32GB",1624,"geforce"],["RTX 4090 24GB",1361,"geforce"],["RTX 3090 24GB",889,"geforce"]]},
- {t:"Swin Transformer, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · nicht gegengeprüft",
+ {t:"Swin Transformer, FP16", u:"Bilder/s", s:"nikolasent (Community-Blog), Februar 2025 · Werte an der Quelle geprüft",
   d:[["RTX 5090 32GB",822,"geforce"],["RTX 4090 24GB",597,"geforce"],["RTX 3090 24GB",337,"geforce"]]},
- {t:"ResNet50, FP16", u:"Einheit an der Quelle nicht genannt", s:"Bizon, 2026 · nicht gegengeprüft",
+ {t:"ResNet50, FP16", u:"Punkte (Bizons eigene Einheit)", s:"Bizon, 2026 · Werte an der Quelle geprüft",
   d:[["A100 80GB",2535,"nvpro"],["RTX 6000 Ada 48GB",1800,"nvpro"],["RTX 4090 24GB",1720,"geforce"],["RTX A6000 48GB",1424,"nvpro"],["RTX 3090 24GB",1071,"geforce"],["RTX A5000 24GB",1061,"nvpro"],["RTX A4000 16GB",604,"nvpro"]]}
 ];
 function drawTrain(){

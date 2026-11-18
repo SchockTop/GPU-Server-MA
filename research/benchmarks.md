@@ -17,7 +17,7 @@ Source: opendata.blender.org, via the site's own JSON query endpoint (`/benchmar
 | RTX PRO 6000 Blackwell WS | 17,306 (19) | 16,737 (205) | 16,782 (293) |
 | GeForce RTX 5090 | 16,101 (236) | 14,966 (1,555) | 15,089 (3,353) |
 | RTX PRO 6000 Server Ed. | 14,103 (10) | 15,519 (28) | 15,620 (52) |
-| RTX PRO 6000 Max-Q | 15,505 (7) | 14,746 (39) | 15,121 (78) |
+| RTX PRO 6000 Max-Q | 15,505 (7) | 14,960 (33) | 15,121 (78) |
 | GeForce RTX 4090 | 11,553 (118) | 11,061 (527) | 11,682 (9,034) |
 | RTX PRO 5000 48GB | 11,691 (4) | 10,929 (7) | 11,486 (18) |
 | RTX PRO 5000 72GB | 10,956 (5) | 10,849 (4) | 10,861 (9) |
@@ -193,7 +193,7 @@ No row for: RTX PRO 5000, RTX 5000/4000 Ada, L40S, W7900, R9700 on ROCm, B60 on 
 
 Takeaways (interpretation):
 - **For single-user speed, bandwidth wins:** 5090 ≈ PRO 6000 > 4090 ≈ 5080 ≈ 5070 Ti ≈ 6000 Ada > PRO 4500.
-- **Capacity is set by VRAM.** A model that spills to the CPU drops to around a tenth of its speed (the PRO 4000 on 32B). That is why the VRAM pain point matters more than raw speed.
+- **Capacity is set by VRAM.** A model that spills to the CPU drops to around a fifth of its speed (the PRO 4000 on 32B at 32k context: 5.3 against 27.8 tokens/s). That is why the VRAM pain point matters more than raw speed.
 - **Multi-user serving** (batching in vLLM) rewards VRAM, which leaves room for the KV cache, and bandwidth. On a 30B MoE model, one PRO 6000 does about 1.8x one 5090.
 - **Splitting across cards:** without NVLink, tensor parallelism across PCIe cards is slow. For inference, several replicas or pipeline parallelism work better. GeForce cards also lack official P2P.
 

@@ -7,7 +7,7 @@ Rows: B70 (updated), B65 (new), B60 24GB (updated), B60 Dual 48GB Maxsun, B50, B
 - **B60 Dual 48GB:** only a stale GameMachines listing (1499 EUR, Aug 2025, sold out). Price cells empty on purpose. Dual-GPU: two separate 24 GB devices, not one 48 GB pool.
 - **Not on sale:** B770 / Big Battlemage consumer (BMG-G31) and Celestial: no launch found (no CES 2026 showing, only leaks). Not included.
 - **Blender:** values are Blender Open Data 4.5.0 oneAPI medians (same version as the master). Newer versions are in blender_note; B65 only exists from 5.2.0. API: `...query/?compute_type=ONEAPI&blender_version=4.5.0&group_by=device_name&response_type=datatables`.
-- **llama.cpp #10879:** FA-enabled table used (same as existing B60 row), no-FA values in the note. B580/B570 pp512 drops sharply with FA, so pp numbers are unreliable. B70 tg128 (113) is twice the B60.
-- **Computed, not seen:** FP32 of B580 (14.6), B570 (12.7), A770 (19.7) from shaders x2 x boost clock. B50 XMX count derived. B70 RT cores and FP32 left empty.
-- vGPU/SR-IOV: kept the existing "community only" text for B60/B70; not checked for other cards, left empty.
+- **llama.cpp #10879:** FA-enabled table used (same as existing B60 row), no-FA values in the note. B580/B570 pp512 drops sharply with FA, so pp numbers are unreliable. B70 tg128 (113) is about 1.7x the B60 (112.89 vs 68.06).
+- **Computed, not seen:** FP32 of B580 (14.6), B570 (12.7), A770 (19.7) from shaders x2 x boost clock. B50 XMX count derived. B70 RT cores (32) and FP32 (22.9) were added on 18 Nov 2026 from Intel material.
+- vGPU/SR-IOV: Intel's support article 000103382 (reviewed 2026-10-01) lists B70 = 4 VFs and B50 = 2 VFs, so B70 and B50 are official; no B60 count from Intel, so B60 stays "community". Read via a summarising tool, re-check in a browser. Other cards not checked.
 - Not covered: Flex / Gaudi PCIe cards (no search done), Intel Arc Pro B50 slot count, cooling for most rows.
